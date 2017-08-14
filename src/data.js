@@ -111,7 +111,7 @@ function hasUser(userId, callback) {
 // Get teams
 function getTeams(callback) {
   teamRef.once('value').then(snapshot =>
-    callback(true, snapshot.val()[userId]), error => {
+    callback(true, snapshot.val()), error => {
       console.error(error);
       callback(false, null);
   });
@@ -120,7 +120,7 @@ function getTeams(callback) {
 // Get members
 function getMembers(callback) {
   memRef.once('value').then(snapshot =>
-    callback(true, snapshot.val()[userId]), error => {
+    callback(true, snapshot.val()), error => {
       console.error(error);
       callback(false, null);
   });
