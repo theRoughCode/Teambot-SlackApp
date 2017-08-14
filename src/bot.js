@@ -220,7 +220,8 @@ function setRoles(msg, role, callback) {
         replace_original: true
       });
     } else {
-      roles.push(role);
+      if (roles === null) roles = [role];
+      else roles.push(role);
       callback({
         text: "You are currently looking to fill: " + roles.join(", ") + "\nAre you looking for any more roles to fill?",
         replace_original: true,
