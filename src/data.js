@@ -31,12 +31,62 @@ function updateUser(userId, data, callback) {
 
 // Update field
 function updateField(userId, field, data, callback) {
-  userRef.child(userId + `/${field}`).set(data).then(() => {
+  userRef.child(`${userId}/${field}`).set(data).then(() => {
     callback(true);
   }, error => {
     console.error(error);
     callback(false);
   });
+}
+
+// Update roles
+function updateRoles(userId, roles, callback) {
+  updateField(userId, "roles", roles, callback);
+}
+
+// Update skills
+function updateSkills(userId, skills, callback) {
+  updateField(userId, "skills", skills, callback);
+}
+
+// Update user type
+function updateType(userId, user_type, callback) {
+  updateField(userId, "user_type", user_type, callback);
+}
+
+// Update visibility
+function updateVisibility(userId, visible, callback) {
+  updateField(userId, "visible", visible, callback);
+}
+
+// Get field
+function getField(userId, field, callback) {
+  userRef.child(`${userId}/${field}`).once('value').then(snapshot => {
+    if (userId !== undefined && snapshot.val())
+      callback(true, snapshot.val());
+    else
+      callback(false, null);
+  });
+}
+
+// Get roles
+function getRoles(userId, callback) {
+  getField(userId, "roles", callback);
+}
+
+// Get skills
+function getSkills(userId, callback) {
+  getField(userId, "skills", callback);
+}
+
+// Get user type
+function getType(userId, callback) {
+  getField(userId, "user_type", callback);
+}
+
+// Get visibility
+function getVisibility(userId, callback) {
+  getField(userId, "visible", callback);
 }
 
 // Returns true if user is in database
@@ -54,9 +104,17 @@ function deleteUser (userId) {
   userRef.child(userId).remove();
 }
 
+
 module.exports = {
   updateUser,
-  updateField,
+  updateRoles,
+  updateSkills,
+  updateType,
+  updateVisibility,
+  getRoles,
+  getSkills,
+  getType,
+  getVisibility,
   hasUser,
   deleteUser
 }

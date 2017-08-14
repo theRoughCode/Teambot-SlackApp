@@ -110,7 +110,7 @@ function parseIMsg(msg, callback) {
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
   } else if (callbackID === 'roles') {
-
+    setRoles(msg, actions[0].value, callback);
   } else if (callbackID === 'edit') {  // edit existing data
     if (actions[0].name === 'user_type') {
       editUserType(msg, actions[0].value, callback);
@@ -212,6 +212,49 @@ function editUserType(msg, type, callback) {
   });
 }
 
+function setRoles(msg, role, callback) {
+  data.getRoles(msg.user.id, (res, roles) => {
+    if(role === 'done') { // no more roles
+      callback({
+        text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
+        replace_original: true
+      });
+    } else {
+      roles.push(role);
+      callback({
+        text: "You are currently looking to fill: " + roles.join(", ") + "\nAre you looking for any more roles to fill?",
+        replace_original: true,
+        attachments: [
+            {
+                "text": "Select your roles:",
+                "fallback": "The features of this app are not supported by your device",
+                "callback_id": "roles",
+                "color": "#3AA3E3",
+                "attachment_type": "default",
+                "actions": [
+                    {
+                        "name": "roles_list",
+                        "text": "Pick a role...",
+                        "type": "select",
+                        "options": options
+                    },
+                    {
+                      "name": "done",
+                      "text": "No more roles",
+                      "type": "button",
+                      "value": "done"
+                    }
+                ]
+            }
+        ]
+      });
+      data.updateRoles(msg.user.id, roles, success => {
+        if (!success) console.error("ERROR: Could not update roles for " + msg.user.name);
+      });
+    }
+  });
+}
+
 
 /* Interact with data.js */
 
@@ -225,22 +268,6 @@ function addUser(userId, userName, { roles = [], skills = {},
     "user_type": userType,
     "visible": visible
   }, success => callback(success));
-}
-
-function updateRoles(userId, roles, callback) {
-  data.updateField(userId, "roles", roles, success => callback(success));
-}
-
-function updateSkills(userId, skills, callback) {
-  data.updateField(userId, "skills", skills, success => callback(success));
-}
-
-function updateUserType(userId, type, callback) {
-  data.updateField(userId, "user_type", type, success => callback(success));
-}
-
-function updateTemp(userId, temp, callback) {
-  data.updateField(userId, "temp", temp, success => callback(success));
 }
 
 module.exports = {
