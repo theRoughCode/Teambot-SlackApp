@@ -176,7 +176,7 @@ function sendMsgToUrl(msg, url) {
   });
   //This is the data we are posting, it needs to be a string or a buffer
   console.log(msg);
-  req.write({ text: "Hello World" });
+  req.write('{ text: "Hello World" }');
   req.end();
 }
 
