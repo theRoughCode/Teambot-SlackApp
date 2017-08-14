@@ -1,4 +1,5 @@
 var Slack = require('slack-node');
+const http = require('http');
 const data = require('../src/data');
 
 webhookUri = process.env.WEBHOOK;
@@ -128,17 +129,45 @@ function display(msg, callback) {
         if(data) callback(data);
         else callback("No members found. :disappointed:");
       } else callback();
-    })
+    });
   } else if (text === "teams" || text === "team") { // display teams
     data.getTeams((res, data) => {
       if(res) {
         if(data) callback(data);
         else callback("No teams found. :disappointed:");
       } else callback();
-    })
+    });
   } else {
     callback("Incorrect command.  e.g. _/display teams_");
   }
+}
+
+/* HELPERS */
+function sendMsgToUrl(msg, url) {
+  url = url.replace("\\","");
+  var index = url.indexOf("/");
+  var options = {
+    host: url.substring(0, index),
+    path: url.substring(index),
+    port: '80',
+    method: 'POST'
+  };
+
+  function callback(response) {
+    var str = ''
+    response.on('data', function (chunk) {
+      str += chunk;
+    });
+
+    response.on('end', function () {
+      console.log(str);
+    });
+  }
+
+  var req = http.request(options, callback);
+  //This is the data we are posting, it needs to be a string or a buffer
+  req.write(msg);
+  req.end();
 }
 
 
@@ -236,12 +265,21 @@ function editUserType(msg, type, callback) {
 }
 
 function setRoles(msg, role, callback) {
+  const url = msg.response_url;
   data.getRoles(msg.user.id, (res, roles) => {
     if(role === 'done') { // no more roles
       callback({
         text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
         replace_original: true
       });
+      data.getMembers((res, data) => {
+        if(res) {
+          if(data) sendMsgToUrl(data, url);
+          else {
+            sendMsgToUrl("No members found. :disappointed:\nWould you like to bed discoverable by other teams?", url);
+          }
+        }
+      })
     } else {
       if (roles === null) roles = [];
       roles.push(role);
