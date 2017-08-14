@@ -110,9 +110,10 @@ function parseIMsg(msg, callback) {
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
   } else if (callbackID === 'roles') {
-    console.log(actions);
-    console.log(actions[0].selected_options);
-    setRoles(msg, actions[0].selected_options[0].value, callback);
+    if(actions[0].name === 'done')
+      setRoles(msg, actions[0].value, callback);
+    else
+      setRoles(msg, actions[0].selected_options[0].value, callback);
   } else if (callbackID === 'edit') {  // edit existing data
     if (actions[0].name === 'user_type') {
       editUserType(msg, actions[0].value, callback);
