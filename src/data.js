@@ -31,11 +31,15 @@ function updateUser(userId, data, callback) {
 
 // Update field
 function updateField(userId, field, data, callback) {
+  console.log(data);
   userRef.child(`${userId}/${field}`).set(data).then(() => {
     callback(true);
   }, error => {
     console.error(error);
     callback(false);
+  }, error => {
+    console.error(error);
+    callback(false, null);
   });
 }
 
@@ -66,6 +70,9 @@ function getField(userId, field, callback) {
       callback(true, snapshot.val());
     else
       callback(false, null);
+  }, error => {
+    console.error(error);
+    callback(false, null);
   });
 }
 

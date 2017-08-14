@@ -220,8 +220,8 @@ function setRoles(msg, role, callback) {
         replace_original: true
       });
     } else {
-      if (roles === null) roles = [role];
-      else roles.push(role);
+      if (roles === null) roles = [];
+      roles.push(role);
 
       var options = ROLES.filter(role => {
         return !(roles.includes(role));
@@ -232,8 +232,12 @@ function setRoles(msg, role, callback) {
         };
       });
 
+      var textStr = (roles.length)
+        ? "You are currently looking to fill: " + roles.join(", ") + "\nAre you looking for any more roles to fill?"
+        : "What roles are you looking to fill?";
+
       callback({
-        text: "You are currently looking to fill: " + roles.join(", ") + "\nAre you looking for any more roles to fill?",
+        text: textStr,
         replace_original: true,
         attachments: [
             {
