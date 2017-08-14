@@ -273,12 +273,9 @@ function setRoles(msg, role, callback) {
         replace_original: true
       });
       data.getMembers((res, data) => {
-        if(res) {
-          if(data) sendMsgToUrl(data, url);
-          else {
-            sendMsgToUrl("No members found. :disappointed:\nWould you like to bed discoverable by other teams?", url);
-          }
-        }
+        if(res && data)  sendMsgToUrl(data, url);
+        else 
+          sendMsgToUrl("No members found. :disappointed:\nWould you like to bed discoverable by other teams?", url);
       })
     } else {
       if (roles === null) roles = [];
