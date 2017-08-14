@@ -113,7 +113,7 @@ function parseIMsg(msg, callback) {
 
   } else if (callbackID === 'edit') {  // edit existing data
     if (actions[0].name === 'user_type') {
-      setUserType(msg, actions[0].value, callback);
+      editUserType(msg, actions[0].value, callback);
     }
   }
 }
