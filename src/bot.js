@@ -147,7 +147,7 @@ function sendMsgToUrl(msg, url) {
   console.log(url);
   url = url.replace("\\","");
   console.log(url);
-  var index = url.indexOf("/");
+  var index = url.indexOf("/", 15);
   const host = url.substring(0, index);
   const path = url.substring(index);
   console.log(host);
