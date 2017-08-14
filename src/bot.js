@@ -2,15 +2,36 @@ var Slack = require('slack-node');
 
 webhookUri = process.env.WEBHOOK;
 
-slack = new Slack();
+var slack = new Slack();
 slack.setWebhook(webhookUri);
 
 // welcome message
-function welcome() {
+function welcome(user) {
   slack.webhook({
-    channel: "#general",
-    username: "webhookbot",
-    text: "This is posted to #general and comes from a bot named webhookbot."
+    text: `Hi ${user}!  I'm here to assist you with forming a team!\nTo start, are you looking to join a team or are you part of a team looking for team members?`,
+    attachments: [
+        {
+            "text": "I am looking for:",
+            "fallback": "The features of this app are not supported by your device",
+            "callback_id": "is_member",
+            "color": "#3AA3E3",
+            "attachment_type": "default",
+            "actions": [
+                {
+                    "name": "isTeam",
+                    "text": "A Team",
+                    "type": "button",
+                    "value": "true"
+                },
+                {
+                    "name": "isTeam",
+                    "text": "Team Members",
+                    "type": "button",
+                    "value": "false"
+                }
+            ]
+        }
+    ]
   }, function(err, response) {
     console.log(response);
   });
@@ -21,8 +42,6 @@ function parseMsg(message) {
   if (message === "help") helpMsg();
   else
     slack.webhook({
-      channel: "#general",
-      username: "webhookbot",
       text: message
     }, function(err, response) {
       console.log(response);
@@ -32,15 +51,21 @@ function parseMsg(message) {
 // list commands
 function helpMsg() {
   slack.webhook({
-    channel: "#general",
-    username: "webhookbot",
     text: message
   }, function(err, response) {
     console.log(response);
   });
 }
 
+// parse interactive messages
+function parseIMsg(msg, callback) {
+  const callbackID = msg.callback_id;
+  const actions = msg.actions;
+  callback("Awesome!");
+}
+
 module.exports = {
   welcome,
-  parseMsg
+  parseMsg,
+  parseIMsg
 }

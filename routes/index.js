@@ -19,11 +19,18 @@ routes.get('/msg/:msg', function(req, res) {
   res.send();
 });
 
+// welcome message
 routes.post('/start', function(req, res) {
+  bot.welcome(req.body.user_name);
+  res.status(200);
+  res.send();
+});
+
+routes.get('/start', function(req, res) {
   bot.welcome();
   res.status(200);
   res.send();
-})
+});
 
 routes.post('/post', function(req, res) {
   /* token, team_id, team_domain, channel_id
@@ -32,6 +39,16 @@ routes.post('/post', function(req, res) {
   bot.parseMsg(req.body.text);
   res.status(200);
   res.send();
+});
+
+// interactive messages
+routes.post('/interact', function(req, res) {
+  res.status(200);
+  bot.parseIMsg(req.body, msg => {
+    res.send({
+      text: msg;  // msg to replace original
+    });
+  });
 });
 
 
