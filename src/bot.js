@@ -144,35 +144,36 @@ function display(msg, callback) {
 
 /* HELPERS */
 function sendMsgToUrl(msg, url) {
-  console.log(url);
   url = url.replace("\\","");
   var index = url.indexOf("hooks");
   url = url.substring(index);
-  console.log(url);
   index = url.indexOf("/");
   const host = "www." + url.substring(0, index);
   const path = url.substring(index);
-  console.log(host);
-  console.log(path);
   var options = {
     host: host,
     path: path,
     port: '80',
-    method: 'POST'
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    }
   };
 
-  function callback(response) {
-    var str = ''
-    response.on('data', function (chunk) {
-      str += chunk;
-    });
-
-    response.on('end', function () {
-      console.log(str);
+  function callback(res) {
+    console.log('Status: ' + res.statusCode);
+    console.log('Headers: ' + JSON.stringify(res.headers));
+    res.setEncoding('utf8');
+    res.on('data', function (body) {
+      console.log('Body: ' + body);
     });
   }
 
   var req = http.request(options, callback);
+
+  req.on('error', function(e) {
+    console.log('problem with request: ' + e.message);
+  });
   //This is the data we are posting, it needs to be a string or a buffer
   req.write(msg);
   req.end();
