@@ -60,8 +60,9 @@ function helpMsg() {
 // parse interactive messages
 function parseIMsg(msg, callback) {
   const callbackID = msg.payload.callback_id;
-  const actions = msg.payload.actions;
+  const actions = msg.payload["actions"];
   console.log(msg.payload);
+  console.log(callbackID);
   console.log(actions);
 
   if (callbackID === 'user_type') {
