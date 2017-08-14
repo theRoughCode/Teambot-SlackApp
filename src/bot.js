@@ -127,15 +127,15 @@ function display(msg, callback) {
   if(text === "members" || text === "member") { // display members
     data.getMembers((res, data) => {
       if(res) {
-        console.log(data);
-        callback(data)
+        if(data) callback(data);
+        else callback("No members found. :disappointed:");
       } else callback();
     })
   } else if (text === "teams" || text === "team") { // display teams
     data.getTeams((res, data) => {
       if(res) {
-        console.log(data);
-        callback(data)
+        if(data) callback(data);
+        else callback("No teams found. :disappointed:");
       } else callback();
     })
   } else {
