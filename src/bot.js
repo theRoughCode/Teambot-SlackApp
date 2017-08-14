@@ -39,5 +39,6 @@ function sendMsg(message, url) {
 }
 
 module.exports = {
+  welcome,
   sendMsg
 }
