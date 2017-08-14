@@ -111,6 +111,7 @@ function setUserType(msg, type, callback) {
   if(type === "team") {
     callback({
       text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
+      replace_original: true,
       attachments: [
           {
               "text": "Select your roles:",
