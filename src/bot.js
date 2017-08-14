@@ -283,9 +283,16 @@ function setRoles(msg, role, callback) {
         replace_original: true
       });
       data.getTeams((res, data) => {
-        if(res && data) sendMsgToUrl(data, url);
+        var tempSlack = new Slack();
+        slack.setWebhook(url);
+        if(res && data) text = data;
         else
-          sendMsgToUrl("No members found. :disappointed:\nWould you like to bed discoverable by other teams?", url);
+          text = "No members found. :disappointed:\nWould you like to bed discoverable by other teams?";
+        slack.webhook({
+          text: text
+        }, function(err, response) {
+          console.log(response);
+        });
       })
     } else {
       if (roles === null) roles = [];
