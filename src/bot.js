@@ -17,7 +17,20 @@ function welcome() {
 }
 
 // send message
-function sendMsg(message) {
+function parseMsg(message) {
+  if (message === "help") helpMsg();
+  else
+    slack.webhook({
+      channel: "#general",
+      username: "webhookbot",
+      text: message
+    }, function(err, response) {
+      console.log(response);
+    });
+}
+
+// list commands
+function helpMsg() {
   slack.webhook({
     channel: "#general",
     username: "webhookbot",
@@ -29,5 +42,5 @@ function sendMsg(message) {
 
 module.exports = {
   welcome,
-  sendMsg
+  parseMsg
 }

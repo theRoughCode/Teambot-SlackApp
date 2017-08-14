@@ -19,11 +19,17 @@ routes.get('/msg/:msg', function(req, res) {
   res.send();
 });
 
+routes.get('/start', function(req, res) {
+  bot.welcome();
+  res.status(200);
+  res.send();
+})
+
 routes.post('/post', function(req, res) {
-  /* token, team_id, team_domain. channel_id
+  /* token, team_id, team_domain, channel_id
   channel_name, user_id, user_name
   command=/ , text, response_url*/
-  bot.sendMsg(req.body.text);
+  bot.parseMsg(req.body.text);
   res.status(200);
   res.send();
 });
