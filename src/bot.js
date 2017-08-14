@@ -111,6 +111,10 @@ function parseIMsg(msg, callback) {
     setUserType(msg, actions[0].value, callback);
   } else if (callbackID === 'roles') {
 
+  } else if (callbackID === 'edit') {  // edit existing data
+    if (actions[0].name === 'user_type') {
+      setUserType(msg, actions[0].value, callback);
+    }
   }
 }
 
@@ -171,6 +175,29 @@ function setUserType(msg, type, callback) {
   else {
     callback(":mag_right: Looking for team members...");
   }
+  addUser(userId, userName, { userType: type }, success => {
+    if(success) {}
+    else {
+      console.error(`Failed to add ${msg.user_name}`);
+    }
+  });
+}
+
+function editUserType(msg, type, callback) {
+  const responseUrl = msg.response_url;
+  const userName = msg.user.name;
+  const userId = msg.user.id;
+  var tempSlack = new Slack();
+
+  tempSlack.setWebhook(responseUrl);
+  var options = roles.map(role => {
+    return {
+      "text": `${role}`,
+      "value": `${role}`
+    };
+  });
+  var str = (type === "team") ? "a team" : "members";
+  callback(`:pencil: You are now looking for ${str}.`);
   addUser(userId, userName, { userType: type }, success => {
     if(success) {}
     else {
