@@ -173,7 +173,10 @@ function setUserType(msg, type, callback) {
   }
   // looking for members
   else {
-    callback(":mag_right: Looking for team members...");
+    callback({
+      text: ":mag_right: Looking for team members...",
+      replace_original: true
+    });
   }
   addUser(userId, userName, { userType: type }, success => {
     if(success) {}
@@ -197,7 +200,10 @@ function editUserType(msg, type, callback) {
     };
   });
   var str = (type === "team") ? "a team" : "members";
-  callback(`:pencil: You are now looking for ${str}.`);
+  callback({
+    text: `:pencil: You are now looking for ${str}.`,
+    replace_original: true
+  });
   addUser(userId, userName, { userType: type }, success => {
     if(success) {}
     else {
