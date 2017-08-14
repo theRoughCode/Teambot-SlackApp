@@ -10,6 +10,8 @@ admin.initializeApp({
 var auth = admin.auth();
 var db = admin.database();
 var userRef = db.ref('users');
+var teamRef = db.ref('teams');
+var memRef = db.ref('members');
 
 // Add user to database
 function updateUser(userId, data, callback) {
@@ -106,6 +108,24 @@ function hasUser(userId, callback) {
   });
 }
 
+// Get teams
+function getTeams(callback) {
+  teamRef.once('value').then(snapshot =>
+    callback(true, snapshot.val()[userId]), error => {
+      console.error(error);
+      callback(false, null);
+  });
+}
+
+// Get members
+function getMembers(callback) {
+  memRef.once('value').then(snapshot =>
+    callback(true, snapshot.val()[userId]), error => {
+      console.error(error);
+      callback(false, null);
+  });
+}
+
 // Delete user
 function deleteUser (userId) {
   userRef.child(userId).remove();
@@ -123,5 +143,7 @@ module.exports = {
   getType,
   getVisibility,
   hasUser,
+  getTeams,
+  getMembers,
   deleteUser
 }

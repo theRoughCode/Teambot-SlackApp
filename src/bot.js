@@ -121,6 +121,28 @@ function parseIMsg(msg, callback) {
   }
 }
 
+// display
+function display(msg, callback) {
+  const text = msg.text.toLowerCase();
+  if(text === "members" || text === "member") { // display members
+    data.getMembers((res, data) => {
+      if(res) {
+        console.log(data);
+        callback(data)
+      } else callback();
+    })
+  } else if (text === "teams" || text === "team") { // display teams
+    data.getTeams((res, data) => {
+      if(res) {
+        console.log(data);
+        callback(data)
+      } else callback();
+    })
+  } else {
+    callback("Incorrect command.  e.g. _/display teams_");
+  }
+}
+
 
 /*   Interactive Message Handlers */
 /* Format:

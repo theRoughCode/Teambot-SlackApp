@@ -65,6 +65,17 @@ routes.post('/interact', function(req, res) {
   });
 });
 
+// display listed teams or members
+routes.post('/display', function(req, res) {
+  /* token, team_id, team_domain, channel_id
+  channel_name, user_id, user_name
+  command=/ , text, response_url*/
+  res.status(200);
+  bot.display(req.body, msg => {
+    res.send(msg);
+  });
+});
+
 
 
 module.exports = routes;
