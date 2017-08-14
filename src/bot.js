@@ -146,9 +146,11 @@ function display(msg, callback) {
 function sendMsgToUrl(msg, url) {
   console.log(url);
   url = url.replace("\\","");
+  var index = url.indexOf("hooks");
+  url = url.substring(index);
   console.log(url);
-  var index = url.indexOf("/", 15);
-  const host = url.substring(0, index);
+  index = url.indexOf("/");
+  const host = "www." + url.substring(0, index);
   const path = url.substring(index);
   console.log(host);
   console.log(path);
