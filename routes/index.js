@@ -19,7 +19,7 @@ routes.get('/msg/:msg', function(req, res) {
   res.send();
 });
 
-routes.get('/start', function(req, res) {
+routes.post('/start', function(req, res) {
   bot.welcome();
   res.status(200);
   res.send();
