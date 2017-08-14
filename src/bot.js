@@ -313,5 +313,6 @@ function addUser(userId, userName, { roles = [], skills = {},
 module.exports = {
   welcome,
   parseMsg,
-  parseIMsg
+  parseIMsg,
+  display
 }
