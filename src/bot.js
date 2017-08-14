@@ -13,21 +13,21 @@ function welcome(user) {
         {
             "text": "I am looking for:",
             "fallback": "The features of this app are not supported by your device",
-            "callback_id": "is_member",
+            "callback_id": "user_type",
             "color": "#3AA3E3",
             "attachment_type": "default",
             "actions": [
                 {
-                    "name": "isTeam",
+                    "name": "choice",
                     "text": "A Team",
                     "type": "button",
-                    "value": "true"
+                    "value": "team"
                 },
                 {
-                    "name": "isTeam",
+                    "name": "choice",
                     "text": "Team Members",
                     "type": "button",
-                    "value": "false"
+                    "value": "member"
                 }
             ]
         }
@@ -61,7 +61,19 @@ function helpMsg() {
 function parseIMsg(msg, callback) {
   const callbackID = msg.callback_id;
   const actions = msg.actions;
-  callback("Awesome!");
+
+  if (callbackID === 'user_type') {
+    setUserType(actions[0].value, callback);
+  }
+}
+
+
+/*   Interactive Message Handlers */
+
+function setUserType(type, callback) {
+  // looking for team
+  if(type === "team") callback("Looking for teams...");
+  else callback("Looking for team members...");
 }
 
 module.exports = {
