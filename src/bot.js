@@ -15,7 +15,7 @@ function welcome(body) {
 
   data.hasUser(userId, (res, data) => {
     // user exists in db
-    if (res) {
+    if (res && data.visibility) {
       var actions = [];
       var action_userType = {
         "name": "user_type",
