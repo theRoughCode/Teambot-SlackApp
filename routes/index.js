@@ -24,10 +24,9 @@ routes.post('/post', function(req, res) {
   /* token, team_id, team_domain. channel_id
   channel_name, user_id, user_name
   command=/ , text, response_url*/
-  console.log("hi");
-  bot.sendMsgToUrl(req.body.text, req.body.response_url);
+  bot.sendMsg(req.body.text);
   res.status(200);
-  res.send(req.body);
+  res.send();
 });
 
 
