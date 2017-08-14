@@ -1,5 +1,4 @@
 const routes = require('express').Router();
-const data = require('../src/data');
 const bot = require('../src/bot');
 const bodyParser = require('body-parser');
 
@@ -21,7 +20,7 @@ routes.get('/msg/:msg', function(req, res) {
 
 // welcome message
 routes.post('/start', function(req, res) {
-  bot.welcome(req.body.user_name);
+  bot.welcome(req.body);
   res.status(200);
   res.send();
 });
@@ -45,9 +44,7 @@ routes.post('/post', function(req, res) {
 routes.post('/interact', function(req, res) {
   res.status(200);
   bot.parseIMsg(req.body, msg => {
-    res.send({
-      text: msg  // msg to replace original
-    });
+    res.send(msg);
   });
 });
 

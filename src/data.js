@@ -13,6 +13,14 @@ var userRef = db.ref('users');
 
 // Add user to database
 function updateUser(userId, data, callback) {
+  /*
+  Keyword Arguments:
+    username -- user's username as a string
+    roles -- list of interested roles
+    skills -- list of skills and their level from 1 to 5 as an integer
+    user_type -- indicates whether looking for a "team" or "member"
+    temp -- boolean of whether data is temporary
+  */
   userRef.child(userId).set(data).then(() => {
     callback(true);
   }, error => {
@@ -21,11 +29,22 @@ function updateUser(userId, data, callback) {
   });
 }
 
-// returns true if user is in database
+// Update field
+function updateField(userId, field, data, callback) {
+  userRef.child(userId + `/${field}`).set(data).then(() => {
+    callback(true);
+  }, error => {
+    console.error(error);
+    callback(false);
+  });
+}
+
+// Returns true if user is in database
 function hasUser(userId, callback) {
-  userRef.once('value', snapshot => {
-    callback(snapshot.hasChild(userId));
-  })
+  userRef.once('value').then(snapshot => {
+    if (snapshot.val()) callback(snapshot.hasChild(userId));
+    else callback(false);
+  });
 }
 
 // Delete user
@@ -35,6 +54,7 @@ function deleteUser (userId) {
 
 module.exports = {
   updateUser,
+  updateField,
   hasUser,
   deleteUser
 }
