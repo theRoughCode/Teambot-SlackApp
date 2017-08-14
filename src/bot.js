@@ -6,7 +6,7 @@ webhookUri = process.env.WEBHOOK;
 var slack = new Slack();
 slack.setWebhook(webhookUri);
 
-const roles = ["Front End", "Back End", "Android", "iOS", "Design", "Hardware"];
+const ROLES = ["Front End", "Back End", "Android", "iOS", "Design", "Hardware"];
 
 // welcome message
 function welcome(body) {
@@ -134,7 +134,7 @@ function setUserType(msg, type, callback) {
   var tempSlack = new Slack();
 
   tempSlack.setWebhook(responseUrl);
-  var options = roles.map(role => {
+  var options = ROLES.map(role => {
     return {
       "text": `${role}`,
       "value": `${role}`
@@ -222,6 +222,16 @@ function setRoles(msg, role, callback) {
     } else {
       if (roles === null) roles = [role];
       else roles.push(role);
+
+      var options = ROLES.filter(role => {
+        return !(roles.includes(role));
+      }).map(role => {
+        return {
+          "text": `${role}`,
+          "value": `${role}`
+        };
+      });
+
       callback({
         text: "You are currently looking to fill: " + roles.join(", ") + "\nAre you looking for any more roles to fill?",
         replace_original: true,
