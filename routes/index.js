@@ -5,12 +5,6 @@ const bodyParser = require('body-parser');
 routes.use(bodyParser.json());  // support JSON-encoded bodies
 routes.use(bodyParser.urlencoded({ extended: true }));  // support URL-encoded bodies
 
-routes.get('/', function(req, res){
-  bot.welcome();
-  res.status(200);
-  res.send();
-})
-
 // send custom msg
 routes.get('/msg/:msg', function(req, res) {
   bot.sendMsg(req.params.msg);
@@ -20,9 +14,11 @@ routes.get('/msg/:msg', function(req, res) {
 
 // welcome message
 routes.post('/start', function(req, res) {
-  bot.welcome(req.body);
   res.status(200);
-  res.send();
+  bot.welcome(req.body, msg => {
+    msg.response_type = "ephemeral";
+    res.send(msg);
+  });
 });
 
 routes.get('/start', function(req, res) {

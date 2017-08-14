@@ -9,7 +9,7 @@ slack.setWebhook(webhookUri);
 const ROLES = ["Front End", "Back End", "Android", "iOS", "Design", "Hardware"];
 
 // welcome message
-function welcome(body) {
+function welcome(body, callback) {
   const userName = body.user_name;
   const userId = body.user_id;
 
@@ -43,7 +43,7 @@ function welcome(body) {
             "actions": actions
           }
         ]
-      }
+      };
     }
     else { // user does not exist
       msg = {
@@ -71,12 +71,10 @@ function welcome(body) {
                 ]
             }
         ]
-      }
+      };
     }
 
-    slack.webhook(msg, function(err, response) {
-      console.log(response);
-    });
+    callback(msg);
   });
 
 }
