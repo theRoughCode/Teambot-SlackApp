@@ -21,9 +21,9 @@ function updateUser(userId, data, callback) {
     user_type -- indicates whether looking for a "team" or "member"
     temp -- boolean of whether data is temporary
   */
-  userRef.set({
-    userId: data
-  }).then(() => {
+  var obj = {};
+  obj[userId] = data;
+  userRef.set(obj).then(() => {
     callback(true);
   }, error => {
     console.error(error);
