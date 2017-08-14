@@ -284,11 +284,11 @@ function setRoles(msg, role, callback) {
       });
       data.getTeams((res, data) => {
         var tempSlack = new Slack();
-        slack.setWebhook(url);
+        tempSlack.setWebhook(url);
         if(res && data) text = data;
         else
           text = "No members found. :disappointed:\nWould you like to bed discoverable by other teams?";
-        slack.webhook({
+        tempSlack.webhook({
           text: text
         }, function(err, response) {
           console.log(response);
