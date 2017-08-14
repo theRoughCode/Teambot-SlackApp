@@ -43,9 +43,10 @@ routes.post('/post', function(req, res) {
 
 // interactive messages
 routes.post('/interact', function(req, res) {
+  res.status(200);
   bot.parseIMsg(req.body, msg => {
     res.send({
-      text: "hasdasd"  // msg to replace original
+      text: msg  // msg to replace original
     });
   });
 });
