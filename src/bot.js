@@ -4,9 +4,6 @@ const data = require('../src/data');
 
 webhookUri = process.env.WEBHOOK;
 
-var slack = new Slack();
-slack.setWebhook(webhookUri);
-
 const ROLES = ["Front End", "Back End", "Android", "iOS", "Design", "Hardware"];
 
 // welcome message
@@ -77,27 +74,18 @@ function welcome(body, callback) {
 
     callback(msg);
   });
-
 }
 
 // send message
 function parseMsg(message) {
   if (message === "help") helpMsg();
   else
-    slack.webhook({
-      text: message
-    }, function(err, response) {
-      console.log(response);
-    });
+    sendMsgToUrl({ text: message });
 }
 
 // list commands
 function helpMsg() {
-  slack.webhook({
-    text: "Type /start to begin the search!"
-  }, function(err, response) {
-    console.log(response);
-  });
+  sendMsgToUrl({ text: "Type /start to begin the search!" });
 }
 
 // parse interactive messages
@@ -113,6 +101,8 @@ function parseIMsg(msg, callback) {
       setRoles(msg, actions[0].value, callback);
     else
       setRoles(msg, actions[0].selected_options[0].value, callback);
+  } else if (callbackID === 'discover') {
+    setDiscoverable(msg, actions[0].value, callback);
   } else if (callbackID === 'edit') {  // edit existing data
     if (actions[0].name === 'user_type') {
       editUserType(msg, actions[0].value, callback);
@@ -143,41 +133,14 @@ function display(msg, callback) {
 }
 
 /* HELPERS */
-function sendMsgToUrl(msg, url) {
-  url = url.replace("\\","");
-  var index = url.indexOf("hooks");
-  url = url.substring(index);
-  index = url.indexOf("/");
-  const host = "www." + url.substring(0, index);
-  const path = url.substring(index);
-  var options = {
-    host: host,
-    path: path,
-    port: '80',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  };
+// send message to webhook
+function sendMsgToUrl(msg, url = webhookUri) {
+  var slack = new Slack();
+  slack.setWebhook(url);
 
-  function callback(res) {
-    console.log('Status: ' + res.statusCode);
-    console.log('Headers: ' + JSON.stringify(res.headers));
-    res.setEncoding('utf8');
-    res.on('data', function (body) {
-      console.log('Body: ' + body);
-    });
-  }
-
-  var req = http.request(options, callback);
-
-  req.on('error', function(e) {
-    console.log('problem with request: ' + e.message);
+  slack.webhook(msg, function(err, response) {
+    console.log(response);
   });
-  //This is the data we are posting, it needs to be a string or a buffer
-  console.log(msg);
-  req.write('{ text: "Hello World" }');
-  req.end();
 }
 
 
@@ -252,9 +215,7 @@ function editUserType(msg, type, callback) {
   const responseUrl = msg.response_url;
   const userName = msg.user.name;
   const userId = msg.user.id;
-  var tempSlack = new Slack();
 
-  tempSlack.setWebhook(responseUrl);
   var options = roles.map(role => {
     return {
       "text": `${role}`,
@@ -283,16 +244,35 @@ function setRoles(msg, role, callback) {
         replace_original: true
       });
       data.getTeams((res, data) => {
-        var tempSlack = new Slack();
-        tempSlack.setWebhook(url);
-        if(res && data) text = data;
-        else
+        if(res && data) sendMsgToUrl({ text: data }, url);
+        else {
           text = "No members found. :disappointed:\nWould you like to bed discoverable by other teams?";
-        tempSlack.webhook({
-          text: text
-        }, function(err, response) {
-          console.log(response);
-        });
+          sendMsgToUrl({
+            text: text,
+            attachments: [
+                {
+                    "fallback": "The features of this app are not supported by your device",
+                    "callback_id": "discover",
+                    "color": "#3AA3E3",
+                    "attachment_type": "default",
+                    "actions": [
+                        {
+                          "name": "yes",
+                          "text": "Yes please!",
+                          "type": "button",
+                          "value": "true"
+                        },
+                        {
+                          "name": "no",
+                          "text": "No, it's ok!",
+                          "type": "button",
+                          "value": "false"
+                        }
+                    ]
+                }
+            ]
+          }, url);
+        }
       })
     } else {
       if (roles === null) roles = [];
@@ -343,6 +323,15 @@ function setRoles(msg, role, callback) {
       });
     }
   });
+}
+
+function setDiscoverable(msg, discoverable, callback) {
+  if(discoverable === "true") {
+    callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!");
+  }
+  else {
+    callback("All the best team-hunting! :smile:");
+  }
 }
 
 
