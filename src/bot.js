@@ -85,7 +85,7 @@ function parseIMsg(msg, callback) {
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
   } else if (callbackID === 'roles') {
-    
+
   }
 }
 
@@ -100,7 +100,10 @@ function parseIMsg(msg, callback) {
 
 function setUserType(msg, type, callback) {
   const responseUrl = msg.response_url;
+  const userName = msg.user.name;
+  const userId = msg.user.id;
   var tempSlack = new Slack();
+
   tempSlack.setWebhook(responseUrl);
   var options = roles.map(role => {
     return {
@@ -143,7 +146,12 @@ function setUserType(msg, type, callback) {
   else {
     callback(":mag_right: Looking for team members...");
   }
-  addUser(msg.user_id, msg.user_name, { userType: type }, success => {});
+  addUser(userId, userName, { userType: type }, success => {
+    if(success) {}
+    else {
+      console.error(`Failed to add ${msg.user_name}`);
+    }
+  });
 }
 
 
@@ -151,6 +159,7 @@ function setUserType(msg, type, callback) {
 
 function addUser(userId, userName, { roles = [], skills = {},
   userType = null, temp = true } = {}, callback) {
+  if (userName === undefined) callback(false);
   data.updateUser(userId, {
     "username": userName,
     "roles": roles,
