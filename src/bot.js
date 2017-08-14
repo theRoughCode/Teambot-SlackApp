@@ -14,23 +14,23 @@ function welcome(body) {
   const userId = body.user_id;
 
   data.hasUser(userId, (res, data) => {
-    var actions = [];
-    var action_userType = {
-      "name": "user_type",
-      "text": "",
-      "type": "button",
-      "value": ""
-    };
-    if(data.user_type === "team") {
-      action_userType["text"] = "Find members instead";
-      action_userType["value"] = "member";
-    } else if (data.user_type === "member") {
-      action_userType["text"] = "Find a team instead";
-      action_userType["value"] = "team";
-    }
-    actions.push(action_userType);
     // user exists in db
     if (res) {
+      var actions = [];
+      var action_userType = {
+        "name": "user_type",
+        "text": "",
+        "type": "button",
+        "value": ""
+      };
+      if(data.user_type === "team") {
+        action_userType["text"] = "Find members instead";
+        action_userType["value"] = "member";
+      } else if (data.user_type === "member") {
+        action_userType["text"] = "Find a team instead";
+        action_userType["value"] = "team";
+      }
+      actions.push(action_userType);
       msg = {
         text: `Welcome back ${userName}! What would you like to do?`,
         attachments: [

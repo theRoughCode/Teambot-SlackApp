@@ -42,8 +42,10 @@ function updateField(userId, field, data, callback) {
 // Returns true if user is in database
 function hasUser(userId, callback) {
   userRef.once('value').then(snapshot => {
-    if (snapshot.val()) callback(snapshot.hasChild(userId), snapshot.val()[userId]);
-    else callback(false, null);
+    if (userId !== undefined && snapshot.val() && snapshot.hasChild(userId))
+      callback(true, snapshot.val()[userId]);
+    else
+      callback(false, null);
   });
 }
 
