@@ -13,11 +13,36 @@ function welcome(body) {
   const userName = body.user_name;
   const userId = body.user_id;
 
-  data.hasUser(userId, res => {
+  data.hasUser(userId, (res, data) => {
+    var actions = [];
+    var action_userType = {
+      "name": "user_type",
+      "text": "",
+      "type": "button",
+      "value": ""
+    };
+    if(data.user_type === "team") {
+      action_userType["text"] = "Find members instead";
+      action_userType["value"] = "member";
+    } else if (data.user_type === "member") {
+      action_userType["text"] = "Find a team instead";
+      action_userType["value"] = "team";
+    }
+    actions.push(action_userType);
     // user exists in db
     if (res) {
       msg = {
-        text: `Welcome back ${userName}!`
+        text: `Welcome back ${userName}! What would you like to do?`,
+        attachments: [
+          {
+            "text": "Select an action:",
+            "fallback": "The features of this app are not supported by your device",
+            "callback_id": "edit",
+            "color": "#3AA3E3",
+            "attachment_type": "default",
+            "actions": actions
+          }
+        ]
       }
     }
     else { // user does not exist
@@ -158,14 +183,14 @@ function setUserType(msg, type, callback) {
 /* Interact with data.js */
 
 function addUser(userId, userName, { roles = [], skills = {},
-  userType = null, temp = true } = {}, callback) {
+  userType = null, visible = false } = {}, callback) {
   if (userName === undefined) callback(false);
   data.updateUser(userId, {
     "username": userName,
     "roles": roles,
     "skills": skills,
     "user_type": userType,
-    "temp": temp
+    "visible": visible
   }, success => callback(success));
 }
 

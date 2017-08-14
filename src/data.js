@@ -19,7 +19,7 @@ function updateUser(userId, data, callback) {
     roles -- list of interested roles
     skills -- list of skills and their level from 1 to 5 as an integer
     user_type -- indicates whether looking for a "team" or "member"
-    temp -- boolean of whether data is temporary
+    visible -- true if user is visible for search
   */
   userRef.child(userId).set(data).then(() => {
     callback(true);
@@ -42,8 +42,8 @@ function updateField(userId, field, data, callback) {
 // Returns true if user is in database
 function hasUser(userId, callback) {
   userRef.once('value').then(snapshot => {
-    if (snapshot.val()) callback(snapshot.hasChild(userId));
-    else callback(false);
+    if (snapshot.val()) callback(snapshot.hasChild(userId), snapshot.val()[userId]);
+    else callback(false, null);
   });
 }
 

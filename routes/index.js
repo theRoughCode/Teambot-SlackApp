@@ -42,6 +42,23 @@ routes.post('/post', function(req, res) {
 
 // interactive messages
 routes.post('/interact', function(req, res) {
+  /*
+  {
+    "actions": [{"name","type","value"}],
+    "callback_id",
+    "team":{"id","domain"},
+    "channel":{"id","name"},
+    "user":{"id","name"},
+    "action_ts",
+    "message_ts",
+    "attachment_id",
+    "token",
+    "is_app_unfurl",
+    "original_message",
+    "response_url",
+    "trigger_id"
+  }
+  */
   res.status(200);
   bot.parseIMsg(req.body, msg => {
     res.send(msg);
