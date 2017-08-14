@@ -20,12 +20,12 @@ routes.get('/msg/:msg', function(req, res) {
   res.send();
 });
 
-routes.get('/post', function(req, res) {
+routes.post('/post', function(req, res) {
   /* token, team_id, team_domain. channel_id
   channel_name, user_id, user_name
   command=/ , text, response_url*/
   console.log("hi");
-  //bot.sendMsg(req.body.text, req.body.response_url);
+  bot.sendMsgToUrl(req.body.text, req.body.response_url);
   res.status(200);
   res.send(req.body);
 });

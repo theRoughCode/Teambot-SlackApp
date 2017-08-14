@@ -27,7 +27,7 @@ function sendMsg(message) {
   });
 }
 
-function sendMsg(message, url) {
+function sendMsgToUrl(message, url) {
   slack.setWebhook(url);
   slack.webhook({
     channel: "#general",
@@ -36,9 +36,11 @@ function sendMsg(message, url) {
   }, function(err, response) {
     console.log(response);
   });
+  slack.setWebhook(webhookUri);
 }
 
 module.exports = {
   welcome,
-  sendMsg
+  sendMsg,
+  sendMsgToUrl
 }
