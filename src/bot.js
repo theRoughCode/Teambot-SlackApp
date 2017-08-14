@@ -61,7 +61,7 @@ function helpMsg() {
 function parseIMsg(msg, callback) {
   const callbackID = msg.callback_id;
   const actions = msg.actions;
-  console.log(actions);
+  console.log(msg);
 
   if (callbackID === 'user_type') {
     setUserType(actions[0].value, callback);
