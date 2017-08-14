@@ -73,8 +73,8 @@ function parseIMsg(msg, callback) {
 
 function setUserType(type, callback) {
   // looking for team
-  if(type === "team") callback("Looking for teams...");
-  else callback("Looking for team members...");
+  if(type === "team") callback(":mag_right: Looking for teams...");
+  else callback(":mag_right: Looking for team members...");
 }
 
 module.exports = {
