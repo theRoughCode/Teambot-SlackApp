@@ -84,6 +84,8 @@ function parseIMsg(msg, callback) {
 
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
+  } else if (callbackID === 'roles') {
+    
   }
 }
 
