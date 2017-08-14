@@ -14,7 +14,6 @@ routes.get('/', function(req, res){
 
 // send custom msg
 routes.get('/msg/:msg', function(req, res) {
-  console.log("asdsa");
   bot.sendMsg(req.params.msg);
   res.status(200);
   res.send();

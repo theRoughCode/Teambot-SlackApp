@@ -27,20 +27,7 @@ function sendMsg(message) {
   });
 }
 
-function sendMsgToUrl(message, url) {
-  slack.setWebhook(url);
-  slack.webhook({
-    channel: "#general",
-    username: "webhookbot",
-    text: message
-  }, function(err, response) {
-    console.log(response);
-  });
-  slack.setWebhook(webhookUri);
-}
-
 module.exports = {
   welcome,
-  sendMsg,
-  sendMsgToUrl
+  sendMsg
 }
