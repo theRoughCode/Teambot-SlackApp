@@ -144,11 +144,17 @@ function display(msg, callback) {
 
 /* HELPERS */
 function sendMsgToUrl(msg, url) {
+  console.log(url);
   url = url.replace("\\","");
+  console.log(url);
   var index = url.indexOf("/");
+  const host = url.substring(0, index);
+  const path = url.substring(index);
+  console.log(host);
+  console.log(path);
   var options = {
-    host: url.substring(0, index),
-    path: url.substring(index),
+    host: host,
+    path: path,
     port: '80',
     method: 'POST'
   };
@@ -272,9 +278,9 @@ function setRoles(msg, role, callback) {
         text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
         replace_original: true
       });
-      data.getMembers((res, data) => {
-        if(res && data)  sendMsgToUrl(data, url);
-        else 
+      data.getTeams((res, data) => {
+        if(res && data) sendMsgToUrl(data, url);
+        else
           sendMsgToUrl("No members found. :disappointed:\nWould you like to bed discoverable by other teams?", url);
       })
     } else {
