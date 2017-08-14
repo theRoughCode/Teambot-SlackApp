@@ -44,7 +44,7 @@ routes.post('/post', function(req, res) {
 routes.post('/interact', function(req, res) {
   /*
   {
-    "actions": [{"name","type","value"}],
+    "actions": [{"name","type","value"/"selected_options:[{"value"}]"}],
     "callback_id",
     "team":{"id","domain"},
     "channel":{"id","name"},
