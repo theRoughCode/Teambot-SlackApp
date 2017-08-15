@@ -258,8 +258,8 @@ function createSkills(msg, callback) {
   var skills = text.split(',');
 
   callback(null);
-  displaySkillChoice(skills, msg => {
-    sendMsgToUrl(msg, responseUrl);
+  displaySkillChoice(skills, res => {
+    sendMsgToUrl(res, responseUrl);
     var skillArr = skills.filter((skill, index, self) => {
       return index === self.indexOf(skill);  // remove duplicates
     }).map(skill => {
@@ -271,7 +271,7 @@ function createSkills(msg, callback) {
     console.log(msg);
     console.log(msg.user_id);
     db.updateSkills(msg.user_id, skillArr, success => {
-      if (!success) displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+      if (!success) displayErrorMsg(res => sendMsgToUrl({ text: res }, responseUrl));
     });
   });
 }
