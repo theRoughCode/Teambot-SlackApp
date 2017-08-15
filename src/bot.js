@@ -145,14 +145,12 @@ function list(msg, callback) {
       else {
         const attachments = [];
         callback(null);
-        console.log(data);
         for (var userId in data) {
-          console.log(userId);
           db.getUserInfo(userId, (success, info) => {
             if (success) {
-              const roles = (data.roles) ? data.roles.join(", ") : "N/A";
-              const skills = (data.skills) ? data.skills.join(", ") : "N/A";
-              const userName = data.username;
+              const roles = (info.roles) ? info.roles.join(", ") : "N/A";
+              const skills = (info.skills) ? info.skills.join(", ") : "N/A";
+              const userName = info.username;
               console.log(userName);
               // if valid username
               if(userName) {
