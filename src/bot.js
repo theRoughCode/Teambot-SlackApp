@@ -268,7 +268,7 @@ function createSkills(msg, callback) {
         level: null
       };
     });
-    db.updateSkills(userId, skillArr, success => {
+    db.updateSkills(msg.user_id, skillArr, success => {
       if (!success) displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
     });
   });
