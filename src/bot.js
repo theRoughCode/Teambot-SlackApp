@@ -166,8 +166,6 @@ function display(userId, callback) {
       const userName = data.username || "N/A";
       const visible = (data.visible) ? "Yes" : "No";
       callback({
-        text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
-        replace_original: true,
         attachments: [
           {
               "fallback": "Required plain-text summary of the attachment.",
