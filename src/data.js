@@ -101,6 +101,19 @@ function getField(userId, field, callback) {
   });
 }
 
+// Get user information
+function getUserInfo(userId, callback) {
+  userRef.child(`${userId}`).once('value').then(snapshot => {
+    if (userId !== undefined && snapshot.val())
+      callback(true, snapshot.val());
+    else
+      callback(false, null);
+  }, error => {
+    console.error(error);
+    callback(false, null);
+  });
+}
+
 // Get roles
 function getRoles(userId, callback) {
   getField(userId, "roles", callback);
@@ -165,6 +178,7 @@ module.exports = {
   updateSkills,
   updateType,
   updateVisibility,
+  getUserInfo,
   getRoles,
   getSkills,
   getType,

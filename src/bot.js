@@ -134,8 +134,8 @@ function parseIMsg(msg, callback) {
   }
 }
 
-// Display teams or members
-function display(msg, callback) {
+// Lists teams or members
+function list(msg, callback) {
   const text = msg.text.toLowerCase();
   if(text === "members" || text === "member") { // display members
     data.getMembers((res, data) => {
@@ -154,6 +154,16 @@ function display(msg, callback) {
   } else {
     callback("Incorrect command.  e.g. _/display teams_");
   }
+}
+
+// display user info
+function display(userId, callback) {
+  data.getUserInfo(userId, (res, data) => {
+    if (res) {
+      console.log(data);
+      callback(data);
+    } else displayErrorMsg(msg => callback({ text: msg }));
+  })
 }
 
 // Update skills
@@ -407,101 +417,13 @@ function setRoles(msg, role, callback) {
       });
     }
   });
-
-/*
-  data.getRoles(msg.user.id, (res, roles) => {
-    if(role === 'done') { // no more roles
-      callback({
-        text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
-        replace_original: true
-      });
-      data.getTeams((res, data) => {
-        if(res && data) sendMsgToUrl({ text: data }, url);
-        else {
-          text = "No teams found. :disappointed:\nWould you like to be discoverable by other teams?";
-          sendMsgToUrl({
-            text: text,
-            attachments: [
-                {
-                    "fallback": "The features of this app are not supported by your device",
-                    "callback_id": "discover_team",
-                    "color": "#3AA3E3",
-                    "attachment_type": "default",
-                    "actions": [
-                        {
-                          "name": "yes",
-                          "text": "Yes please!",
-                          "type": "button",
-                          "value": "true"
-                        },
-                        {
-                          "name": "no",
-                          "text": "No, it's ok!",
-                          "type": "button",
-                          "value": "false"
-                        }
-                    ]
-                }
-            ]
-          }, url);
-        }
-      })
-    } else {
-      if (roles === null) roles = [];
-      roles.push(role);
-
-      var options = ROLES.filter(role => {
-        return !(roles.includes(role.role));
-      }).map(role => {
-        return {
-          "text": `${role}`,
-          "value": `${role}`
-        };
-      });
-
-      var textStr = (roles.length)
-        ? "You are currently looking to fill: " + roles.join(", ") + "\nAre you looking for any more roles to fill?"
-        : "What roles are you looking to fill?";
-
-      callback({
-        text: textStr,
-        replace_original: true,
-        attachments: [
-            {
-                "text": "Select your roles:",
-                "fallback": "The features of this app are not supported by your device",
-                "callback_id": "roles",
-                "color": "#3AA3E3",
-                "attachment_type": "default",
-                "actions": [
-                    {
-                        "name": "roles_list",
-                        "text": "Pick a role...",
-                        "type": "select",
-                        "options": options
-                    },
-                    {
-                      "name": "done",
-                      "text": "No more roles",
-                      "type": "button",
-                      "value": "done"
-                    }
-                ]
-            }
-        ]
-      });
-      data.updateRoles(msg.user.id, roles, success => {
-        if (!success) console.error("ERROR: Could not update roles for " + msg.user.name);
-      });
-    }
-  });*/
 }
 
 function setDiscoverable(msg, discoverable, category, callback) {
   if (discoverable === "true") {
     data.updateVisibility(msg.user.id, true, success => {
       if(success)
-        callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can list down all relevant skills(i.e. languages/frameworks/tools) using the `/skills` command!\ne.g. /skills Node.js, Python, Java");
+        callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can list down all relevant skills (i.e. languages/frameworks/tools) using the `/skills` command!\ne.g. `/skills Node.js, Python, Java`");
       else {
         console.error("ERROR: Could not update visibility of " + msg.user.name);
         return displayErrorMsg(callback);
@@ -537,6 +459,7 @@ module.exports = {
   welcome,
   parseMsg,
   parseIMsg,
+  list,
   display,
   updateSkills
 }
