@@ -151,6 +151,7 @@ function list(msg, callback) {
               const roles = (data.roles) ? data.roles.join(", ") : "N/A";
               const skills = (data.skills) ? data.skills.join(", ") : "N/A";
               const userName = data.username;
+              console.log(userName);
               // if valid username
               if(userName) {
                 attachments.push({
@@ -176,6 +177,7 @@ function list(msg, callback) {
             }
           });
         }
+        console.log(attachments);
         return sendMsgToUrl({
           "text": "List of members:",
           attachments: attachments
