@@ -145,13 +145,15 @@ function list(msg, callback) {
       else {
         const attachments = [];
         callback(null);
+
+        var count = 0;
         for (var userId in data) {
           db.getUserInfo(userId, (success, info) => {
             if (success) {
               const roles = (info.roles) ? info.roles.join(", ") : "N/A";
               const skills = (info.skills) ? info.skills.join(", ") : "N/A";
               const userName = info.username;
-              console.log(userName);
+
               // if valid username
               if(userName) {
                 attachments.push({
@@ -172,16 +174,18 @@ function list(msg, callback) {
                   ]
                 });
               }
+              count++;
+              // if final key
+              console.log(attachments);
+              if(count >= Object.keys(myObj).length) return sendMsgToUrl({
+                "text": "List of members:",
+                attachments: attachments
+              }, responseUrl);
             } else {
               return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
             }
           });
         }
-        console.log(attachments);
-        return sendMsgToUrl({
-          "text": "List of members:",
-          attachments: attachments
-        }, responseUrl);
       }
     });
   } else if (text === "teams" || text === "team") { // display teams
