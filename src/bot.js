@@ -4,7 +4,34 @@ const data = require('../src/data');
 
 webhookUri = process.env.WEBHOOK;
 
-const ROLES = ["Front End", "Back End", "Android", "iOS", "Design", "Hardware"];
+const ROLES = [
+  {
+    role: "Front End",
+    emote: ":computer:"
+  },
+  {
+    role: "Back End",
+    emote: ":floppy_disk:"
+  },
+  {
+    role: "Android",
+    emote: ":iphone:"
+  },
+  {
+    role: "iOS",
+    emote: ":apple:"
+  },
+  {
+    role: "Design",
+    emote: ":art:"
+  },
+  {
+    role: "Hardware",
+    emote: ":wrench:"
+  }
+];
+// ["Front End", "Back End", "Android", "iOS", "Design", "Hardware"];
+// const EMOTES = [":computer:", ":floppy_disk:", ":iphone:", ":apple:", ":art:", ":wrench:"];
 
 // welcome message
 function welcome(body, callback) {
@@ -186,7 +213,7 @@ function setUserType(msg, type, callback) {
   tempSlack.setWebhook(responseUrl);
   var attachments = ROLES.map(role => {
     return {
-      "text": `${role}`,
+      "text": `${role.emote} ${role.role}`,
       "fallback": "The features of this app are not supported by your device",
       "callback_id": "roles",
       "color": "#3AA3E3",
@@ -196,7 +223,7 @@ function setUserType(msg, type, callback) {
               "name": "roles",
               "text": "Add to roles",
               "type": "button",
-              "value": `${role}`
+              "value": `${role.role}`
           }
         ]
       /*"text": `${role}`,
@@ -318,7 +345,7 @@ function setRoles(msg, role, callback) {
       roles.push(role);
 
       var options = ROLES.filter(role => {
-        return !(roles.includes(role));
+        return !(roles.includes(role.role));
       }).map(role => {
         return {
           "text": `${role}`,
