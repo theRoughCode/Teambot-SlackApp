@@ -227,7 +227,7 @@ function editUserType(msg, type, callback) {
   data.updateType(userId, type, success => {
     if(success) {
       var isTeam = (type !== "team");
-      var str = isTeam ? "a team" : "members";
+      var str = !isTeam ? "a team" : "members";
       data.updateTeam(userId, success => {
         if(success) {
           callback({
