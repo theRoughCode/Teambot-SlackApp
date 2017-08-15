@@ -302,7 +302,7 @@ function setUserType(msg, type, callback) {
       "attachment_type": "default",
       "actions": [
           {
-              "name": "roles",
+              "name": `${type}`,
               "text": "Add to roles",
               "type": "button",
               "value": `${role.role}`
@@ -453,7 +453,7 @@ function setRoles(msg, role, callback) {
           "attachment_type": "default",
           "actions": [
             {
-              "name": "roles",
+              "name": `${type}`,
               "text": "Add to roles",
               "type": "button",
               "value": `${role.role}`
@@ -469,7 +469,7 @@ function setRoles(msg, role, callback) {
       "attachment_type": "default",
       "actions": [
         {
-          "name": "roles",
+          "name": `${type}`,
           "text": "Begin search",
           "type": "button",
           "value": "done"
