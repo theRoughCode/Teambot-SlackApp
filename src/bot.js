@@ -210,16 +210,7 @@ function setUserType(msg, type, callback) {
     callback({
       text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
       replace_original: true,
-      attachments: [
-          {
-              "text": "Select your roles:",
-              "fallback": "The features of this app are not supported by your device",
-              "callback_id": "roles",
-              "color": "#3AA3E3",
-              "attachment_type": "default",
-              "actions": attachments
-          }
-      ]
+      attachments: attachments
     });
   }
   // looking for members
