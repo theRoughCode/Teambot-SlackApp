@@ -141,7 +141,7 @@ function updateSkills(msg, callback) {
   data.updateSkills(msg.user_id, skills, success => {
     if (success) {
       callback({
-        text: "Here are your skills: " + skills.join(", ");
+        text: "Here are your skills: " + skills.join(", ")
       });
     } else displayErrorMsg(msg => callback({ text: msg }));
   });
