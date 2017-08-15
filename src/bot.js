@@ -117,7 +117,6 @@ function helpMsg() {
 
 // parse interactive messages
 function parseIMsg(msg, callback) {
-  console.log(msg);
   msg = JSON.parse(msg.payload);
   const callbackID = msg.callback_id;
   const actions = msg.actions;
@@ -299,19 +298,20 @@ function editUserType(msg, type, callback) {
 }
 
 function setRoles(msg, role, callback) {
+  console.log("msg=" + msg);
   data.getRoles(msg.user.id, (res, roles) => {
     if (roles === null) roles = [];
     roles.push(role);
     data.updateRoles(msg.user.id, roles, success => {
       if (success) {
-        var msg = msg.original_message;
-        msg[replace_original] = true;
-        for (var i = 0; i < msg[attachments].length; i++) {
-          if(msg[attachments][i].actions[0].value === 'role') {
-            msg[attachments][i] = `:white_check_mark: Added ${role} to your roles!`;
+        var output = msg.original_message;
+        output[replace_original] = true;
+        for (var i = 0; i < output[attachments].length; i++) {
+          if(output[attachments][i].actions[0].value === 'role') {
+            output[attachments][i] = `:white_check_mark: Added ${role} to your roles!`;
           }
         }
-        callback(msg);
+        callback(output);
       }
       else {
         console.error("ERROR: Could not update roles for " + msg.user.name);
