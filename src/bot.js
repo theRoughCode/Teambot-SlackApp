@@ -181,7 +181,7 @@ function list(msg, callback) {
           count++;
           // if final key
           console.log(attachments);
-          if(count >= Object.keys(myObj).length) return sendMsgToUrl({
+          if(count >= Object.keys(data).length) return sendMsgToUrl({
             "text": "List of members:",
             attachments: attachments
           }, responseUrl);
