@@ -112,7 +112,7 @@ function parseMsg(message) {
 
 // list commands
 function helpMsg(callback) {
-  callback({ text: "List of commands:\n  /start to begin the search!\n  /display to display your preferences\n  /list (members/teams) to display the list of discoverable users" });
+  callback({ text: "List of commands:\n  `/start` to begin the search!\n  `/display` to display your preferences\n  `/list (members/teams)` to display the list of discoverable users" });
 }
 
 // parse interactive messages
