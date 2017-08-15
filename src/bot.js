@@ -298,17 +298,17 @@ function editUserType(msg, type, callback) {
 }
 
 function setRoles(msg, role, callback) {
-  console.log("msg=" + msg);
   data.getRoles(msg.user.id, (res, roles) => {
     if (roles === null) roles = [];
     roles.push(role);
     data.updateRoles(msg.user.id, roles, success => {
       if (success) {
+        console.log(msg);
         var output = msg.original_message;
-        output[replace_original] = true;
-        for (var i = 0; i < output[attachments].length; i++) {
-          if(output[attachments][i].actions[0].value === 'role') {
-            output[attachments][i] = `:white_check_mark: Added ${role} to your roles!`;
+        output["replace_original"] = true;
+        for (var i = 0; i < output["attachments"].length; i++) {
+          if(output["attachments"][i].actions[0].value === 'role') {
+            output["attachments"][i] = `:white_check_mark: Added ${role} to your roles!`;
           }
         }
         callback(output);
