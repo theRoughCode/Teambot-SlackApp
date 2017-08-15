@@ -267,6 +267,8 @@ function updateSkills(msg, callback) {
             "value": n
           });
         }, (err, actions) => {
+          console.log(skill);
+          console.log(actions);
           return {
             "fallback": "The features of this app are not supported by your device",
             "callback_id": "skills",
@@ -277,6 +279,7 @@ function updateSkills(msg, callback) {
           };
         }));
       }, (err, attachments) => {
+        console.log(attachments);
         return sendMsgToUrl({
           text: "Here are your skills: " + skills.join(", ") + "\nHow proficient are you at:",
           attachments: attachments
