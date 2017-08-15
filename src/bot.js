@@ -268,6 +268,8 @@ function createSkills(msg, callback) {
         level: null
       };
     });
+    console.log(msg);
+    console.log(msg.user_id);
     db.updateSkills(msg.user_id, skillArr, success => {
       if (!success) displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
     });
