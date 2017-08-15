@@ -162,7 +162,7 @@ function display(userId, callback) {
     if (res) {
       const roles = (data.roles) ? data.roles.join(", ") : "N/A";
       const skills = (data.skills) ? data.skills.join(", ") : "N/A";
-      const userType = data.user_type || "N/A";
+      const userType = (data.user_type) ? data.userType.substring(0, 1).toUpperCase() + data.userType.substring(1) : "N/A";
       const userName = data.username || "N/A";
       const visible = (data.visible) ? "Yes" : "No";
       callback({
