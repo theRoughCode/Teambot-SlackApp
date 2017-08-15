@@ -1,6 +1,7 @@
 var Slack = require('slack-node');
 const http = require('http');
 const db = require('../src/data');
+const async = require('async');
 
 webhookUri = process.env.WEBHOOK;
 
@@ -146,8 +147,7 @@ function list(msg, callback) {
         const attachments = [];
         callback(null);
 
-        var count = 0;
-        for (var userId in data) {
+        async.forEachOf(data, (value, userId, innerCallback) => {
           db.getUserInfo(userId, (success, info) => {
             if (success) {
               const roles = (info.roles) ? info.roles.join(", ") : "N/A";
@@ -173,19 +173,23 @@ function list(msg, callback) {
                     }
                   ]
                 });
-                count++;
               }
+              innerCallback();
             } else {
               return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
             }
           });
-          // if final key
-          console.log(attachments);
-          if(count >= Object.keys(data).length) return sendMsgToUrl({
-            "text": "List of members:",
-            attachments: attachments
-          }, responseUrl);
-        }
+        }, function (err) {
+          if (err) {
+            console.error(err.message);
+            return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+          } else {
+            return sendMsgToUrl({
+             "text": "List of members:",
+             attachments: attachments
+           }, responseUrl);
+          }
+        });
       }
     });
   } else if (text === "teams" || text === "team") { // display teams
