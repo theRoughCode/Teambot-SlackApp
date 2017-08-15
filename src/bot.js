@@ -101,8 +101,10 @@ function parseIMsg(msg, callback) {
       setRoles(msg, actions[0].value, callback);
     else
       setRoles(msg, actions[0].selected_options[0].value, callback);
-  } else if (callbackID === 'discover') {
-    setDiscoverable(msg, actions[0].value, callback);
+  } else if (callbackID === 'discover_team') { // find teams
+    setDiscoverable(msg, actions[0].value, "member", callback);
+  } else if (callbackID === 'discover_member') {  // find members
+    setDiscoverable(msg, actions[0].value, "team", callback);
   } else if (callbackID === 'edit') {  // edit existing data
     if (actions[0].name === 'user_type') {
       editUserType(msg, actions[0].value, callback);
@@ -246,13 +248,13 @@ function setRoles(msg, role, callback) {
       data.getTeams((res, data) => {
         if(res && data) sendMsgToUrl({ text: data }, url);
         else {
-          text = "No members found. :disappointed:\nWould you like to bed discoverable by other teams?";
+          text = "No teams found. :disappointed:\nWould you like to be discoverable by other teams?";
           sendMsgToUrl({
             text: text,
             attachments: [
                 {
                     "fallback": "The features of this app are not supported by your device",
-                    "callback_id": "discover",
+                    "callback_id": "discover_team",
                     "color": "#3AA3E3",
                     "attachment_type": "default",
                     "actions": [
@@ -325,9 +327,17 @@ function setRoles(msg, role, callback) {
   });
 }
 
-function setDiscoverable(msg, discoverable, callback) {
-  if(discoverable === "true") {
+function setDiscoverable(msg, discoverable, category, callback) {
+  if (discoverable === "true") {
     callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!");
+    data.updateVisibility(msg.user.id, true, success => {
+      if(!success) console.error("ERROR: Could not update visibility of " + msg.user.name);
+    });
+    if (category === "member") { // member looking for teams
+      data.addMember(msg.user.id, () => {});
+    } else if (category === "team") {  // team looking for members
+      data.addTeam(msg.user.id, () => {});
+    }
   }
   else {
     callback("All the best team-hunting! :smile:");

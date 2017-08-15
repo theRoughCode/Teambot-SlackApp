@@ -7,13 +7,13 @@ admin.initializeApp({
   databaseURL: "https://teambot-68704.firebaseio.com"
 });
 
-var auth = admin.auth();
-var db = admin.database();
-var userRef = db.ref('users');
-var teamRef = db.ref('teams');
-var memRef = db.ref('members');
+const auth = admin.auth();
+const db = admin.database();
+const userRef = db.ref('users');
+const teamRef = db.ref('teams');
+const memRef = db.ref('members');
 
-// Add user to database
+// Update user
 function updateUser(userId, data, callback) {
   /*
   Keyword Arguments:
@@ -31,9 +31,32 @@ function updateUser(userId, data, callback) {
   });
 }
 
+// Update team
+function addTeam(userId, callback, remove = false) {
+  var data = new Date().getTime();
+  if(remove) data = null;
+  teamRef.child(userId).set(data).then(() => {
+    callback(true);
+  }, error => {
+    console.error(error);
+    callback(false);
+  });
+}
+
+// Update member
+function addMember(userId, callback, remove = false) {
+  var data = new Date().getTime();
+  if(remove) data = null;
+  memRef.child(userId).set(data).then(() => {
+    callback(true);
+  }, error => {
+    console.error(error);
+    callback(false);
+  });
+}
+
 // Update field
 function updateField(userId, field, data, callback) {
-  console.log(data);
   userRef.child(`${userId}/${field}`).set(data).then(() => {
     callback(true);
   }, error => {
