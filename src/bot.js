@@ -135,6 +135,7 @@ function display(msg, callback) {
 }
 
 /* HELPERS */
+
 // send message to webhook
 function sendMsgToUrl(msg, url = webhookUri) {
   var slack = new Slack();
@@ -143,6 +144,11 @@ function sendMsgToUrl(msg, url = webhookUri) {
   slack.webhook(msg, function(err, response) {
     console.log(response);
   });
+}
+
+// display error message
+function displayErrorMsg(callback) {
+  callback("Oops, something went wrong! :thinking-face:\nPlease contact an organizer! :telephone_receiver:");
 }
 
 
@@ -224,13 +230,42 @@ function editUserType(msg, type, callback) {
       "value": `${role}`
     };
   });
-  var str = (type === "team") ? "a team" : "members";
-  callback({
-    text: `:pencil: You are now looking for ${str}.`,
-    replace_original: true
-  });
-  addUser(userId, userName, { userType: type }, success => {
-    if(success) {}
+
+  data.updateType(userId, type, success => {
+    if(success) {
+      var isTeam = (type === "team");
+      var str = isTeam ? "a team" : "members";
+      data.updateTeam(userId, success => {
+        if(success) {
+          callback({
+            text: `:pencil: You are now looking for ${str}.`,
+            replace_original: true
+          });
+        } else {
+          displayErrorMsg(msg => {
+            return callback({
+              text: msg,
+              replace_original: true
+            });
+          });
+        }
+      }, !isTeam);
+      data.updateMember(userId, success => {
+        if(success) {
+          callback({
+            text: `:pencil: You are now looking for ${str}.`,
+            replace_original: true
+          });
+        } else {
+          displayErrorMsg(msg => {
+            return callback({
+              text: msg,
+              replace_original: true
+            });
+          });
+        }
+      }, isTeam);
+    }
     else {
       console.error(`Failed to add ${msg.user_name}`);
     }
@@ -334,7 +369,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
         callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!");
       else {
         console.error("ERROR: Could not update visibility of " + msg.user.name);
-        return callback("Oops, something went wrong! :thinking-face:\nPlease contact an organizer! :telephone_receiver:");
+        return displayErrorMsg(callback);
       }
     });
     if (category === "member") { // member looking for teams
