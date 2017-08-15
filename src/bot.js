@@ -173,9 +173,7 @@ function display(userId, callback) {
               "fallback": "Required plain-text summary of the attachment.",
               "color": "#3AA3E3",
               "pretext": "Here's your information!",
-              "author_name": `${userName}`,
-                "title": "Your Preferences",
-                "text": "Optional text that appears within the attachment",
+              "title": "Your Preferences",
               "fields": [
                   {
                       "title": "Roles",
