@@ -153,7 +153,6 @@ function list(msg, callback) {
               const roles = (info.roles) ? info.roles.join(", ") : "N/A";
               const skills = (info.skills) ? info.skills.join(", ") : "N/A";
               const userName = info.username;
-              console.log(userName);
 
               // if valid username
               if(userName) {
@@ -174,13 +173,12 @@ function list(msg, callback) {
                     }
                   ]
                 });
-                console.log(attachments);
+                count++;
               }
             } else {
               return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
             }
           });
-          count++;
           // if final key
           console.log(attachments);
           if(count >= Object.keys(data).length) return sendMsgToUrl({
