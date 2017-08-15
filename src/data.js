@@ -32,7 +32,7 @@ function updateUser(userId, data, callback) {
 }
 
 // Update team
-function addTeam(userId, callback, remove = false) {
+function updateTeam(userId, callback, remove = false) {
   var data = new Date().getTime();
   if(remove) data = null;
   teamRef.child(userId).set(data).then(() => {
@@ -44,7 +44,7 @@ function addTeam(userId, callback, remove = false) {
 }
 
 // Update member
-function addMember(userId, callback, remove = false) {
+function updateMember(userId, callback, remove = false) {
   var data = new Date().getTime();
   if(remove) data = null;
   memRef.child(userId).set(data).then(() => {
@@ -157,6 +157,8 @@ function deleteUser (userId) {
 
 module.exports = {
   updateUser,
+  updateTeam,
+  updateMember,
   updateRoles,
   updateSkills,
   updateType,

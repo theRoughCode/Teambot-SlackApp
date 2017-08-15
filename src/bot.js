@@ -329,14 +329,18 @@ function setRoles(msg, role, callback) {
 
 function setDiscoverable(msg, discoverable, category, callback) {
   if (discoverable === "true") {
-    callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!");
     data.updateVisibility(msg.user.id, true, success => {
-      if(!success) console.error("ERROR: Could not update visibility of " + msg.user.name);
+      if(success)
+        callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!");
+      else {
+        console.error("ERROR: Could not update visibility of " + msg.user.name);
+        return callback("Oops, something went wrong! :thinking-face:\nPlease contact an organizer! :telephone_receiver:");
+      }
     });
     if (category === "member") { // member looking for teams
-      data.addMember(msg.user.id, () => {});
+      data.updateMember(msg.user.id, () => {});
     } else if (category === "team") {  // team looking for members
-      data.addTeam(msg.user.id, () => {});
+      data.updateTeam(msg.user.id, () => {});
     }
   }
   else {
