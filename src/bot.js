@@ -203,6 +203,7 @@ function setUserType(msg, type, callback) {
       "value": `${role}`*/
     };
   });
+  console.log(attachments);
 
   // looking for team
   if(type === "team") {
