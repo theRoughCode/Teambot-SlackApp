@@ -259,25 +259,25 @@ function updateSkills(msg, callback) {
     if (success) {
       callback(null);
       async.map(skills, (skill, next1) => {
-        next1(null, async.times(5, (n, next2) => {
+        async.times(5, (n, next2) => {
           next2(null, {
             "name": `${skill}`,
-            "text": ":star:".repeat(n),
+            "text": ":star:".repeat(n + 1),
             "type": "button",
-            "value": n
+            "value": n + 1
           });
         }, (err, actions) => {
           console.log(skill);
           console.log(actions);
-          return {
+          next1(null, {
             "fallback": "The features of this app are not supported by your device",
             "callback_id": "skills",
             "color": "#3AA3E3",
             "attachment_type": "default",
             "title": `${skill}`,
             "actions": actions
-          };
-        }));
+          });
+        });
       }, (err, attachments) => {
         console.log(attachments);
         return sendMsgToUrl({
