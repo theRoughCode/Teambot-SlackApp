@@ -136,11 +136,50 @@ function parseIMsg(msg, callback) {
 
 // Lists teams or members
 function list(msg, callback) {
+  const responseUrl = msg.response_url;
   const text = msg.text.toLowerCase();
   if(text === "members" || text === "member") { // display members
     data.getMembers((res, data) => {
       if(res) {
-        if(data) callback(data);
+        if(data) {
+          const attachments = [];
+          callback(null);
+          for (var userId in data) {
+            data.getUserInfo(userId, (success, info) => {
+              if (success) {
+                const roles = (data.roles) ? data.roles.join(", ") : "N/A";
+                const skills = (data.skills) ? data.skills.join(", ") : "N/A";
+                const userName = data.username;
+                // if valid username
+                if(userName) {
+                  attachments.push({
+                    "fallback": "Required plain-text summary of the attachment.",
+                    "color": "#3AA3E3",
+                    "title": `<@${userId}|${userName}>`,
+                    "fields": [
+                      {
+                        "title": "Roles",
+                        "value": roles,
+                        "short": true
+                      },
+                      {
+                        "title": "Skills",
+                        "value": skills,
+                        "short": true
+                      }
+                    ]
+                  });
+                }
+              } else {
+                return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+              }
+            });
+          }
+          return sendMsgToUrl({
+            "text": "List of members:",
+            attachments: attachments
+          }, responseUrl);
+        }
         else callback("No members found. :disappointed:");
       } else callback();
     });
@@ -152,7 +191,7 @@ function list(msg, callback) {
       } else callback();
     });
   } else {
-    callback("Incorrect command.  e.g. _/display teams_");
+    callback("Incorrect command.  e.g. _/list teams_");
   }
 }
 
