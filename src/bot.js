@@ -303,6 +303,7 @@ function setRoles(msg, role, callback) {
     roles.push(role);
     data.updateRoles(msg.user.id, roles, success => {
       if (success) {
+        console.log(msg);
         var msg = msg.original_message;
         msg[replace_original] = true;
         for (var i = 0; i < msg[attachments].length; i++) {
