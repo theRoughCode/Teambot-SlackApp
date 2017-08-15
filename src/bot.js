@@ -184,10 +184,23 @@ function setUserType(msg, type, callback) {
   var tempSlack = new Slack();
 
   tempSlack.setWebhook(responseUrl);
-  var options = ROLES.map(role => {
+  var attachments = ROLES.map(role => {
     return {
       "text": `${role}`,
-      "value": `${role}`
+      "fallback": "The features of this app are not supported by your device",
+      "callback_id": "roles",
+      "color": "#3AA3E3",
+      "attachment_type": "default",
+      "actions": [
+          {
+              "name": "roles",
+              "text": "Add to roles",
+              "type": "button",
+              "value": `${role}`
+          }
+        ]
+      /*"text": `${role}`,
+      "value": `${role}`*/
     };
   });
 
@@ -203,20 +216,7 @@ function setUserType(msg, type, callback) {
               "callback_id": "roles",
               "color": "#3AA3E3",
               "attachment_type": "default",
-              "actions": [
-                  {
-                      "name": "roles_list",
-                      "text": "Pick a role...",
-                      "type": "select",
-                      "options": options
-                  },
-                  {
-                    "name": "done",
-                    "text": "No more roles",
-                    "type": "button",
-                    "value": "done"
-                  }
-              ]
+              "actions": attachments
           }
       ]
     });
