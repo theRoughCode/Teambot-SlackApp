@@ -160,8 +160,8 @@ function list(msg, callback) {
 function display(userId, callback) {
   data.getUserInfo(userId, (res, data) => {
     if (res) {
-      const roles = data.roles.join(", ") || "N/A";
-      const skills = data.skills.join(", ") || "N/A";
+      const roles = (data.roles) data.roles.join(", ") : "N/A";
+      const skills = (data.skills) ? data.skills.join(", ") : "N/A";
       const userType = data.user_type || "N/A";
       const userName = data.username || "N/A";
       const visible = (data.visible) ? "Yes" : "No";
