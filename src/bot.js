@@ -174,17 +174,17 @@ function list(msg, callback) {
                   ]
                 });
               }
-              count++;
-              // if final key
-              console.log(attachments);
-              if(count >= Object.keys(myObj).length) return sendMsgToUrl({
-                "text": "List of members:",
-                attachments: attachments
-              }, responseUrl);
             } else {
               return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
             }
           });
+          count++;
+          // if final key
+          console.log(attachments);
+          if(count >= Object.keys(myObj).length) return sendMsgToUrl({
+            "text": "List of members:",
+            attachments: attachments
+          }, responseUrl);
         }
       }
     });
