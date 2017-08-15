@@ -145,7 +145,9 @@ function list(msg, callback) {
       else {
         const attachments = [];
         callback(null);
+        console.log(data);
         for (var userId in data) {
+          console.log(userId);
           db.getUserInfo(userId, (success, info) => {
             if (success) {
               const roles = (data.roles) ? data.roles.join(", ") : "N/A";
@@ -264,9 +266,7 @@ function sendMsgToUrl(msg, url = webhookUri) {
   var slack = new Slack();
   slack.setWebhook(url);
 
-  slack.webhook(msg, function(err, response) {
-    console.log(response);
-  });
+  slack.webhook(msg, function(err, response) {});
 }
 
 // display error message
