@@ -137,7 +137,7 @@ function display(msg, callback) {
 // Update skills
 function updateSkills(msg, callback) {
   if (!msg.text) return callback({
-    text: "Please input skills"
+    text: "Incorrect command. Please input skills!"
   });
   var text = msg.text.replace(/\s/g,'');
   var skills = text.split(',');
