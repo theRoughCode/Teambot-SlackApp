@@ -20,14 +20,23 @@ routes.post('/start', function(req, res) {
     res.send(msg);
   });
 });
-
+/*
 routes.post('/post', function(req, res) {
   /* token, team_id, team_domain, channel_id
   channel_name, user_id, user_name
-  command=/ , text, response_url*/
+  command=/ , text, response_url
   bot.parseMsg(req.body.text);
   res.status(200);
   res.send();
+});*/
+
+// help
+routes.post('/help', function(req, res) {
+  res.status(200);
+  bot.helpMsg(msg => {
+    msg.response_type = "ephemeral";
+    res.send(msg);
+  });
 });
 
 // interactive messages

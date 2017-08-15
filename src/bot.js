@@ -103,15 +103,16 @@ function welcome(body, callback) {
 }
 
 // send message
+/*
 function parseMsg(message) {
   if (message === "help") helpMsg();
   else
     sendMsgToUrl({ text: message });
-}
+}*/
 
 // list commands
-function helpMsg() {
-  sendMsgToUrl({ text: "Type /start to begin the search!" });
+function helpMsg(callback) {
+  callback({ text: "List of commands:\n  /start to begin the search!\n  /display to display your preferences\n  /list (members/teams) to display the list of discoverable users" });
 }
 
 // parse interactive messages
@@ -617,7 +618,7 @@ function addUser(userId, userName, { roles = [], skills = [],
 
 module.exports = {
   welcome,
-  parseMsg,
+  helpMsg,
   parseIMsg,
   list,
   display,
