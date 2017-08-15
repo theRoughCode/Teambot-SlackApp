@@ -124,10 +124,7 @@ function parseIMsg(msg, callback) {
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
   } else if (callbackID === 'roles') {
-    if(actions[0].name === 'done')
-      setRoles(msg, actions[0].value, callback);
-    else
-      setRoles(msg, actions[0].selected_options[0].value, callback);
+    setRoles(msg, actions[0].value, callback);
   } else if (callbackID === 'discover_team') { // find teams
     setDiscoverable(msg, actions[0].value, "member", callback);
   } else if (callbackID === 'discover_member') {  // find members
@@ -302,6 +299,24 @@ function editUserType(msg, type, callback) {
 }
 
 function setRoles(msg, role, callback) {
+  data.getRoles(msg.user.id, (res, roles) => {
+    if (roles === null) roles = [];
+    roles.push(role);
+    data.updateRoles(msg.user.id, roles, success => {
+      if (success) {
+        callback({
+          text: `Added ${role}`,
+          replace_original: true,
+        });
+      }
+      else {
+        console.error("ERROR: Could not update roles for " + msg.user.name);
+        displayErrorMsg(msg => callback({ text: msg }));
+      }
+    });
+  });
+
+/*
   const url = msg.response_url;
   data.getRoles(msg.user.id, (res, roles) => {
     if(role === 'done') { // no more roles
@@ -388,7 +403,7 @@ function setRoles(msg, role, callback) {
         if (!success) console.error("ERROR: Could not update roles for " + msg.user.name);
       });
     }
-  });
+  });*/
 }
 
 function setDiscoverable(msg, discoverable, category, callback) {
