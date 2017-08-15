@@ -117,6 +117,7 @@ function helpMsg() {
 
 // parse interactive messages
 function parseIMsg(msg, callback) {
+  console.log(msg);
   msg = JSON.parse(msg.payload);
   const callbackID = msg.callback_id;
   const actions = msg.actions;
@@ -303,7 +304,6 @@ function setRoles(msg, role, callback) {
     roles.push(role);
     data.updateRoles(msg.user.id, roles, success => {
       if (success) {
-        console.log(msg);
         var msg = msg.original_message;
         msg[replace_original] = true;
         for (var i = 0; i < msg[attachments].length; i++) {
