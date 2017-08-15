@@ -66,6 +66,17 @@ routes.post('/display', function(req, res) {
   });
 });
 
+// edit skills
+routes.post('/skills', function(req, res) {
+  /* token, team_id, team_domain, channel_id
+  channel_name, user_id, user_name
+  command=/ , text, response_url*/
+  res.status(200);
+  bot.updateSkills(req.body, msg => {
+    res.send(msg);
+  });
+})
+
 
 
 module.exports = routes;

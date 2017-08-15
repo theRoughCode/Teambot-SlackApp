@@ -112,7 +112,7 @@ function parseIMsg(msg, callback) {
   }
 }
 
-// display
+// Display teams or members
 function display(msg, callback) {
   const text = msg.text.toLowerCase();
   if(text === "members" || text === "member") { // display members
@@ -132,6 +132,19 @@ function display(msg, callback) {
   } else {
     callback("Incorrect command.  e.g. _/display teams_");
   }
+}
+
+// Update skills
+function updateSkills(msg, callback) {
+  var text = msg.text.replace(/\s/g,'');
+  var skills = text.split(',');
+  data.updateSkills(msg.user_id, skills, success => {
+    if (success) {
+      callback({
+        text: "Here are your skills: " + skills.join(", ");
+      });
+    } else displayErrorMsg(msg => callback({ text: msg }));
+  });
 }
 
 /* HELPERS */
@@ -359,7 +372,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
   if (discoverable === "true") {
     data.updateVisibility(msg.user.id, true, success => {
       if(success)
-        callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!");
+        callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can list down all relevant skills(i.e. languages/frameworks/tools) using the `/skills` command!\ne.g. /skills Node.js, Python, Java");
       else {
         console.error("ERROR: Could not update visibility of " + msg.user.name);
         return displayErrorMsg(callback);
@@ -395,5 +408,6 @@ module.exports = {
   welcome,
   parseMsg,
   parseIMsg,
-  display
+  display,
+  updateSkills
 }
