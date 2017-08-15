@@ -1,6 +1,6 @@
 var Slack = require('slack-node');
 const http = require('http');
-const data = require('../src/data');
+const db = require('../src/data');
 
 webhookUri = process.env.WEBHOOK;
 
@@ -36,7 +36,7 @@ function welcome(body, callback) {
   const userName = body.user_name;
   const userId = body.user_id;
 
-  data.hasUser(userId, (res, data) => {
+  db.hasUser(userId, (res, data) => {
     // user exists in db
     if (res && data.visible) {
       var actions = [];
@@ -139,52 +139,51 @@ function list(msg, callback) {
   const responseUrl = msg.response_url;
   const text = msg.text.toLowerCase();
   if(text === "members" || text === "member") { // display members
-    data.getMembers((res, data) => {
-      if(res) {
-        if(data) {
-          const attachments = [];
-          callback(null);
-          for (var userId in data) {
-            data.getUserInfo(userId, (success, info) => {
-              if (success) {
-                const roles = (data.roles) ? data.roles.join(", ") : "N/A";
-                const skills = (data.skills) ? data.skills.join(", ") : "N/A";
-                const userName = data.username;
-                // if valid username
-                if(userName) {
-                  attachments.push({
-                    "fallback": "Required plain-text summary of the attachment.",
-                    "color": "#3AA3E3",
-                    "title": `<@${userId}|${userName}>`,
-                    "fields": [
-                      {
-                        "title": "Roles",
-                        "value": roles,
-                        "short": true
-                      },
-                      {
-                        "title": "Skills",
-                        "value": skills,
-                        "short": true
-                      }
-                    ]
-                  });
-                }
-              } else {
-                return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+    db.getMembers((res, data) => {
+      if(!res) return displayErrorMsg(msg => callback({ text: msg }));
+      else if (!data) return callback("No members found. :disappointed:");
+      else {
+        const attachments = [];
+        callback(null);
+        for (var userId in data) {
+          db.getUserInfo(userId, (success, info) => {
+            if (success) {
+              const roles = (data.roles) ? data.roles.join(", ") : "N/A";
+              const skills = (data.skills) ? data.skills.join(", ") : "N/A";
+              const userName = data.username;
+              // if valid username
+              if(userName) {
+                attachments.push({
+                  "fallback": "Required plain-text summary of the attachment.",
+                  "color": "#3AA3E3",
+                  "title": `<@${userId}|${userName}>`,
+                  "fields": [
+                    {
+                      "title": "Roles",
+                      "value": roles,
+                      "short": true
+                    },
+                    {
+                      "title": "Skills",
+                      "value": skills,
+                      "short": true
+                    }
+                  ]
+                });
               }
-            });
-          }
-          return sendMsgToUrl({
-            "text": "List of members:",
-            attachments: attachments
-          }, responseUrl);
+            } else {
+              return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+            }
+          });
         }
-        else callback("No members found. :disappointed:");
-      } else callback();
+        return sendMsgToUrl({
+          "text": "List of members:",
+          attachments: attachments
+        }, responseUrl);
+      }
     });
   } else if (text === "teams" || text === "team") { // display teams
-    data.getTeams((res, data) => {
+    db.getTeams((res, data) => {
       if(res) {
         if(data) callback(data);
         else callback("No teams found. :disappointed:");
@@ -197,7 +196,7 @@ function list(msg, callback) {
 
 // display user info
 function display(userId, callback) {
-  data.getUserInfo(userId, (res, data) => {
+  db.getUserInfo(userId, (res, data) => {
     if (res) {
       const roles = (data.roles) ? data.roles.join(", ") : "N/A";
       const skills = (data.skills) ? data.skills.join(", ") : "N/A";
@@ -247,7 +246,7 @@ function updateSkills(msg, callback) {
   var text = msg.text.replace(/\s/g,'');
   var skills = text.split(',');
 
-  data.updateSkills(msg.user_id, skills, success => {
+  db.updateSkills(msg.user_id, skills, success => {
     if (success) {
       callback({
         text: "Here are your skills: " + skills.join(", ")
@@ -350,11 +349,11 @@ function editUserType(msg, type, callback) {
   const userName = msg.user.name;
   const userId = msg.user.id;
 
-  data.updateType(userId, type, success => {
+  db.updateType(userId, type, success => {
     if(success) {
       var isTeam = (type !== "team");
       var str = !isTeam ? "a team" : "members";
-      data.updateTeam(userId, success => {
+      db.updateTeam(userId, success => {
         if(success) {
           callback({
             text: `:pencil: You are now looking for ${str}.`,
@@ -369,7 +368,7 @@ function editUserType(msg, type, callback) {
           });
         }
       }, !isTeam);
-      data.updateMember(userId, success => {
+      db.updateMember(userId, success => {
         if(success) {
           callback({
             text: `:pencil: You are now looking for ${str}.`,
@@ -393,13 +392,13 @@ function editUserType(msg, type, callback) {
 
 function setRoles(msg, role, callback) {
   const url = msg.response_url;
-  data.getRoles(msg.user.id, (res, roles) => {
+  db.getRoles(msg.user.id, (res, roles) => {
     if(role === 'done') { // no more roles
       callback({
         text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
         replace_original: true
       });
-      data.getTeams((res, data) => {
+      db.getTeams((res, data) => {
         if(res && data) sendMsgToUrl({ text: data }, url);
         else {
           text = "No teams found. :disappointed:\nWould you like to be discoverable by other teams?";
@@ -475,7 +474,7 @@ function setRoles(msg, role, callback) {
         ]
       });
 
-      data.updateRoles(msg.user.id, roles, success => {
+      db.updateRoles(msg.user.id, roles, success => {
         if (success) {
           callback({
             text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
@@ -494,7 +493,7 @@ function setRoles(msg, role, callback) {
 
 function setDiscoverable(msg, discoverable, category, callback) {
   if (discoverable === "true") {
-    data.updateVisibility(msg.user.id, true, success => {
+    db.updateVisibility(msg.user.id, true, success => {
       if(success)
         callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can list down all relevant skills (i.e. languages/frameworks/tools) using the `/skills` command!\ne.g. `/skills Node.js, Python, Java`");
       else {
@@ -503,9 +502,9 @@ function setDiscoverable(msg, discoverable, category, callback) {
       }
     });
     if (category === "member") { // member looking for teams
-      data.updateMember(msg.user.id, () => {});
+      db.updateMember(msg.user.id, () => {});
     } else if (category === "team") {  // team looking for members
-      data.updateTeam(msg.user.id, () => {});
+      db.updateTeam(msg.user.id, () => {});
     }
   }
   else {
@@ -519,7 +518,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
 function addUser(userId, userName, { roles = [], skills = {},
   userType = null, visible = false } = {}, callback) {
   if (userName === undefined) callback(false);
-  data.updateUser(userId, {
+  db.updateUser(userId, {
     "username": userName,
     "roles": roles,
     "skills": skills,
