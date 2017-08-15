@@ -227,7 +227,6 @@ function setUserType(msg, type, callback) {
       "value": `${role}`*/
     };
   });
-  console.log(attachments);
 
   // looking for team
   if(type === "team") {
@@ -304,10 +303,14 @@ function setRoles(msg, role, callback) {
     roles.push(role);
     data.updateRoles(msg.user.id, roles, success => {
       if (success) {
-        callback({
-          text: `Added ${role}`,
-          replace_original: true,
-        });
+        var msg = msg.original_message;
+        msg[replace_original] = true;
+        for (var i = 0; i < msg[attachments].length; i++) {
+          if(msg[attachments][i].actions[0].value === 'role') {
+            msg[attachments][i] = `:white_check_mark: Added ${role} to your roles!`;
+          }
+        }
+        callback(msg);
       }
       else {
         console.error("ERROR: Could not update roles for " + msg.user.name);
