@@ -551,9 +551,12 @@ function setRoles(msg, role, callback) {
 
 // Update Skill Levels
 function updateSkillLevels(msg, skill, level, callback) {
+  const responseUrl = msg.response_url;
   const skillArr = [];
+
   db.getSkills(msg.user.id, (res, skills) => {
-    if (!res) displayErrorMsg(msg => callback({ text: msg }));
+    if (!res) return displayErrorMsg(msg => callback({ text: msg }));
+    callback(null);
     for (var i = 0; i < skills.length; i++) {
       if(skills[i].skill === skill) {
         skills[i]["level"] = level;
@@ -562,8 +565,8 @@ function updateSkillLevels(msg, skill, level, callback) {
             if (!value.level) skillArr.push(value.skill);
             next();
           }, err => {
-            if (err) return displayErrorMsg(msg => callback({ text: msg }));
-            displaySkillChoice(skillArr, msg => callback(msg));
+            if (err) return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+            displaySkillChoice(skillArr, msg => sendMsgToUrl(msg, responseUrl));
           });
         });
       }
