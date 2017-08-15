@@ -124,6 +124,8 @@ function parseIMsg(msg, callback) {
     setUserType(msg, actions[0].value, callback);
   } else if (callbackID === 'roles') {
     setRoles(msg, actions[0].value, callback);
+  } else if (callbackID === 'skills') {
+    updateSkillLevels(msg, actions[0].name, actions[0].value, callback);
   } else if (callbackID === 'discover_team') { // find teams
     setDiscoverable(msg, actions[0].value, "member", callback);
   } else if (callbackID === 'discover_member') {  // find members
@@ -245,8 +247,8 @@ function display(userId, callback) {
   })
 }
 
-// Update skills
-function updateSkills(msg, callback) {
+// Create new skills
+function createSkills(msg, callback) {
   const responseUrl = msg.response_url;
 
   if (!msg.text) return callback({
@@ -255,37 +257,20 @@ function updateSkills(msg, callback) {
   var text = msg.text.replace(/\s/g,'');
   var skills = text.split(',');
 
-  db.updateSkills(msg.user_id, skills, success => {
-    if (success) {
-      callback(null);
-      async.map(skills, (skill, next1) => {
-        async.times(5, (n, next2) => {
-          next2(null, {
-            "name": `${skill}`,
-            "text": ":star:".repeat(n + 1),
-            "type": "button",
-            "value": n + 1
-          });
-        }, (err, actions) => {
-          console.log(skill);
-          console.log(actions);
-          next1(null, {
-            "fallback": "The features of this app are not supported by your device",
-            "callback_id": "skills",
-            "color": "#3AA3E3",
-            "attachment_type": "default",
-            "title": `${skill}`,
-            "actions": actions
-          });
-        });
-      }, (err, attachments) => {
-        console.log(attachments);
-        return sendMsgToUrl({
-          text: "Here are your skills: " + skills.join(", ") + "\nHow proficient are you at:",
-          attachments: attachments
-        }, responseUrl);
-      });
-    } else displayErrorMsg(msg => callback({ text: msg }));
+  callback(null);
+  displaySkillChoice(skills, msg => {
+    sendMsgToUrl(msg, responseUrl);
+    var skillArr = skills.filter((skill, index, self) => {
+      return index === self.indexOf(skill);  // remove duplicates
+    }).map(skill => {
+      return {
+        skill: skill,
+        level: null
+      };
+    });
+    db.updateSkills(userId, skillArr, success => {
+      if (!success) displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+    });
   });
 }
 
@@ -302,6 +287,38 @@ function sendMsgToUrl(msg, url = webhookUri) {
 // display error message
 function displayErrorMsg(callback) {
   callback("Oops, something went wrong! :thinking-face:\nPlease contact an organizer! :telephone_receiver:");
+}
+
+// display skills
+function displaySkillChoice(skills, callback) {
+  if(!skills.length) return callback({
+    text: ":thumbsup: Excellent! Your skill levels are all set!"
+  });
+
+  async.map(skills, (skill, next1) => {
+    async.times(5, (n, next2) => {
+      next2(null, {
+        "name": `${skill}`,
+        "text": ":star:".repeat(n + 1),
+        "type": "button",
+        "value": n + 1
+      });
+    }, (err, actions) => {
+      next1(null, {
+        "fallback": "The features of this app are not supported by your device",
+        "callback_id": "skills",
+        "color": "#3AA3E3",
+        "attachment_type": "default",
+        "title": `${skill}`,
+        "actions": actions
+      });
+    });
+  }, (err, attachments) => {
+    callback({
+      text: "How proficient are you at:",
+      attachments: attachments
+    });
+  });
 }
 
 
@@ -520,7 +537,8 @@ function setRoles(msg, role, callback) {
   }
 
   db.getRoles(msg.user.id, (res, roles) => {
-    if(role === 'done') { // no more roles
+    if (!res) return displayErrorMsg(msg => callback({ text: msg }));
+    if (role === 'done') { // no more roles
       callback({
         text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
         replace_original: true
@@ -529,6 +547,28 @@ function setRoles(msg, role, callback) {
       else db.getMembers(output);
     } else parseRoles(roles);
   });
+}
+
+// Update Skill Levels
+function updateSkillLevels(msg, skill, level, callback) {
+  const skillArr = [];
+  db.getSkills(msg.user.id, (res, skills) => {
+    if (!res) displayErrorMsg(msg => callback({ text: msg }));
+    for (var i = 0; i < skills.length; i++) {
+      if(skills[i].skill === skill) {
+        skills[i]["level"] = level;
+        db.updateSkills(msg.user.id, skills, success => {
+          async.forEachOf(skills, (value, index, next) => {
+            if (!value.level) skillArr.push(value.skill);
+            next();
+          }, err => {
+            if (err) return displayErrorMsg(msg => callback({ text: msg }));
+            displaySkillChoice(skillArr, msg => callback(msg));
+          });
+        });
+      }
+    }
+  })
 }
 
 function setDiscoverable(msg, discoverable, category, callback) {
@@ -555,7 +595,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
 
 /* Interact with data.js */
 
-function addUser(userId, userName, { roles = [], skills = {},
+function addUser(userId, userName, { roles = [], skills = [],
   userType = null, visible = false } = {}, callback) {
   if (userName === undefined) callback(false);
   db.updateUser(userId, {
@@ -573,5 +613,5 @@ module.exports = {
   parseIMsg,
   list,
   display,
-  updateSkills
+  createSkills
 }

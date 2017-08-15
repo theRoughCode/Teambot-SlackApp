@@ -64,7 +64,7 @@ function updateField(userId, field, data, callback) {
     callback(false);
   }, error => {
     console.error(error);
-    callback(false, null);
+    callback(false);
   });
 }
 

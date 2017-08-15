@@ -83,7 +83,7 @@ routes.post('/skills', function(req, res) {
   channel_name, user_id, user_name
   command=/ , text, response_url*/
   res.status(200);
-  bot.updateSkills(req.body, msg => {
+  bot.createSkills(req.body, msg => {
     res.send(msg);
   });
 })
