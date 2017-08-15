@@ -224,13 +224,6 @@ function editUserType(msg, type, callback) {
   const userName = msg.user.name;
   const userId = msg.user.id;
 
-  var options = roles.map(role => {
-    return {
-      "text": `${role}`,
-      "value": `${role}`
-    };
-  });
-
   data.updateType(userId, type, success => {
     if(success) {
       var isTeam = (type === "team");
