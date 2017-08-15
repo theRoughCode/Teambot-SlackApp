@@ -139,66 +139,63 @@ function parseIMsg(msg, callback) {
 function list(msg, callback) {
   const responseUrl = msg.response_url;
   const text = msg.text.toLowerCase();
-  if(text === "members" || text === "member") { // display members
-    db.getMembers((res, data) => {
-      if(!res) return displayErrorMsg(msg => callback({ text: msg }));
-      else if (!data) return callback("No members found. :disappointed:");
-      else {
-        const attachments = [];
-        callback(null);
 
-        async.forEachOf(data, (value, userId, innerCallback) => {
-          db.getUserInfo(userId, (success, info) => {
-            if (success) {
-              const roles = (info.roles) ? info.roles.join(", ") : "N/A";
-              const skills = (info.skills) ? info.skills.join(", ") : "N/A";
-              const userName = info.username;
+  var output = function (type, res, data) {
+    if(!res) return displayErrorMsg(msg => callback({ text: msg }));
+    else if (!data) return callback(`No ${type}s found. :disappointed:`);
 
-              // if valid username
-              if(userName) {
-                attachments.push({
-                  "fallback": "Required plain-text summary of the attachment.",
-                  "color": "#3AA3E3",
-                  "title": `<@${userId}|${userName}>`,
-                  "fields": [
-                    {
-                      "title": "Roles",
-                      "value": roles,
-                      "short": true
-                    },
-                    {
-                      "title": "Skills",
-                      "value": skills,
-                      "short": true
-                    }
-                  ]
-                });
-              }
-              innerCallback();
-            } else {
-              return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
-            }
-          });
-        }, function (err) {
-          if (err) {
-            console.error(err.message);
-            return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
-          } else {
-            return sendMsgToUrl({
-             "text": "List of members:",
-             attachments: attachments
-           }, responseUrl);
+    const attachments = [];
+    callback(null);
+
+    async.forEachOf(data, (value, userId, innerCallback) => {
+      db.getUserInfo(userId, (success, info) => {
+        if (success) {
+          const roles = (info.roles) ? info.roles.join(", ") : "N/A";
+          const skills = (info.skills) ? info.skills.join(", ") : "N/A";
+          const userName = info.username;
+
+          // if valid username
+          if(userName) {
+            attachments.push({
+              "fallback": "Required plain-text summary of the attachment.",
+              "color": "#3AA3E3",
+              "title": `<@${userId}|${userName}>`,
+              "fields": [
+                {
+                  "title": "Roles",
+                  "value": roles,
+                  "short": true
+                },
+                {
+                  "title": "Skills",
+                  "value": skills,
+                  "short": true
+                }
+              ]
+            });
           }
-        });
+          innerCallback();
+        } else {
+          return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+        }
+      });
+    }, function (err) {
+      if (err) {
+        console.error(err.message);
+        return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+      } else {
+        return sendMsgToUrl({
+         "text": `List of ${type}s:`,
+         attachments: attachments
+       }, responseUrl);
       }
     });
+  };
+
+  if(text === "members" || text === "member") { // display members
+    db.getMembers((res, data) => output("member", res, data));
   } else if (text === "teams" || text === "team") { // display teams
-    db.getTeams((res, data) => {
-      if(res) {
-        if(data) callback(data);
-        else callback("No teams found. :disappointed:");
-      } else callback();
-    });
+    db.getTeams((res, data) => output("team", res, data));
   } else {
     callback("Incorrect command.  e.g. _/list teams_");
   }
