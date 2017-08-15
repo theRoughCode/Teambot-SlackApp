@@ -309,6 +309,7 @@ function editUserType(msg, type, callback) {
 }
 
 function setRoles(msg, role, callback) {
+  const url = msg.response_url;
   data.getRoles(msg.user.id, (res, roles) => {
     if(role === 'done') { // no more roles
       callback({
@@ -408,7 +409,6 @@ function setRoles(msg, role, callback) {
   });
 
 /*
-  const url = msg.response_url;
   data.getRoles(msg.user.id, (res, roles) => {
     if(role === 'done') { // no more roles
       callback({
