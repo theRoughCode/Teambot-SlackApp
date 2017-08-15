@@ -10,11 +10,10 @@ const ROLES = ["Front End", "Back End", "Android", "iOS", "Design", "Hardware"];
 function welcome(body, callback) {
   const userName = body.user_name;
   const userId = body.user_id;
-  
+
   data.hasUser(userId, (res, data) => {
     // user exists in db
-    console.log(data);
-    if (res && data.visibility) {
+    if (res && data.visible) {
       var actions = [];
       var action_userType = {
         "name": "user_type",
