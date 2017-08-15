@@ -138,6 +138,9 @@ function display(msg, callback) {
 function updateSkills(msg, callback) {
   var text = msg.text.replace(/\s/g,'');
   var skills = text.split(',');
+  if(!skills.length) return callback({
+    text: "Please input skills"
+  });
   data.updateSkills(msg.user_id, skills, success => {
     if (success) {
       callback({
