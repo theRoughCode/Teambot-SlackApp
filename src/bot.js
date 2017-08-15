@@ -160,8 +160,47 @@ function list(msg, callback) {
 function display(userId, callback) {
   data.getUserInfo(userId, (res, data) => {
     if (res) {
-      console.log(data);
-      callback(data);
+      const roles = data.roles.join(", ") || "N/A";
+      const skills = data.skills.join(", ") || "N/A";
+      const userType = data.user_type || "N/A";
+      const userName = data.username || "N/A";
+      const visible = (data.visible) ? "Yes" : "No";
+      callback({
+        text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
+        replace_original: true,
+        attachments: [
+          {
+              "fallback": "Required plain-text summary of the attachment.",
+              "color": "#3AA3E3",
+              "pretext": "Here's your information!",
+              "author_name": `${userName}`,
+                "title": "Your Preferences",
+                "text": "Optional text that appears within the attachment",
+              "fields": [
+                  {
+                      "title": "Roles",
+                      "value": roles,
+                      "short": true
+                  },
+                  {
+                      "title": "Skills",
+                      "value": skills,
+                      "short": true
+                  },
+                  {
+                      "title": "Looking For",
+                      "value": userType,
+                      "short": true
+                  },
+                  {
+                      "title": "Discoverable?",
+                      "value": visible,
+                      "short": true
+                  }
+              ]
+          }
+        ]
+      });
     } else displayErrorMsg(msg => callback({ text: msg }));
   })
 }
