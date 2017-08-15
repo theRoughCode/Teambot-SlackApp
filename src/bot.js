@@ -353,7 +353,10 @@ function setRoles(msg, role, callback) {
       var attachments = ROLES.map(role => {
         if (roles.includes(role.role))
           return {
-            "text": `:white_check_mark: Added ${role} to your roles!`
+            "text": `:white_check_mark: Added ${role.role} to your roles!`,
+            "fallback": "The features of this app are not supported by your device",
+            "color": "#3AA3E3",
+            "attachment_type": "default"
           };
         else
           return {
