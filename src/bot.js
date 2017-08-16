@@ -40,6 +40,7 @@ function welcome(body, callback) {
   const userId = body.user_id;
   const responseUrl = body.response_url;
   callback(null);
+  console.log(body);
 
   db.hasUser(userId, (res, data) => {
     // user exists in db
@@ -48,14 +49,6 @@ function welcome(body, callback) {
     else return welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
   });
 }
-
-// send message
-/*
-function parseMsg(message) {
-  if (message === "help") helpMsg();
-  else
-    sendMsgToUrl({ text: message });
-}*/
 
 // list commands
 function helpMsg(callback) {
@@ -99,9 +92,7 @@ function parseEvent(msg, callback) {
   if (msg.event.type === "url_verification")
     verifyURL(msg.challenge, callback);
   else if (msg.event.type === "member_joined_channel")
-    welcomeUser(msg.event.user, msg.event.item.channel, callback);
-  else if (msg.event.type === "reaction_added")
-    welcomeUser(msg.event.user, msg.event.item.channel, callback);
+    welcomeUser(msg.event.user, msg.event.channel, callback);
 }
 
 // Lists teams or members
