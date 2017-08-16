@@ -115,7 +115,7 @@ function parseIMsg(msg, callback) {
 function parseEvent(msg, callback) {
   console.log("Event fired");
   console.log(msg);
-  return callback({text: msg});
+  return callback({text: JSON.stringify(msg)});
   if (msg.type === "url_verification")
     verifyURL(msg.challenge, callback);
   else if (msg.type === "member_joined_channel")
