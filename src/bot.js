@@ -580,6 +580,8 @@ function setRoles(msg, role, callback) {
   const url = msg.response_url;
   const type = msg.actions[0].name;
 
+    console.log(msg.actions);
+    console.log(type);
   var output = function(res, data) {
     if(res && data) sendMsgToUrl({ text: data }, url);
     else {
