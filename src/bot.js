@@ -362,8 +362,17 @@ function welcomeOldUser(userName, userId, data, callback) {
   }
   actions.push(action_userType);
 
+  // Set roles
+  if (!data.roles) {
+    actions.push({
+      "name": "set_roles",
+      "text": "Pick roles",
+      "type": "button",
+      "value": "roles"
+    });
+  }
   // Toggle visibility
-  if (!data.visible)
+  else if (!data.visible)
     actions.push({
       "name": "visibility",
       "text": "Turn on discoverability",
@@ -391,6 +400,40 @@ function welcomeOldUser(userName, userId, data, callback) {
         "actions": actions
       }
     ]
+  });
+}
+
+// Role selection
+function selectRoles(roles, defaultButtonText, callback) {
+  if (roles === null) roles = [];
+  roles.push(role);  // add role to list
+
+  async.map(ROLES, (role, next) => {
+    if (roles.includes(role.role))
+      return {
+        "text": `:white_check_mark: Added ${role.role} to your roles!`,
+        "fallback": "The features of this app are not supported by your device",
+        "color": "#3AA3E3",
+        "attachment_type": "default"
+      };
+    else
+      return {
+        "text": `${role.emote} ${role.role}`,
+        "fallback": "The features of this app are not supported by your device",
+        "callback_id": "roles",
+        "color": "#3AA3E3",
+        "attachment_type": "default",
+        "actions": [
+          {
+            "name": `${type}`,
+            "text": "Add to roles",
+            "type": "button",
+            "value": `${role.role}`
+          }
+        ]
+      };
+  }, (err, results) => {
+    callback(attachments);
   });
 }
 
@@ -572,66 +615,6 @@ function setRoles(msg, role, callback) {
     }
   }
 
-  var parseRoles = function(roles) {
-    if (roles === null) roles = [];
-    roles.push(role);  // add role to list
-
-    var attachments = ROLES.map(role => {
-      if (roles.includes(role.role))
-        return {
-          "text": `:white_check_mark: Added ${role.role} to your roles!`,
-          "fallback": "The features of this app are not supported by your device",
-          "color": "#3AA3E3",
-          "attachment_type": "default"
-        };
-      else
-        return {
-          "text": `${role.emote} ${role.role}`,
-          "fallback": "The features of this app are not supported by your device",
-          "callback_id": "roles",
-          "color": "#3AA3E3",
-          "attachment_type": "default",
-          "actions": [
-            {
-              "name": `${type}`,
-              "text": "Add to roles",
-              "type": "button",
-              "value": `${role.role}`
-            }
-          ]
-        };
-    });
-    attachments.push({
-      "text": ":thumbsup: That's all",
-      "fallback": "The features of this app are not supported by your device",
-      "callback_id": "roles",
-      "color": "#3AA3E3",
-      "attachment_type": "default",
-      "actions": [
-        {
-          "name": `${type}`,
-          "text": "Begin search",
-          "type": "button",
-          "value": "done"
-        }
-      ]
-    });
-
-    db.updateRoles(msg.user.id, roles, success => {
-      if (success) {
-        callback({
-          text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
-          replace_original: true,
-          attachments: attachments
-        });
-      }
-      else {
-        console.error("ERROR: Could not update roles for " + msg.user.name);
-        displayErrorMsg(msg => callback({ text: msg }));
-      }
-    });
-  }
-
   db.getRoles(msg.user.id, (res, roles) => {
     // errors is handled by parseRoles(null)
     if (role === 'done') { // no more roles
@@ -641,7 +624,36 @@ function setRoles(msg, role, callback) {
       });
       if(type === "teams") db.getTeams(output);
       else db.getMembers(output);
-    } else parseRoles(roles);
+    } else selectRoles(roles, attachments => {
+      attachments.push({
+        "text": ":thumbsup: That's all",
+        "fallback": "The features of this app are not supported by your device",
+        "callback_id": "roles",
+        "color": "#3AA3E3",
+        "attachment_type": "default",
+        "actions": [
+          {
+            "name": `${type}`,
+            "text": "Begin search",
+            "type": "button",
+            "value": "done"
+          }
+        ]
+      });
+      db.updateRoles(msg.user.id, roles, success => {
+        if (success) {
+          callback({
+            text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
+            replace_original: true,
+            attachments: attachments
+          });
+        }
+        else {
+          console.error("ERROR: Could not update roles for " + msg.user.name);
+          displayErrorMsg(msg => callback({ text: msg }));
+        }
+      });
+    });
   });
 }
 
