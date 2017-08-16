@@ -168,14 +168,8 @@ function deleteUser (userId, callback) {
     console.error(error);
     callback(false);
   });
-  teamRef.child(userId).set(null).then(() => callback(true), error => {
-    console.error(error);
-    callback(false);
-  });
-  memRef.child(userId).set(null).then(() => callback(true), error => {
-    console.error(error);
-    callback(false);
-  });
+  teamRef.child(userId).set(null);
+  memRef.child(userId).set(null);
 }
 
 
