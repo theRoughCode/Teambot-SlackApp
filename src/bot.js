@@ -419,13 +419,15 @@ function welcomeUser(userId, channel, callback) {
   callback(null);
   console.log(userId);
   console.log(channel);
-  convertToUserName(userId, username => {
+  convertToUserName("U6MB28M97", username => console.log(username));
+
+  /*convertToUserName(userId, username => {
     return sendMsgToUrl({
       "channel": `#${channel}`,
       "username": username,
       "text": `:wave: Welcome ${username}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
     });
-  });
+  });*/
 }
 
 
