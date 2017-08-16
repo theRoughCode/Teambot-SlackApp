@@ -629,7 +629,9 @@ function setRoles(msg, role, callback) {
       else db.getMembers(output);
     } else {
       if (roles === null) roles = [];
+      console.log(roles);
       roles.push(role);  // add role to list
+      console.log(roles);
 
       selectRoles(roles, attachments => {
         db.updateRoles(msg.user.id, roles, success => {
