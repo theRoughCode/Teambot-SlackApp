@@ -603,8 +603,7 @@ function setRoles(msg, role, callback) {
     var roles = data.roles;
 
     // errors is handled by parseRoles(null)
-    if (role === 'done') { // no more roles
-      const type = msg.actions[0].name;
+    if (role === 'done') { // no more role
       sendMsgToUrl({
         text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
         replace_original: true
