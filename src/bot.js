@@ -627,8 +627,9 @@ function setRoles(msg, role, callback) {
     } else {
       if (roles === null) roles = [];
       roles.push(role);  // add role to list
-      console.log(roles);
+
       selectRoles(roles, type, attachments => {
+        console.log(attachments);
         db.updateRoles(msg.user.id, roles, success => {
           if (success) {
             sendMsgToUrl({
