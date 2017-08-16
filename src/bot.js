@@ -125,9 +125,9 @@ function parseEvent(msg, callback) {
   if (msg.event.type === "url_verification")
     verifyURL(msg.challenge, callback);
   else if (msg.event.type === "member_joined_channel")
-    welcomeUser(msg.event.user, callback);
+    welcomeUser(msg.event.user, msg.event.item.channel, callback);
   else if (msg.event.type === "reaction_added")
-    welcomeUser(msg.event.user, callback);
+    welcomeUser(msg.event.user, msg.event.item.channel, callback);
 }
 
 // Lists teams or members
