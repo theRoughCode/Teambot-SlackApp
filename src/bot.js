@@ -404,7 +404,7 @@ function welcomeOldUser(userName, userId, data, callback) {
 }
 
 // Role selection
-function selectRoles(roles, defaultButtonText, callback) {
+function selectRoles(roles, type, callback, defaultButton = null) {
   async.map(ROLES, (role, next) => {
     if (roles.includes(role.role))
       return {
@@ -430,7 +430,8 @@ function selectRoles(roles, defaultButtonText, callback) {
         ]
       };
   }, (err, results) => {
-    callback(attachments);
+    if(defaultButton) results.push(defaultButton);
+    return callback(results);
   });
 }
 
@@ -626,24 +627,7 @@ function setRoles(msg, role, callback) {
     } else {
       if (roles === null) roles = [];
       roles.push(role);  // add role to list
-      selectRoles(roles, attachments => {
-        console.log(msg.actions);
-        console.log(type);
-        attachments.push({
-          "text": ":thumbsup: That's all",
-          "fallback": "The features of this app are not supported by your device",
-          "callback_id": "roles",
-          "color": "#3AA3E3",
-          "attachment_type": "default",
-          "actions": [
-            {
-              "name": `${type}`,
-              "text": "Begin search",
-              "type": "button",
-              "value": "done"
-            }
-          ]
-        });
+      selectRoles(roles, type, attachments => {
         db.updateRoles(msg.user.id, roles, success => {
           if (success) {
             callback({
@@ -657,6 +641,22 @@ function setRoles(msg, role, callback) {
             displayErrorMsg(msg => callback({ text: msg }));
           }
         });
+      },
+      // Default Button
+      {
+        "text": ":thumbsup: That's all",
+        "fallback": "The features of this app are not supported by your device",
+        "callback_id": "roles",
+        "color": "#3AA3E3",
+        "attachment_type": "default",
+        "actions": [
+          {
+            "name": `${type}`,
+            "text": "Begin search",
+            "type": "button",
+            "value": "done"
+          }
+        ]
       });
     }
   });
