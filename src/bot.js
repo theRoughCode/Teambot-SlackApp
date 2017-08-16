@@ -412,6 +412,8 @@ function verifyURL(challenge, callback) {
 // welcome new user
 function welcomeUser(userId, channel, callback) {
   callback(null);
+  console.log(userId);
+  console.log(channel);
   convertToUserName(userId, username => {
     return sendMsgToUrl({
       "channel": `#${channel}`,
