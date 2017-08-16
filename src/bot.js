@@ -406,16 +406,15 @@ function welcomeOldUser(userName, userId, data, callback) {
 // Role selection
 function selectRoles(roles, callback, defaultButton = null) {
   async.map(ROLES, (role, next) => {
-    console.log(role);
     if (roles.includes(role.role))
-      return {
+      return next(null, {
         "text": `:white_check_mark: Added ${role.role} to your roles!`,
         "fallback": "The features of this app are not supported by your device",
         "color": "#3AA3E3",
         "attachment_type": "default"
-      };
+      });
     else
-      return {
+      return next(null, {
         "text": `${role.emote} ${role.role}`,
         "fallback": "The features of this app are not supported by your device",
         "callback_id": "roles",
@@ -429,7 +428,7 @@ function selectRoles(roles, callback, defaultButton = null) {
             "value": `${role.role}`
           }
         ]
-      };
+      });
   }, (err, results) => {
     if(defaultButton) results.push(defaultButton);
     console.log(results);
