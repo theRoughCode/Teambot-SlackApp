@@ -415,12 +415,14 @@ function verifyURL(challenge, callback) {
 function welcomeUser(userId, channel, callback) {
   callback(null);
 
-  convertToUserName(userId, username => {
-    return sendMsgToUrl({
-      "channel": `#${channel}`,
-      "username": username,
-      "text": `:wave: Welcome ${username}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
-    });
+  convertToUserName(userId, (success, data) => {
+    if (success)
+      return sendMsgToUrl({
+        "channel": `#${channel}`,
+        "username": data,
+        "text": `:wave: Welcome ${username}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
+      });
+    else return displayErrorMsg(msg => sendMsgToUrl({ text: msg }));
   });
 }
 
