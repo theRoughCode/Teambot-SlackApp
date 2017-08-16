@@ -615,6 +615,7 @@ function setRoles(msg, role, callback) {
   }
 
   db.getUserInfo(msg.user.id, (res, data) => {
+    console.log(data);
     const roles = data.roles;
     const type = data.user_type;
 
