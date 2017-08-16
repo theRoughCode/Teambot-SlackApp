@@ -5,6 +5,25 @@ const async = require('async');
 
 webhookUri = process.env.WEBHOOK;
 
+/* Added functionality to Slack object */
+Slack.prototype.convertToUserID = function(key){
+  // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
+  if(key in this.users) return key; // This string must already be a user ID
+
+  for(var userid in this.users){
+    if(this.users[userid].name === key) return userid;
+  }
+}
+
+Slack.prototype.convertToUserName = function(key){
+  // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
+  for(var userid in this.users){
+    if(userid === key || this.users[userid].name === key){
+      return this.users[userid].name;
+    }
+  }
+}
+
 const ROLES = [
   {
     role: "Front End",
@@ -97,6 +116,8 @@ function parseEvent(msg, callback) {
   if (msg.type === "url_verification")
     verifyURL(msg.challenge, callback);
   else if (msg.type === "member_joined_channel")
+    welcomeUser(msg.user, msg.channel, callback);
+  else if (msg.type === "reaction_added")
     welcomeUser(msg.user, msg.channel, callback);
 }
 
@@ -380,12 +401,9 @@ function verifyURL(challenge, callback) {
 }
 
 // welcome new user
-function welcomeUser(user, channel, callback) {
-  callback(200);
-  data.hasUser(new Slack().convertToUserID(user), (success, data) => {
-    if (success) {  // user is in database
-
-    }
+function welcomeUser(userId, channel, callback) {
+  callback({
+    "text": `:wave: Welcome ${new Slack().convertToUserName(userId)}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
   });
 }
 
@@ -402,9 +420,7 @@ function setUserType(msg, type, callback) {
   const responseUrl = msg.response_url;
   const userName = msg.user.name;
   const userId = msg.user.id;
-  var tempSlack = new Slack();
 
-  tempSlack.setWebhook(responseUrl);
   var attachments = ROLES.map(role => {
     return {
       "text": `${role.emote} ${role.role}`,
@@ -681,7 +697,9 @@ function addUser(userId, userName, { roles = [], skills = [],
 // remove user
 function removeUser(userId, callback) {
   db.deleteUser(userId, success => {
-    if (success) callback(null);
+    if (success) callback({
+      "text": ":thumbsup: You've been successfully removed!  Happy hacking! :smiley:"
+    });
     else displayErrorMsg(msg => callback({ text: msg }));
   });
 }
