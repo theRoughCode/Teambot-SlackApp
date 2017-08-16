@@ -36,12 +36,14 @@ const ROLES = [
 function welcome(body, callback) {
   const userName = body.user_name;
   const userId = body.user_id;
+  const responseUrl = body.response_url;
+  callback(null);
 
   db.hasUser(userId, (res, data) => {
     // user exists in db
-    if (res) return welcomeOldUser(userName, userId, data, callback);
+    if (res) return welcomeOldUser(userName, userId, data, msg => sendMsgToUrl(msg, responseUrl));
     // user does not exist
-    else return welcomeNewUser(userName, callback);
+    else return welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
   });
 }
 
