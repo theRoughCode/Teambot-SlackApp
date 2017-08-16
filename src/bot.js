@@ -404,9 +404,8 @@ function welcomeOldUser(userName, userId, data, callback) {
 }
 
 // Role selection
-function selectRoles(roles, type, callback, defaultButton = null) {
+function selectRoles(roles, callback, defaultButton = null) {
   async.map(ROLES, (role, next) => {
-    console.log(role);
     if (roles.includes(role.role))
       return {
         "text": `:white_check_mark: Added ${role.role} to your roles!`,
@@ -423,7 +422,7 @@ function selectRoles(roles, type, callback, defaultButton = null) {
         "attachment_type": "default",
         "actions": [
           {
-            "name": `${type}`,
+            "name": "roles",
             "text": "Add to roles",
             "type": "button",
             "value": `${role.role}`
@@ -484,7 +483,7 @@ function setUserType(msg, type, callback) {
       "attachment_type": "default",
       "actions": [
           {
-              "name": `${type}`,
+              "name": "roles",
               "text": "Add to roles",
               "type": "button",
               "value": `${role.role}`
@@ -580,7 +579,6 @@ function editUserType(msg, type, callback) {
 
 function setRoles(msg, role, callback) {
   const responseUrl = msg.response_url;
-  const type = msg.actions[0].name;
 
   callback(null);
 
@@ -619,6 +617,7 @@ function setRoles(msg, role, callback) {
   db.getRoles(msg.user.id, (res, roles) => {
     // errors is handled by parseRoles(null)
     if (role === 'done') { // no more roles
+      const type = msg.actions[0].name;
       sendMsgToUrl({
         text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
         replace_original: true
@@ -629,7 +628,8 @@ function setRoles(msg, role, callback) {
       if (roles === null) roles = [];
       roles.push(role);  // add role to list
 
-      selectRoles(roles, type, attachments => {
+      selectRoles(roles, attachments => {
+        console.log(attachments);
         db.updateRoles(msg.user.id, roles, success => {
           if (success) {
             sendMsgToUrl({
