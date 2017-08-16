@@ -431,7 +431,6 @@ function selectRoles(roles, callback, defaultButton = null) {
       });
   }, (err, results) => {
     if(defaultButton) results.push(defaultButton);
-    console.log(results);
     return callback(results);
   });
 }
@@ -475,24 +474,24 @@ function setUserType(msg, type, callback) {
   const userName = msg.user.name;
   const userId = msg.user.id;
 
-  var attachments = ROLES.map(role => {
-    return {
-      "text": `${role.emote} ${role.role}`,
-      "fallback": "The features of this app are not supported by your device",
-      "callback_id": "roles",
-      "color": "#3AA3E3",
-      "attachment_type": "default",
-      "actions": [
-          {
-              "name": "roles",
-              "text": "Add to roles",
-              "type": "button",
-              "value": `${role.role}`
-          }
-        ]
-    };
-  });
-  attachments.push({
+  selectRoles([], attachments => {
+    // looking for team
+    if(type === "team") {
+      callback({
+        text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
+        replace_original: true,
+        attachments: attachments
+      });
+    }
+    // looking for members
+    else {
+      callback({
+        text: `Awesome!  Before we begin our search, tell us more about your team!\nWhat roles are you looking for?`,
+        replace_original: true,
+        attachments: attachments
+      });
+    }
+  }, {
     "text": ":thumbsup: That's all!",
     "fallback": "The features of this app are not supported by your device",
     "callback_id": "roles",
@@ -508,26 +507,10 @@ function setUserType(msg, type, callback) {
       ]
   });
 
-  // looking for team
-  if(type === "team") {
-    callback({
-      text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
-      replace_original: true,
-      attachments: attachments
-    });
-  }
-  // looking for members
-  else {
-    callback({
-      text: `Awesome!  Before we begin our search, tell us more about your team!\nWhat roles are you looking for?`,
-      replace_original: true,
-      attachments: attachments
-    });
-  }
   addUser(userId, userName, { userType: type }, success => {
-    if(success) {}
-    else {
+    if (!success) {
       console.error(`Failed to add ${msg.user_name}`);
+      displayErrorMsg(msg => sendMsgToUrl(msg, responseUrl));
     }
   });
 }
@@ -633,7 +616,6 @@ function setRoles(msg, role, callback) {
       roles.push(role);  // add role to list
 
       selectRoles(roles, attachments => {
-        console.log(attachments);
         db.updateRoles(msg.user.id, roles, success => {
           if (success) {
             sendMsgToUrl({
