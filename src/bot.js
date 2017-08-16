@@ -566,7 +566,7 @@ function setRoles(msg, role, callback) {
 
   callback(null);
 
-  var output = function(res, data) {
+  var output = function(res, data, type) {
     if(res && data) sendMsgToUrl({ text: data }, responseUrl);
     else {
       text = `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`;
@@ -609,8 +609,8 @@ function setRoles(msg, role, callback) {
         text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
         replace_original: true
       }, responseUrl);
-      if(type === "teams") db.getTeams(output);
-      else db.getMembers(output);
+      if(type === "teams") db.getTeams((res, data) => output(res, data, type));
+      else db.getMembers((res, data) => output(res, data, type));
     } else {
       if (!roles) roles = [];
       roles.push(role);  // add role to list
