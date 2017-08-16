@@ -15,10 +15,7 @@ routes.get('/msg/:msg', function(req, res) {
 // welcome message
 routes.post('/start', function(req, res) {
   res.status(200);
-  bot.welcome(req.body, msg => {
-    msg.response_type = "ephemeral";
-    res.send(msg);
-  });
+  bot.welcome(req.body, msg => res.send(msg));
 });
 /*
 routes.post('/post', function(req, res) {
