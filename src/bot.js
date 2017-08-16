@@ -39,36 +39,7 @@ function welcome(body, callback) {
 
   db.hasUser(userId, (res, data) => {
     // user exists in db
-    if (res && data.visible) {
-      var actions = [];
-      var action_userType = {
-        "name": "user_type",
-        "text": "",
-        "type": "button",
-        "value": ""
-      };
-      if(data.user_type === "team") {
-        action_userType["text"] = "Find members instead";
-        action_userType["value"] = "member";
-      } else if (data.user_type === "member") {
-        action_userType["text"] = "Find a team instead";
-        action_userType["value"] = "team";
-      }
-      actions.push(action_userType);
-      msg = {
-        text: `Welcome back ${userName}! What would you like to do?`,
-        attachments: [
-          {
-            "text": "Select an action:",
-            "fallback": "The features of this app are not supported by your device",
-            "callback_id": "edit",
-            "color": "#3AA3E3",
-            "attachment_type": "default",
-            "actions": actions
-          }
-        ]
-      };
-    }
+    if (res) welcomeOldUser(userId, data);
     else { // user does not exist
       msg = {
         text: `Hi ${userName}!  I'm here to assist you with forming a team!\nTo start, are you looking to join a team or are you part of a team looking for team members?`,
@@ -128,25 +99,31 @@ function parseIMsg(msg, callback) {
   } else if (callbackID === 'skills') {
     updateSkillLevels(msg, actions[0].name, actions[0].value, callback);
   } else if (callbackID === 'discover_team') { // find teams
-    setDiscoverable(msg, actions[0].value, "member", callback);
-  } else if (callbackID === 'discover_member') {  // find members
     setDiscoverable(msg, actions[0].value, "team", callback);
+  } else if (callbackID === 'discover_member') {  // find members
+    setDiscoverable(msg, actions[0].value, "member", callback);
   } else if (callbackID === 'edit') {  // edit existing data
+    // change user type
     if (actions[0].name === 'user_type') {
       editUserType(msg, actions[0].value, callback);
+    }
+    // turn on visibility
+    else if (actions[0].name === "visibility") {
+      setDiscoverable(msg, "true", actions[0].value, callback);
+    }
+    // remove user
+    else if (actions[0].name === "remove") {
+      removeUser(msg.user.id, callback);
     }
   }
 }
 
 // parse incoming events
 function parseEvent(msg, callback) {
-  if(msg.type === "url_verification")
+  if (msg.type === "url_verification")
     verifyURL(msg.challenge, callback);
-}
-
-// Respond to event
-function reactEvent(callback) {
-
+  else if (msg.type === "member_joined_channel")
+    welcomeUser(msg.user, msg.channel, callback);
 }
 
 // Lists teams or members
@@ -283,8 +260,6 @@ function createSkills(msg, callback) {
         level: null
       };
     });
-    console.log(msg);
-    console.log(msg.user_id);
     db.updateSkills(msg.user_id, skillArr, success => {
       if (!success) displayErrorMsg(res => sendMsgToUrl({ text: res }, responseUrl));
     });
@@ -338,12 +313,80 @@ function displaySkillChoice(skills, callback) {
   });
 }
 
+// Welcome new users
+function welcomeNewUser() {
+
+}
+
+// Welcome returning user
+function welcomeOldUser(userId, data, callback) {
+  var actions = [];
+  var action_userType = {
+    "name": "user_type",
+    "text": "",
+    "type": "button",
+    "value": ""
+  };
+
+  // Switch user type
+  if(data.user_type === "team") {
+    action_userType["text"] = "Find members instead";
+    action_userType["value"] = "member";
+  } else if (data.user_type === "member") {
+    action_userType["text"] = "Find a team instead";
+    action_userType["value"] = "team";
+  }
+  actions.push(action_userType);
+
+  // Toggle visibility
+  if (!data.visible)
+    actions.push({
+      "name": "visibility",
+      "text": "Turn on discoverability",
+      "type": "button",
+      "value": (user_type === "team") ? "team" : "members"
+    });
+
+  // Remove User
+  actions.push({
+    "name": "remove",
+    "text": "Remove me",
+    "type": "button",
+    "value": "remove"
+  });
+
+  msg = {
+    text: `Welcome back ${userName}! What would you like to do?`,
+    attachments: [
+      {
+        "text": "Select an action:",
+        "fallback": "The features of this app are not supported by your device",
+        "callback_id": "edit",
+        "color": "#3AA3E3",
+        "attachment_type": "default",
+        "actions": actions
+      }
+    ]
+  };
+}
+
+
 /*  Event Handlers */
 
 // handle url verification to Events API
 function verifyURL(challenge, callback) {
   callback({
     "challenge": challenge
+  });
+}
+
+// welcome new user
+function welcomeUser(user, channel, callback) {
+  callback(200);
+  data.hasUser(new Slack().convertToUserID(user), (success, data) => {
+    if (success) {  // user is in database
+
+    }
   });
 }
 
@@ -610,9 +653,9 @@ function setDiscoverable(msg, discoverable, category, callback) {
         return displayErrorMsg(callback);
       }
     });
-    if (category === "member") { // member looking for teams
+    if (category === "team") { // member looking for teams
       db.updateMember(msg.user.id, () => {});
-    } else if (category === "team") {  // team looking for members
+    } else if (category === "member") {  // team looking for members
       db.updateTeam(msg.user.id, () => {});
     }
   }
@@ -634,6 +677,14 @@ function addUser(userId, userName, { roles = [], skills = [],
     "user_type": userType,
     "visible": visible
   }, success => callback(success));
+}
+
+// remove user
+function removeUser(userId, callback) {
+  db.deleteUser(userId, success => {
+    if (success) callback(null);
+    else displayErrorMsg(msg => callback({ text: msg }));
+  });
 }
 
 module.exports = {

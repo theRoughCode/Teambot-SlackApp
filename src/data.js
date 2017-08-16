@@ -137,8 +137,6 @@ function getVisibility(userId, callback) {
 // Returns true if user is in database
 function hasUser(userId, callback) {
   userRef.once('value').then(snapshot => {
-    console.log(userId);
-    console.log(snapshot.val());
     if (userId !== undefined && snapshot.val() && snapshot.hasChild(userId))
       callback(true, snapshot.val()[userId]);
     else
@@ -165,8 +163,11 @@ function getMembers(callback) {
 }
 
 // Delete user
-function deleteUser (userId) {
-  userRef.child(userId).remove();
+function deleteUser (userId, callback) {
+  userRef.child(userId).set(null).then(() => callback(true), error => {
+    console.error(error);
+    callback(false);
+  });
 }
 
 
