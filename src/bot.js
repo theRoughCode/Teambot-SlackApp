@@ -7,32 +7,6 @@ webhookUri = process.env.WEBHOOK;
 token = process.env.API_TOKEN;
 const SLACK = new Slack(token);
 
-/* Added functionality to Slack object */
-
-Slack.prototype.convertToUserID = function(key, callback){
-  // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
-  SLACK.api("users.list", function(err, response) {
-    for (var i = 0; i < response.members.length; i++) {
-      if(response.members[i].id === key || response.members[i].name === key){
-        return callback(response.members[i].id);
-      }
-      if (i === response.members.length) callback(null);
-    }
-  });
-}
-
-Slack.prototype.convertToUserName = function(key, callback){
-  // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
-  SLACK.api("users.list", function(err, response) {
-    for (var i = 0; i < response.members.length; i++) {
-      if(response.members[i].id === key || response.members[i].name === key){
-        return callback(response.members[i].name);
-      }
-      if (i === response.members.length) callback(null);
-    }
-  });
-}
-
 const ROLES = [
   {
     role: "Front End",
@@ -317,6 +291,32 @@ function displaySkillChoice(skills, callback) {
   });
 }
 
+// Convert from username to id
+function convertToUserID(userId, callback){
+  // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
+  SLACK.api("users.list", function(err, response) {
+    for (var i = 0; i < response.members.length; i++) {
+      if(response.members[i].id === userId || response.members[i].name === userId){
+        return callback(response.members[i].id);
+      }
+      if (i === response.members.length) callback(null);
+    }
+  });
+}
+
+// convert from id to username
+function convertToUserName(userName, callback){
+  // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
+  SLACK.api("users.list", function(err, response) {
+    for (var i = 0; i < response.members.length; i++) {
+      if(response.members[i].id === userName || response.members[i].name === userName){
+        return callback(response.members[i].name);
+      }
+      if (i === response.members.length) callback(null);
+    }
+  });
+}
+
 // Welcome new users
 function welcomeNewUser(userName, callback) {
   callback({
@@ -412,7 +412,7 @@ function verifyURL(challenge, callback) {
 // welcome new user
 function welcomeUser(userId, channel, callback) {
   callback(null);
-  SLACK.convertToUserName(userId, username => {
+  convertToUserName(userId, username => {
     return sendMsgToUrl({
       "channel": `#${channel}`,
       "username": username,
