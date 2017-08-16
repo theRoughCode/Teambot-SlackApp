@@ -406,6 +406,7 @@ function welcomeOldUser(userName, userId, data, callback) {
 // Role selection
 function selectRoles(roles, callback, defaultButton = null) {
   async.map(ROLES, (role, next) => {
+    console.log(role);
     if (roles.includes(role.role))
       return {
         "text": `:white_check_mark: Added ${role.role} to your roles!`,
@@ -431,6 +432,7 @@ function selectRoles(roles, callback, defaultButton = null) {
       };
   }, (err, results) => {
     if(defaultButton) results.push(defaultButton);
+    console.log(results);
     return callback(results);
   });
 }
@@ -630,7 +632,6 @@ function setRoles(msg, role, callback) {
     } else {
       if (!roles) roles = [];
       roles.push(role);  // add role to list
-      console.log(roles);
 
       selectRoles(roles, attachments => {
         console.log(attachments);
