@@ -499,7 +499,7 @@ function setUserType(msg, type, callback) {
     "attachment_type": "default",
     "actions": [
         {
-            "name": `${type}`,
+            "name": "done",
             "text": "Begin search",
             "type": "button",
             "value": "done"
@@ -614,8 +614,10 @@ function setRoles(msg, role, callback) {
     }
   }
 
-  db.getRoles(msg.user.id, (res, roles) => {
-    console.log(msg);
+  db.getUserInfo(msg.user.id, (res, data) => {
+    const roles = data.roles;
+    const type = data.user_type;
+
     // errors is handled by parseRoles(null)
     if (role === 'done') { // no more roles
       const type = msg.actions[0].name;
@@ -654,7 +656,7 @@ function setRoles(msg, role, callback) {
         "attachment_type": "default",
         "actions": [
           {
-            "name": `${type}`,
+            "name": "done",
             "text": "Begin search",
             "type": "button",
             "value": "done"
