@@ -420,7 +420,7 @@ function welcomeUser(userId, channel, callback) {
       return sendMsgToUrl({
         "channel": `#${channel}`,
         "username": data,
-        "text": `:wave: Welcome ${username}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
+        "text": `:wave: Welcome ${data}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
       });
     else return displayErrorMsg(msg => sendMsgToUrl({ text: msg }));
   });
