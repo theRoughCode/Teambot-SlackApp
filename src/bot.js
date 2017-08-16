@@ -39,37 +39,9 @@ function welcome(body, callback) {
 
   db.hasUser(userId, (res, data) => {
     // user exists in db
-    if (res) welcomeOldUser(userId, data);
-    else { // user does not exist
-      msg = {
-        text: `Hi ${userName}!  I'm here to assist you with forming a team!\nTo start, are you looking to join a team or are you part of a team looking for team members?`,
-        attachments: [
-            {
-                "text": "I am looking for:",
-                "fallback": "The features of this app are not supported by your device",
-                "callback_id": "user_type",
-                "color": "#3AA3E3",
-                "attachment_type": "default",
-                "actions": [
-                    {
-                        "name": "user_team",
-                        "text": "A Team",
-                        "type": "button",
-                        "value": "team"
-                    },
-                    {
-                        "name": "user_member",
-                        "text": "Team Members",
-                        "type": "button",
-                        "value": "member"
-                    }
-                ]
-            }
-        ]
-      };
-    }
-
-    callback(msg);
+    if (res) return welcomeOldUser(userName, userId, data, callback);
+    // user does not exist
+    else return welcomeNewUser(userName, callback);
   });
 }
 
@@ -314,12 +286,37 @@ function displaySkillChoice(skills, callback) {
 }
 
 // Welcome new users
-function welcomeNewUser() {
-
+function welcomeNewUser(userName, callback) {
+  callback({
+    text: `Hi ${userName}!  I'm here to assist you with forming a team!\nTo start, are you looking to join a team or are you part of a team looking for team members?`,
+    attachments: [
+      {
+        "text": "I am looking for:",
+        "fallback": "The features of this app are not supported by your device",
+        "callback_id": "user_type",
+        "color": "#3AA3E3",
+        "attachment_type": "default",
+        "actions": [
+          {
+            "name": "user_team",
+            "text": "A Team",
+            "type": "button",
+            "value": "team"
+          },
+          {
+            "name": "user_member",
+            "text": "Team Members",
+            "type": "button",
+            "value": "member"
+          }
+        ]
+      }
+    ]
+  });
 }
 
 // Welcome returning user
-function welcomeOldUser(userId, data, callback) {
+function welcomeOldUser(userName, userId, data, callback) {
   var actions = [];
   var action_userType = {
     "name": "user_type",
