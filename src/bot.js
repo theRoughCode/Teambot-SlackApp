@@ -578,13 +578,13 @@ function editUserType(msg, type, callback) {
 }
 
 function setRoles(msg, role, callback) {
-  const url = msg.response_url;
+  const responseUrl = msg.response_url;
   const type = msg.actions[0].name;
 
-    console.log(msg.actions);
-    console.log(type);
+  callback(200);
+
   var output = function(res, data) {
-    if(res && data) sendMsgToUrl({ text: data }, url);
+    if(res && data) sendMsgToUrl({ text: data }, responseUrl);
     else {
       text = `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`;
       sendMsgToUrl({
@@ -611,17 +611,17 @@ function setRoles(msg, role, callback) {
                 ]
             }
         ]
-      }, url);
+      }, responseUrl);
     }
   }
 
   db.getRoles(msg.user.id, (res, roles) => {
     // errors is handled by parseRoles(null)
     if (role === 'done') { // no more roles
-      callback({
+      sendMsgToUrl({
         text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
         replace_original: true
-      });
+      }, responseUrl);
       if(type === "teams") db.getTeams(output);
       else db.getMembers(output);
     } else {
@@ -630,15 +630,15 @@ function setRoles(msg, role, callback) {
       selectRoles(roles, type, attachments => {
         db.updateRoles(msg.user.id, roles, success => {
           if (success) {
-            callback({
+            sendMsgToUrl({
               text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
               replace_original: true,
               attachments: attachments
-            });
+            }, responseUrl);
           }
           else {
             console.error("ERROR: Could not update roles for " + msg.user.name);
-            displayErrorMsg(msg => callback({ text: msg }));
+            displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
           }
         });
       },
