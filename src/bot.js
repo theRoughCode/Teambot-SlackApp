@@ -292,11 +292,11 @@ function displaySkillChoice(skills, callback) {
 }
 
 // Convert from username to id
-function convertToUserID(userId, callback){
+function convertToUserID(userName, callback){
   // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
   SLACK.api("users.list", function(err, response) {
     for (var i = 0; i < response.members.length; i++) {
-      if(response.members[i].id === userId || response.members[i].name === userId){
+      if(response.members[i].id === userName || response.members[i].name === userName){
         return callback(response.members[i].id);
       }
       if (i === response.members.length) callback(null);
@@ -305,11 +305,15 @@ function convertToUserID(userId, callback){
 }
 
 // convert from id to username
-function convertToUserName(userName, callback){
+function convertToUserName(userId, callback){
   // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
   SLACK.api("users.list", function(err, response) {
     for (var i = 0; i < response.members.length; i++) {
-      if(response.members[i].id === userName || response.members[i].name === userName){
+      if(response.members[i].id === userId || response.members[i].name === userId){
+        console.log(userId);
+        console.log(response.members[i].id);
+        console.log(response.members[i].id === userId);
+        console.log(response.members[i].name);
         return callback(response.members[i].name);
       }
       if (i === response.members.length) callback(null);
