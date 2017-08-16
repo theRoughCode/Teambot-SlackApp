@@ -409,6 +409,7 @@ function selectRoles(roles, defaultButtonText, callback) {
   roles.push(role);  // add role to list
 
   async.map(ROLES, (role, next) => {
+    console.log(role);
     if (roles.includes(role.role))
       return {
         "text": `:white_check_mark: Added ${role.role} to your roles!`,
