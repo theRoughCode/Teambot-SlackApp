@@ -294,12 +294,13 @@ function displaySkillChoice(skills, callback) {
 // Convert from username to id
 function convertToUserID(userName, callback){
   // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
+  if (err) displayErrorMsg(msg => callback({ text: msg }));
   SLACK.api("users.list", function(err, response) {
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userName || response.members[i].name === userName){
         return callback(response.members[i].id);
       }
-      if (i === response.members.length) callback(null);
+      if (i === response.members.length) displayErrorMsg(msg => callback(false, { text: msg }));
     }
   });
 }
@@ -309,15 +310,12 @@ function convertToUserName(userId, callback){
   // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
   SLACK.api("users.list", function(err, response) {
     console.log(response);
+    if (err) displayErrorMsg(msg => callback(false, { text: msg }));
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userId || response.members[i].name === userId){
-        console.log(userId);
-        console.log(response.members[i].id);
-        console.log(response.members[i].id === userId);
-        console.log(response.members[i].name);
-        return callback(response.members[i].name);
+        return callback(true, response.members[i].name);
       }
-      if (i === response.members.length) callback(null);
+      if (i === response.members.length) displayErrorMsg(msg => callback(false, { text: msg }));
     }
   });
 }
@@ -419,7 +417,10 @@ function welcomeUser(userId, channel, callback) {
   callback(null);
   console.log(userId);
   console.log(channel);
-  convertToUserName("U6MB28M97", username => console.log(username));
+  convertToUserName("U6MB28M97", (success, res) => {
+    if (success) console.log(res);
+    else console.log(res.text);
+  });
 
   /*convertToUserName(userId, username => {
     return sendMsgToUrl({
