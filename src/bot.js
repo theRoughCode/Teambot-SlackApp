@@ -354,7 +354,7 @@ function welcomeOldUser(userName, userId, data, callback) {
     "value": "remove"
   });
 
-  msg = {
+  callback({
     text: `Welcome back ${userName}! What would you like to do?`,
     attachments: [
       {
@@ -366,7 +366,7 @@ function welcomeOldUser(userName, userId, data, callback) {
         "actions": actions
       }
     ]
-  };
+  });
 }
 
 
