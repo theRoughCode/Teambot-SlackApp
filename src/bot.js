@@ -138,6 +138,17 @@ function parseIMsg(msg, callback) {
   }
 }
 
+// parse incoming events
+function parseEvent(msg, callback) {
+  if(msg.type === "url_verification")
+    verifyURL(msg.challenge, callback);
+}
+
+// Respond to event
+function reactEvent(callback) {
+
+}
+
 // Lists teams or members
 function list(msg, callback) {
   const responseUrl = msg.response_url;
@@ -324,6 +335,15 @@ function displaySkillChoice(skills, callback) {
       text: "How proficient are you at:",
       attachments: attachments
     });
+  });
+}
+
+/*  Event Handlers */
+
+// handle url verification to Events API
+function verifyURL(challenge, callback) {
+  callback({
+    "challenge": challenge
   });
 }
 
@@ -620,6 +640,7 @@ module.exports = {
   welcome,
   helpMsg,
   parseIMsg,
+  parseEvent,
   list,
   display,
   createSkills

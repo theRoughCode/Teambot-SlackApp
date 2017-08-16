@@ -59,10 +59,14 @@ routes.post('/interact', function(req, res) {
   }
   */
   res.status(200);
-  bot.parseIMsg(req.body, msg => {
-    res.send(msg);
-  });
+  bot.parseIMsg(req.body, msg => res.send(msg));
 });
+
+// Receive events from Event application
+routes.post('/events', function(req, res) {
+  res.status(200);
+  bot.parseEvent(req.body, msg => res.send(msg));
+})
 
 // display listed teams or members
 routes.post('/list', function(req, res) {
@@ -70,9 +74,7 @@ routes.post('/list', function(req, res) {
   channel_name, user_id, user_name
   command=/ , text, response_url*/
   res.status(200);
-  bot.list(req.body, msg => {
-    res.send(msg);
-  });
+  bot.list(req.body, msg => res.send(msg));
 });
 
 // display personal info
@@ -81,9 +83,7 @@ routes.post('/display', function(req, res) {
   channel_name, user_id, user_name
   command=/ , text, response_url*/
   res.status(200);
-  bot.display(req.body.user_id, msg => {
-    res.send(msg);
-  });
+  bot.display(req.body.user_id, msg => res.send(msg));
 });
 
 // edit skills
@@ -92,9 +92,7 @@ routes.post('/skills', function(req, res) {
   channel_name, user_id, user_name
   command=/ , text, response_url*/
   res.status(200);
-  bot.createSkills(req.body, msg => {
-    res.send(msg);
-  });
+  bot.createSkills(req.body, msg => res.send(msg));
 })
 
 
