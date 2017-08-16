@@ -308,6 +308,7 @@ function convertToUserID(userName, callback){
 function convertToUserName(userId, callback){
   // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
   SLACK.api("users.list", function(err, response) {
+    console.log(response);
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userId || response.members[i].name === userId){
         console.log(userId);
