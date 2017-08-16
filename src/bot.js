@@ -406,7 +406,6 @@ function welcomeOldUser(userName, userId, data, callback) {
 // Role selection
 function selectRoles(roles, defaultButtonText, callback) {
   async.map(ROLES, (role, next) => {
-    console.log(role);
     if (roles.includes(role.role))
       return {
         "text": `:white_check_mark: Added ${role.role} to your roles!`,
@@ -626,6 +625,8 @@ function setRoles(msg, role, callback) {
       if (roles === null) roles = [];
       roles.push(role);  // add role to list
       selectRoles(roles, attachments => {
+        console.log(msg.actions);
+        console.log(type);
         attachments.push({
           "text": ":thumbsup: That's all",
           "fallback": "The features of this app are not supported by your device",
