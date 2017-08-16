@@ -61,6 +61,14 @@ routes.post('/interact', function(req, res) {
 
 // Receive events from Event application
 routes.post('/events', function(req, res) {
+  /*
+  {"token","team_id","api_app_id",
+  "event":
+    {"type","user","item":
+      {"type","channel","ts"},
+    "reaction","item_user","event_ts"},
+  "type","authed_users":[],"event_id","event_time"}
+  */
   res.status(200);
   bot.parseEvent(req.body, msg => res.send(msg));
 })

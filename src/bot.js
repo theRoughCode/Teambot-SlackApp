@@ -113,16 +113,12 @@ function parseIMsg(msg, callback) {
 
 // parse incoming events
 function parseEvent(msg, callback) {
-  console.log("Event fired");
-  msg = JSON.stringify(msg);
-  console.log(msg);
-  return callback({text: msg});
-  if (msg.type === "url_verification")
+  if (msg.event.type === "url_verification")
     verifyURL(msg.challenge, callback);
-  else if (msg.type === "member_joined_channel")
-    welcomeUser(msg.user, msg.channel, callback);
-  else if (msg.type === "reaction_added")
-    welcomeUser(msg.user, msg.channel, callback);
+  else if (msg.event.type === "member_joined_channel")
+    welcomeUser(msg.event.user, callback);
+  else if (msg.event.type === "reaction_added")
+    welcomeUser(msg.event.user, callback);
 }
 
 // Lists teams or members
