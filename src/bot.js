@@ -40,7 +40,6 @@ function welcome(body, callback) {
   const userId = body.user_id;
   const responseUrl = body.response_url;
   callback(null);
-  console.log(body);
 
   db.hasUser(userId, (res, data) => {
     // user exists in db
@@ -342,6 +341,7 @@ function welcomeNewUser(userName, callback) {
 
 // Welcome returning user
 function welcomeOldUser(userName, userId, data, callback) {
+  console.log(data);
   var actions = [];
   var action_userType = {
     "name": "user_type",
