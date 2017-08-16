@@ -59,10 +59,6 @@ routes.post('/interact', function(req, res) {
   bot.parseIMsg(req.body, msg => res.send(msg));
 });
 
-routes.get('/test', function(req, res) {
-  bot.test();
-});
-
 // Receive events from Event application
 routes.post('/events', function(req, res) {
   /*

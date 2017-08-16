@@ -295,10 +295,10 @@ function displaySkillChoice(skills, callback) {
 function convertToUserID(userName, callback){
   // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
   SLACK.api("users.list", function(err, response) {
-    if (err) displayErrorMsg(msg => callback({ text: msg }));
+    if (response.error) displayErrorMsg(msg => callback(false, { text: msg }));
     for (var i = 0; i < response.members.length; i++) {
-      if(response.members[i].id === userName || response.members[i].name === userName){
-        return callback(response.members[i].id);
+      if(response.members[i].id === userId || response.members[i].name === userId){
+        return callback(true, response.members[i].id);
       }
       if (i === response.members.length) displayErrorMsg(msg => callback(false, { text: msg }));
     }
@@ -309,7 +309,6 @@ function convertToUserID(userName, callback){
 function convertToUserName(userId, callback){
   // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
   SLACK.api("users.list", function(err, response) {
-    console.log(response);
     if (response.error) displayErrorMsg(msg => callback(false, { text: msg }));
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userId || response.members[i].name === userId){
@@ -415,20 +414,14 @@ function verifyURL(challenge, callback) {
 // welcome new user
 function welcomeUser(userId, channel, callback) {
   callback(null);
-  console.log(userId);
-  console.log(channel);
-  convertToUserName("U6MB28M97", (success, res) => {
-    if (success) console.log(res);
-    else console.log(res.text);
-  });
 
-  /*convertToUserName(userId, username => {
+  convertToUserName(userId, username => {
     return sendMsgToUrl({
       "channel": `#${channel}`,
       "username": username,
       "text": `:wave: Welcome ${username}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
     });
-  });*/
+  });
 }
 
 
