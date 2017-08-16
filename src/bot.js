@@ -406,6 +406,7 @@ function welcomeOldUser(userName, userId, data, callback) {
 // Role selection
 function selectRoles(roles, type, callback, defaultButton = null) {
   async.map(ROLES, (role, next) => {
+    console.log(role);
     if (roles.includes(role.role))
       return {
         "text": `:white_check_mark: Added ${role.role} to your roles!`,
@@ -629,7 +630,6 @@ function setRoles(msg, role, callback) {
       roles.push(role);  // add role to list
 
       selectRoles(roles, type, attachments => {
-        console.log(attachments);
         db.updateRoles(msg.user.id, roles, success => {
           if (success) {
             sendMsgToUrl({
