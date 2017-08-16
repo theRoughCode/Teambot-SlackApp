@@ -341,7 +341,6 @@ function welcomeNewUser(userName, callback) {
 
 // Welcome returning user
 function welcomeOldUser(userName, userId, data, callback) {
-  console.log(data);
   var actions = [];
   var action_userType = {
     "name": "user_type",
@@ -366,7 +365,7 @@ function welcomeOldUser(userName, userId, data, callback) {
       "name": "visibility",
       "text": "Turn on discoverability",
       "type": "button",
-      "value": (user_type === "team") ? "team" : "members"
+      "value": (data.user_type === "team") ? "team" : "members"
     });
 
   // Remove User
