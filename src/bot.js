@@ -110,7 +110,7 @@ function list(msg, callback) {
       db.getUserInfo(userId, (success, info) => {
         if (success) {
           const roles = (info.roles) ? info.roles.join(", ") : "N/A";
-          const skills = (data.skills) ? data.skills.map(skill => {
+          const skills = (info.skills) ? info.skills.map(skill => {
             if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
             else return `${skill.skill}`;
           }).join(", ") : "N/A";
