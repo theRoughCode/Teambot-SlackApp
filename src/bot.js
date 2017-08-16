@@ -678,8 +678,10 @@ function updateSkillLevels(msg, skill, level, callback) {
 function setDiscoverable(msg, discoverable, category, callback) {
   if (discoverable === "true") {
     db.updateVisibility(msg.user.id, true, success => {
-      if(success)
-        callback(":thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can list down all relevant skills (i.e. languages/frameworks/tools) using the `/skills` command!\ne.g. `/skills Node.js, Python, Java`");
+      if(success) {
+        var text = (category === "team") ? "all relevant skills" : "the skills you're looking for"
+        callback(`:thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can list down ${text} (i.e. languages/frameworks/tools) using the ` + "`/skills` command!\ne.g. `/skills Node.js, Python, Java`");
+      }
       else {
         console.error("ERROR: Could not update visibility of " + msg.user.name);
         return displayErrorMsg(callback);
