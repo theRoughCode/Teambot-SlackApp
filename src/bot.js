@@ -405,9 +405,6 @@ function welcomeOldUser(userName, userId, data, callback) {
 
 // Role selection
 function selectRoles(roles, defaultButtonText, callback) {
-  if (roles === null) roles = [];
-  roles.push(role);  // add role to list
-
   async.map(ROLES, (role, next) => {
     console.log(role);
     if (roles.includes(role.role))
@@ -625,36 +622,40 @@ function setRoles(msg, role, callback) {
       });
       if(type === "teams") db.getTeams(output);
       else db.getMembers(output);
-    } else selectRoles(roles, attachments => {
-      attachments.push({
-        "text": ":thumbsup: That's all",
-        "fallback": "The features of this app are not supported by your device",
-        "callback_id": "roles",
-        "color": "#3AA3E3",
-        "attachment_type": "default",
-        "actions": [
-          {
-            "name": `${type}`,
-            "text": "Begin search",
-            "type": "button",
-            "value": "done"
+    } else {
+      if (roles === null) roles = [];
+      roles.push(role);  // add role to list
+      selectRoles(roles, attachments => {
+        attachments.push({
+          "text": ":thumbsup: That's all",
+          "fallback": "The features of this app are not supported by your device",
+          "callback_id": "roles",
+          "color": "#3AA3E3",
+          "attachment_type": "default",
+          "actions": [
+            {
+              "name": `${type}`,
+              "text": "Begin search",
+              "type": "button",
+              "value": "done"
+            }
+          ]
+        });
+        db.updateRoles(msg.user.id, roles, success => {
+          if (success) {
+            callback({
+              text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
+              replace_original: true,
+              attachments: attachments
+            });
           }
-        ]
+          else {
+            console.error("ERROR: Could not update roles for " + msg.user.name);
+            displayErrorMsg(msg => callback({ text: msg }));
+          }
+        });
       });
-      db.updateRoles(msg.user.id, roles, success => {
-        if (success) {
-          callback({
-            text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
-            replace_original: true,
-            attachments: attachments
-          });
-        }
-        else {
-          console.error("ERROR: Could not update roles for " + msg.user.name);
-          displayErrorMsg(msg => callback({ text: msg }));
-        }
-      });
-    });
+    }
   });
 }
 
