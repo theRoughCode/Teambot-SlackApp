@@ -566,38 +566,6 @@ function setRoles(msg, role, callback) {
 
   callback(null);
 
-  var output = function(res, data, type) {
-    if(res && data) sendMsgToUrl({ text: data }, responseUrl);
-    else {
-      text = `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`;
-      sendMsgToUrl({
-        text: text,
-        attachments: [
-            {
-                "fallback": "The features of this app are not supported by your device",
-                "callback_id": `discover_${type}`,
-                "color": "#3AA3E3",
-                "attachment_type": "default",
-                "actions": [
-                    {
-                      "name": "yes",
-                      "text": "Yes please!",
-                      "type": "button",
-                      "value": "true"
-                    },
-                    {
-                      "name": "no",
-                      "text": "No, it's ok!",
-                      "type": "button",
-                      "value": "false"
-                    }
-                ]
-            }
-        ]
-      }, responseUrl);
-    }
-  }
-
   db.getUserInfo(msg.user.id, (res, data) => {
     const type = data.user_type;
     var roles = data.roles;
@@ -608,8 +576,10 @@ function setRoles(msg, role, callback) {
         text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
         replace_original: true
       }, responseUrl);
-      if(type === "teams") db.getTeams((res, data) => output(res, data, type));
-      else db.getMembers((res, data) => output(res, data, type));
+
+      // Perform matchmaking
+      findMatch(type, msg => sendMsgToUrl(msg, responseUrl));
+
     } else {
       if (!roles) roles = [];
       roles.push(role);  // add role to list
@@ -650,6 +620,46 @@ function setRoles(msg, role, callback) {
   });
 }
 
+// Find match
+function findMatch(category, callback) {
+  // algorithm that determines match
+  var computeMatch = function(res, data) {
+    console.log(data);
+    if(res && data) return callback({ text: data }, responseUrl);
+    else {
+      text = `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`;
+      return callback({
+        text: text,
+        attachments: [
+            {
+                "fallback": "The features of this app are not supported by your device",
+                "callback_id": `discover_${type}`,
+                "color": "#3AA3E3",
+                "attachment_type": "default",
+                "actions": [
+                    {
+                      "name": "yes",
+                      "text": "Yes please!",
+                      "type": "button",
+                      "value": "true"
+                    },
+                    {
+                      "name": "no",
+                      "text": "No, it's ok!",
+                      "type": "button",
+                      "value": "false"
+                    }
+                ]
+            }
+        ]
+      }, responseUrl);
+    }
+  }
+
+  if (category === "team") db.getTeams(computeMatch);
+  else db.getMembers(computeMatch);
+}
+
 // Update Skill Levels
 function updateSkillLevels(msg, skill, level, callback) {
   const responseUrl = msg.response_url;
@@ -680,7 +690,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
     db.updateVisibility(msg.user.id, true, success => {
       if(success) {
         var text = (category === "team") ? "all relevant skills" : "the skills you're looking for"
-        callback(`:thumbsup: Awesome!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can list down ${text} (i.e. languages/frameworks/tools) using the ` + "`/skills` command!\ne.g. `/skills Node.js, Python, Java`");
+        callback(`:clap: Yay!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can list down ${text} (i.e. languages/frameworks/tools) using the ` + "`/skills` command!\ne.g. `/skills Node.js, Python, Java`");
       }
       else {
         console.error("ERROR: Could not update visibility of " + msg.user.name);
