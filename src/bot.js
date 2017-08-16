@@ -627,13 +627,15 @@ function setRoles(msg, role, callback) {
     } else {
       if (roles === null) roles = [];
       roles.push(role);  // add role to list
+      console.log(roles);
       selectRoles(roles, type, attachments => {
         db.updateRoles(msg.user.id, roles, success => {
           if (success) {
             sendMsgToUrl({
-              text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
-              replace_original: true,
-              attachments: attachments
+              "text": `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
+              "replace_original": true,
+              "attachments": attachments,
+              "response_type": "ephemeral"
             }, responseUrl);
           }
           else {
