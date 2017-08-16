@@ -4,24 +4,33 @@ const db = require('../src/data');
 const async = require('async');
 
 webhookUri = process.env.WEBHOOK;
+token = process.env.API_TOKEN;
+const SLACK = new Slack(token);
 
 /* Added functionality to Slack object */
-Slack.prototype.convertToUserID = function(key){
-  // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
-  if(key in this.users) return key; // This string must already be a user ID
 
-  for(var userid in this.users){
-    if(this.users[userid].name === key) return userid;
-  }
+Slack.prototype.convertToUserID = function(key, callback){
+  // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
+  SLACK.api("users.list", function(err, response) {
+    for (var i = 0; i < response.members.length; i++) {
+      if(response.members[i].id === key || response.members[i].name === key){
+        return callback(response.members[i].id);
+      }
+      if (i === response.members.length) callback(null);
+    }
+  });
 }
 
-Slack.prototype.convertToUserName = function(key){
+Slack.prototype.convertToUserName = function(key, callback){
   // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
-  for(var userid in this.users){
-    if(userid === key || this.users[userid].name === key){
-      return this.users[userid].name;
+  SLACK.api("users.list", function(err, response) {
+    for (var i = 0; i < response.members.length; i++) {
+      if(response.members[i].id === key || response.members[i].name === key){
+        return callback(response.members[i].name);
+      }
+      if (i === response.members.length) callback(null);
     }
-  }
+  });
 }
 
 const ROLES = [
@@ -402,10 +411,13 @@ function verifyURL(challenge, callback) {
 
 // welcome new user
 function welcomeUser(userId, channel, callback) {
-  console.log(userId);
-  console.log(new Slack().convertToUserName(userId));
-  callback({
-    "text": `:wave: Welcome ${new Slack().convertToUserName(userId)}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
+  callback(null);
+  SLACK.convertToUserName(userId, username => {
+    return sendMsgToUrl({
+      "channel": `#${channel}`,
+      "username": username,
+      "text": `:wave: Welcome ${username}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
+    });
   });
 }
 
