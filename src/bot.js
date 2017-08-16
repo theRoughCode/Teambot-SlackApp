@@ -113,6 +113,8 @@ function parseIMsg(msg, callback) {
 
 // parse incoming events
 function parseEvent(msg, callback) {
+  console.log("Event fired");
+  console.log(msg);
   if (msg.type === "url_verification")
     verifyURL(msg.challenge, callback);
   else if (msg.type === "member_joined_channel")
@@ -402,6 +404,8 @@ function verifyURL(challenge, callback) {
 
 // welcome new user
 function welcomeUser(userId, channel, callback) {
+  console.log(userId);
+  console.log(new Slack().convertToUserName(userId));
   callback({
     "text": `:wave: Welcome ${new Slack().convertToUserName(userId)}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
   });
