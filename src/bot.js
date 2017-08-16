@@ -630,7 +630,7 @@ function setRoles(msg, role, callback) {
   }
 
   db.getRoles(msg.user.id, (res, roles) => {
-    if (!res) return displayErrorMsg(msg => callback({ text: msg }));
+    // errors is handled by parseRoles(null)
     if (role === 'done') { // no more roles
       callback({
         text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
