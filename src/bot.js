@@ -615,7 +615,6 @@ function setRoles(msg, role, callback) {
   }
 
   db.getUserInfo(msg.user.id, (res, data) => {
-    console.log(data);
     const roles = data.roles;
     const type = data.user_type;
 
@@ -629,7 +628,7 @@ function setRoles(msg, role, callback) {
       if(type === "teams") db.getTeams(output);
       else db.getMembers(output);
     } else {
-      if (roles === null) roles = [];
+      if (!roles) roles = [];
       console.log(roles);
       roles.push(role);  // add role to list
       console.log(roles);
