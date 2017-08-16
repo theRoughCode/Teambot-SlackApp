@@ -615,7 +615,7 @@ function setRoles(msg, role, callback) {
   }
 
   db.getUserInfo(msg.user.id, (res, data) => {
-    const roles = data.roles;
+    var roles = data.roles;
     const type = data.user_type;
 
     // errors is handled by parseRoles(null)
@@ -629,9 +629,7 @@ function setRoles(msg, role, callback) {
       else db.getMembers(output);
     } else {
       if (!roles) roles = [];
-      console.log(roles);
       roles.push(role);  // add role to list
-      console.log(roles);
 
       selectRoles(roles, attachments => {
         db.updateRoles(msg.user.id, roles, success => {
