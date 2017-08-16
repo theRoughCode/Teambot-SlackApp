@@ -655,7 +655,7 @@ function findMatch(category, callback) {
       }, responseUrl);
     }
   }
-
+  console.log(category);
   if (category === "team") db.getTeams(computeMatch);
   else db.getMembers(computeMatch);
 }
