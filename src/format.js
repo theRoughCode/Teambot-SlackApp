@@ -121,6 +121,8 @@ function formatMatches(sortedMatches, callback) {
 }
 
 function formatUser(userId, userName, roles, skills, callback) {
+  console.log(roles);
+  console.log(skills);
   callback({
     "fallback": "Required plain-text summary of the attachment.",
     "color": COLOUR,

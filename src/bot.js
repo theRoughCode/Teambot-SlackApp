@@ -559,7 +559,7 @@ function setRoles(msg, role, callback) {
         else if (data) findMatch(userData, data, matches => {
           if (!matches || !matches.length) return sendMsgToUrl(noMatchMsg, responseUrl);
           else return format.formatMatches(matches, formatted => sendMsgToUrl({
-           "text": `:tada: We found some matches!  Here they are:`,
+           "text": `:tada: We found some matches! :tada:\nHere they are:`,
            attachments: formatted
          }, responseUrl));
         });
