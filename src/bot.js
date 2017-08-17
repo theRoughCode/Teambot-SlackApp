@@ -133,8 +133,8 @@ function list(msg, callback) {
     async.forEachOf(data, (value, userId, innerCallback) => {
       db.getUserInfo(userId, (success, info) => {
         if (success) {
-          const roles = (data.roles) ? data.roles.join(", ") : "N/A";
-          const skills = (data.skills) ? data.skills.map(skill => {
+          const roles = (info.roles) ? info.roles.join(", ") : "N/A";
+          const skills = (info.skills) ? info.skills.map(skill => {
             if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
             else return ` - ${skill.skill}`;
           }).join("\n") : "N/A";
@@ -170,16 +170,16 @@ function list(msg, callback) {
 
 // display user info
 function display(userId, callback) {
-  db.getUserInfo(userId, (res, data) => {
+  db.getUserInfo(userId, (res, info) => {
     if (res) {
-      const roles = (data.roles) ? data.roles.join(", ") : "N/A";
-      const skills = (data.skills) ? data.skills.map(skill => {
+      const roles = (info.roles) ? info.roles.join(", ") : "N/A";
+      const skills = (info.skills) ? info.skills.map(skill => {
         if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
         else return ` - ${skill.skill}`;
       }).join("\n") : "N/A";
-      const userType = (data.user_type) ? data.user_type.substring(0, 1).toUpperCase() + data.user_type.substring(1) : "N/A";
-      const userName = data.username || "N/A";
-      const visible = (data.visible) ? "Yes" : "No";
+      const userType = (info.user_type) ? info.user_type.substring(0, 1).toUpperCase() + info.user_type.substring(1) : "N/A";
+      const userName = info.username || "N/A";
+      const visible = (info.visible) ? "Yes" : "No";
 
       // format display
       format.formatInfo(roles, skills, userType, visible, obj => callback({ "attachments" : [obj] }));
