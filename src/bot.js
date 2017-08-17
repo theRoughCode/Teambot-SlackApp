@@ -1,6 +1,8 @@
 var Slack = require('slack-node');
 const http = require('http');
 const db = require('../src/data');
+const match = require('../src/match');
+const format = require('../src/format');
 const async = require('async');
 
 webhookUri = process.env.WEBHOOK;
@@ -43,9 +45,23 @@ function welcome(body, callback) {
 
   db.hasUser(userId, (res, data) => {
     // user exists in db
-    if (res) return welcomeOldUser(userName, userId, data, msg => sendMsgToUrl(msg, responseUrl));
+    if (res) return format.welcomeOldUser(userName, userId, data, msg => sendMsgToUrl(msg, responseUrl));
     // user does not exist
-    else return welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
+    else return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
+  });
+}
+
+// welcome new user
+function welcomeUser(userId, channel, callback) {
+  callback(null);
+
+  convertToUserName(userId, data => {
+    if (data)
+      return sendMsgToUrl({
+        "channel": `#${channel}`,
+        "username": data,
+        "text": `:wave: Welcome ${data}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
+      });
   });
 }
 
@@ -117,25 +133,7 @@ function list(msg, callback) {
           const userName = info.username;
 
           // if valid username
-          if(userName) {
-            attachments.push({
-              "fallback": "Required plain-text summary of the attachment.",
-              "color": "#3AA3E3",
-              "title": `<@${userId}|${userName}>`,
-              "fields": [
-                {
-                  "title": "Roles",
-                  "value": roles,
-                  "short": true
-                },
-                {
-                  "title": "Skills",
-                  "value": skills,
-                  "short": true
-                }
-              ]
-            });
-          }
+          if(userName) format.formatUser(obj => attachments.push(obj));
           innerCallback();
         } else {
           return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
@@ -175,37 +173,10 @@ function display(userId, callback) {
       const userType = (data.user_type) ? data.user_type.substring(0, 1).toUpperCase() + data.user_type.substring(1) : "N/A";
       const userName = data.username || "N/A";
       const visible = (data.visible) ? "Yes" : "No";
-      callback({
-        attachments: [
-          {
-              "fallback": "Required plain-text summary of the attachment.",
-              "color": "#3AA3E3",
-              "pretext": "Here are your preferences!",
-              "fields": [
-                  {
-                      "title": "Roles",
-                      "value": roles,
-                      "short": true
-                  },
-                  {
-                      "title": "Skills",
-                      "value": skills,
-                      "short": true
-                  },
-                  {
-                      "title": "Looking For",
-                      "value": userType,
-                      "short": true
-                  },
-                  {
-                      "title": "Discoverable?",
-                      "value": visible,
-                      "short": true
-                  }
-              ]
-          }
-        ]
-      });
+
+      // format display
+      format.formatInfo(obj => callback({ "attachments" : [obj] }));
+
     } else displayErrorMsg(msg => callback({ text: msg }));
   })
 }
@@ -219,6 +190,24 @@ function createSkills(msg, callback) {
   });
   var text = msg.text.replace(/\s/g,'');
   var skills = text.split(',');
+
+  // Remove duplicates
+  var tempObj = {};
+  for (var i = 0; i < skills.length; i++) {
+    // store index of elements (case-insensitive)
+    const skill = skills[i].toLowerCase();
+    if (!tempObj[skill]) tempObj[skill] = [i];
+    else tempObj[skill].push(i);
+  }
+
+  for (let skill in tempObj) {
+    const indexArr = tempObj[skill];
+    if (indexArr.length > 1) {
+      for (var i = 1; i < indexArr.length; i++) {
+        skills.splice(indexArr[i], 1);  // remove duplicate at that index
+      }
+    }
+  }
 
   callback(null);
   displaySkillChoice(skills, res => {
@@ -247,11 +236,6 @@ function sendMsgToUrl(msg, url = webhookUri) {
   slack.webhook(msg, function(err, response) {});
 }
 
-// display error message
-function displayErrorMsg(callback) {
-  callback("Oops, something went wrong! :thinking-face:\nPlease contact an organizer! :telephone_receiver:");
-}
-
 // display skills
 function displaySkillChoice(skills, callback) {
   if(!skills.length) return callback({
@@ -267,14 +251,7 @@ function displaySkillChoice(skills, callback) {
         "value": n + 1
       });
     }, (err, actions) => {
-      next1(null, {
-        "fallback": "The features of this app are not supported by your device",
-        "callback_id": "skills",
-        "color": "#3AA3E3",
-        "attachment_type": "default",
-        "title": `${skill}`,
-        "actions": actions
-      });
+      format.formatSkillLvl(obj => next1(null, obj));
     });
   }, (err, attachments) => {
     callback({
@@ -288,12 +265,12 @@ function displaySkillChoice(skills, callback) {
 function convertToUserID(userName, callback){
   // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
   SLACK.api("users.list", function(err, response) {
-    if (response.error) displayErrorMsg(msg => callback(false, { text: msg }));
+    if (response.error) format.displayErrorMsg(`Failed to convert username of ${userName} to id: Database error`, msg => callback(false, { text: msg }));
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userId || response.members[i].name === userId){
         return callback(true, response.members[i].id);
       }
-      if (i === response.members.length) displayErrorMsg(msg => callback(false, { text: msg }));
+      if (i === response.members.length) format.displayErrorMsg("Failed to convert username to id: User could not be found", msg => callback(false, { text: msg }));
     }
   });
 }
@@ -302,104 +279,13 @@ function convertToUserID(userName, callback){
 function convertToUserName(userId, callback){
   // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
   SLACK.api("users.list", function(err, response) {
-    if (response.error) displayErrorMsg(msg => callback(false, { text: msg }));
+    if (response.error) format.displayErrorMsg(`Failed to convert id of ${userId} to username: Database error`, msg => callback({ text: msg }));
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userId || response.members[i].name === userId){
-        return callback(true, response.members[i].name);
+        return callback(response.members[i].name);
       }
-      if (i === response.members.length) displayErrorMsg(msg => callback(false, { text: msg }));
+      if (i === response.members.length) format.displayErrorMsg("Failed to convert username to id: User could not be found", msg => callback({ text: msg }));
     }
-  });
-}
-
-// Welcome new users
-function welcomeNewUser(userName, callback) {
-  callback({
-    text: `Hi ${userName}!  I'm here to assist you with forming a team!\nTo start, are you looking to join a team or are you part of a team looking for team members?`,
-    attachments: [
-      {
-        "text": "I am looking for:",
-        "fallback": "The features of this app are not supported by your device",
-        "callback_id": "user_type",
-        "color": "#3AA3E3",
-        "attachment_type": "default",
-        "actions": [
-          {
-            "name": "user_team",
-            "text": "A Team",
-            "type": "button",
-            "value": "team"
-          },
-          {
-            "name": "user_member",
-            "text": "Team Members",
-            "type": "button",
-            "value": "member"
-          }
-        ]
-      }
-    ]
-  });
-}
-
-// Welcome returning user
-function welcomeOldUser(userName, userId, data, callback) {
-  var actions = [];
-  var action_userType = {
-    "name": "user_type",
-    "text": "",
-    "type": "button",
-    "value": ""
-  };
-
-  // Switch user type
-  if(data.user_type === "team") {
-    action_userType["text"] = "Find members instead";
-    action_userType["value"] = "member";
-  } else if (data.user_type === "member") {
-    action_userType["text"] = "Find a team instead";
-    action_userType["value"] = "team";
-  }
-  actions.push(action_userType);
-
-  // Set roles
-  if (!data.roles) {
-    actions.push({
-      "name": "set_roles",
-      "text": "Pick roles",
-      "type": "button",
-      "value": "roles"
-    });
-  }
-  // Toggle visibility
-  else if (!data.visible)
-    actions.push({
-      "name": "visibility",
-      "text": "Turn on discoverability",
-      "type": "button",
-      "value": (data.user_type === "team") ? "team" : "members"
-    });
-
-  // Remove User
-  actions.push({
-    "name": "remove",
-    "text": "Remove me",
-    "type": "button",
-    "value": "remove"
-  });
-
-  callback({
-    text: `Welcome back ${userName}! What would you like to do?`,
-    attachments: [
-      {
-        "text": "Select an action:",
-        "fallback": "The features of this app are not supported by your device",
-        "callback_id": "edit",
-        "color": "#3AA3E3",
-        "attachment_type": "default",
-        "actions": actions
-      }
-    ]
   });
 }
 
@@ -442,21 +328,6 @@ function selectRoles(roles, callback, defaultButton = null) {
 function verifyURL(challenge, callback) {
   callback({
     "challenge": challenge
-  });
-}
-
-// welcome new user
-function welcomeUser(userId, channel, callback) {
-  callback(null);
-
-  convertToUserName(userId, (success, data) => {
-    if (success)
-      return sendMsgToUrl({
-        "channel": `#${channel}`,
-        "username": data,
-        "text": `:wave: Welcome ${data}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
-      });
-    else return displayErrorMsg(msg => sendMsgToUrl({ text: msg }));
   });
 }
 
@@ -509,8 +380,7 @@ function setUserType(msg, type, callback) {
 
   addUser(userId, userName, { userType: type }, success => {
     if (!success) {
-      console.error(`Failed to add ${msg.user_name}`);
-      displayErrorMsg(msg => sendMsgToUrl(msg, responseUrl));
+      format.displayErrorMsg(`Failed to add ${msg.user_name}`, msg => sendMsgToUrl(msg, responseUrl));
     }
   });
 }
@@ -531,7 +401,7 @@ function editUserType(msg, type, callback) {
             replace_original: true
           });
         } else {
-          displayErrorMsg(msg => {
+          format.displayErrorMsg("Failed to update team", msg => {
             return callback({
               text: msg,
               replace_original: true
@@ -546,7 +416,7 @@ function editUserType(msg, type, callback) {
             replace_original: true
           });
         } else {
-          displayErrorMsg(msg => {
+          format.displayErrorMsg("Failed to update member", msg => {
             return callback({
               text: msg,
               replace_original: true
@@ -556,7 +426,12 @@ function editUserType(msg, type, callback) {
       }, isTeam);
     }
     else {
-      console.error(`Failed to add ${msg.user_name}`);
+      format.displayErrorMsg(`Failed to update user type of ${msg.user_name}`, msg => {
+        return callback({
+          text: msg,
+          replace_original: true
+        });
+      });
     }
   });
 }
@@ -566,9 +441,9 @@ function setRoles(msg, role, callback) {
 
   callback(null);
 
-  db.getUserInfo(msg.user.id, (res, data) => {
-    const type = data.user_type;
-    var roles = data.roles;
+  db.getUserInfo(msg.user.id, (res, userData) => {
+    const type = userData.user_type;
+    var roles = userData.roles;
 
     // errors is handled by parseRoles(null)
     if (role === 'done') { // no more role
@@ -577,8 +452,47 @@ function setRoles(msg, role, callback) {
         replace_original: true
       }, responseUrl);
 
+      const noMatchMsg = {
+        text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
+        attachments: [
+            {
+                "fallback": "The features of this app are not supported by your device",
+                "callback_id": `discover_${type}`,
+                "color": "#3AA3E3",
+                "attachment_type": "default",
+                "actions": [
+                    {
+                      "name": "yes",
+                      "text": "Yes please!",
+                      "type": "button",
+                      "value": "true"
+                    },
+                    {
+                      "name": "no",
+                      "text": "No, it's ok!",
+                      "type": "button",
+                      "value": "false"
+                    }
+                ]
+            }
+        ]
+      };
+
       // Perform matchmaking
-      findMatch(type, msg => sendMsgToUrl(msg, responseUrl));
+      if (category === "team") db.getTeams((res, data) => {
+        if (res && data) findMatch(userData, data, matches => {
+          if (!matches) return sendMsgToUrl(noMatchMsg, responseUrl);
+          else return format.formatMatches(matches, formatted => sendMsgToUrl(formatted, responseUrl));
+        });
+        else return sendMsgToUrl(noMatchMsg, responseUrl);
+      });
+      else db.getMembers((res, data) => {
+        if (res && data) findMatch(userData, data, matches => {
+          if (!matches) return sendMsgToUrl(noMatchMsg, responseUrl);
+          else return format.formatMatches(matches, formatted => sendMsgToUrl(formatted, responseUrl));
+        });
+        else sendMsgToUrl(noMatchMsg, responseUrl);
+      });
 
     } else {
       if (!roles) roles = [];
@@ -595,8 +509,7 @@ function setRoles(msg, role, callback) {
             }, responseUrl);
           }
           else {
-            console.error("ERROR: Could not update roles for " + msg.user.name);
-            displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+            format.displayErrorMsg(`ERROR: Could not update roles for ${msg.user.name}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
           }
         });
       },
@@ -620,63 +533,55 @@ function setRoles(msg, role, callback) {
   });
 }
 
-// Find match
-function findMatch(category, callback) {
-  // algorithm that determines match
-  var computeMatch = function(res, data) {
-    console.log(data);
-    if(res && data) return callback({ text: data }, responseUrl);
-    else {
-      text = `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`;
-      return callback({
-        text: text,
-        attachments: [
-            {
-                "fallback": "The features of this app are not supported by your device",
-                "callback_id": `discover_${type}`,
-                "color": "#3AA3E3",
-                "attachment_type": "default",
-                "actions": [
-                    {
-                      "name": "yes",
-                      "text": "Yes please!",
-                      "type": "button",
-                      "value": "true"
-                    },
-                    {
-                      "name": "no",
-                      "text": "No, it's ok!",
-                      "type": "button",
-                      "value": "false"
-                    }
-                ]
-            }
-        ]
-      }, responseUrl);
-    }
-  }
-  console.log(category);
-  if (category === "team") db.getTeams(computeMatch);
-  else db.getMembers(computeMatch);
+// Return array of matches
+/*
+[{ "user_id","user_name","rating","roles","skills","ts" }]
+*/
+function findMatch(userData, matchArr, callback) {
+    const matches = [];
+
+    async.forEachOf(matchArr, (ts, matchId, next) => {
+      db.getUserInfo(matchId, (res, matchData) => {
+        match.rateUser(userData, matchData, rating => {
+          if(rating) matches.push({
+            "user_id": matchId,
+            "user_name": matchData.username,
+            "rating": rating,
+            "roles": matchData.roles,
+            "skills": matchData.skills,
+            "ts": ts
+          });
+          next();
+        });
+      });
+    }, err => {
+      if (err) return callback(null);
+      else matches.sortMatches(sorted => {
+        return callback(sorted);
+      });
+    });
 }
 
 // Update Skill Levels
 function updateSkillLevels(msg, skill, level, callback) {
   const responseUrl = msg.response_url;
   const skillArr = [];
+  const userId = msg.user.id;
 
-  db.getSkills(msg.user.id, (res, skills) => {
-    if (!res) return displayErrorMsg(msg => callback({ text: msg }));
+  db.getSkills(userId, (res, skills) => {
+    if (!res) return format.displayErrorMsg(`Could not retrieve skills for ${userId}: Database error`, msg => callback({ text: msg }));
+
     callback(null);
+
     for (var i = 0; i < skills.length; i++) {
       if(skills[i].skill === skill) {
         skills[i]["level"] = level;
-        db.updateSkills(msg.user.id, skills, success => {
+        db.updateSkills(userId, skills, success => {
           async.forEachOf(skills, (value, index, next) => {
             if (!value.level) skillArr.push(value.skill);
             next();
           }, err => {
-            if (err) return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+            if (err) return format.displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => sendMsgToUrl({ text: msg }, responseUrl));
             displaySkillChoice(skillArr, msg => sendMsgToUrl(msg, responseUrl));
           });
         });
@@ -693,14 +598,17 @@ function setDiscoverable(msg, discoverable, category, callback) {
         callback(`:clap: Yay!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can list down ${text} (i.e. languages/frameworks/tools) using the ` + "`/skills` command!\ne.g. `/skills Node.js, Python, Java`");
       }
       else {
-        console.error("ERROR: Could not update visibility of " + msg.user.name);
-        return displayErrorMsg(callback);
+        return format.displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
       }
     });
     if (category === "team") { // member looking for teams
-      db.updateMember(msg.user.id, () => {});
+      db.updateMember(msg.user.id, success => {
+        if (!success) return format.displayErrorMsg(`Could not add ${msg.user.name} into Member database`, callback);
+      });
     } else if (category === "member") {  // team looking for members
-      db.updateTeam(msg.user.id, () => {});
+      db.updateTeam(msg.user.id,  success => {
+        if (!success) return format.displayErrorMsg(`Could not add ${msg.user.name} into Team database`, callback);
+      });
     }
   }
   else {
@@ -729,7 +637,7 @@ function removeUser(userId, callback) {
     if (success) callback({
       "text": ":thumbsup: You've been successfully removed!  Happy hacking! :smiley:"
     });
-    else displayErrorMsg(msg => callback({ text: msg }));
+    else format.displayErrorMsg(`Could not remove ${userId} from database`, msg => callback({ text: msg }));
   });
 }
 
