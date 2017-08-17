@@ -108,7 +108,8 @@ function parseIMsg(msg, callback) {
   } else if (callbackID === 'skills') {
     updateSkillLevels(msg, actions[0].name, actions[0].value, callback);
   } else if (callbackID === 'discover') { // turn on discoverability
-    setDiscoverable(msg, true, actions[0].value, callback);
+    if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
+    else callback("All the best team-hunting! :smile:");
   } else if (callbackID === 'edit') {  // edit existing data
     // change user type
     if (actions[0].name === 'user_type') {
