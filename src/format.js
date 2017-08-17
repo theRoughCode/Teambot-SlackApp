@@ -18,7 +18,7 @@ function welcomeNewUser(userName, callback) {
     text: `Hi ${userName}!  I'm here to assist you with forming a team!\nTo start, are you looking to join a team or are you part of a team looking for team members?`,
     attachments: [
       {
-        "text": "I am looking for:",
+        "text": "I want to:",
         "fallback": "The features of this app are not supported by your device",
         "callback_id": "user_type",
         "color": COLOUR,
@@ -26,13 +26,13 @@ function welcomeNewUser(userName, callback) {
         "actions": [
           {
             "name": "user_team",
-            "text": "A Team",
+            "text": "Join a team",
             "type": "button",
             "value": "team"
           },
           {
             "name": "user_member",
-            "text": "Team Members",
+            "text": "Find members for my team",
             "type": "button",
             "value": "member"
           }
