@@ -49,7 +49,7 @@ function welcomeOldUser(userName, data, callback) {
   // Set roles
   if (!data.roles) {
     actions.push({
-      "name": "set_roles",
+      "name": "roles",
       "text": "Pick roles",
       "type": "button",
       "value": "roles"
