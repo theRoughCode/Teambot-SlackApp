@@ -558,7 +558,10 @@ function setRoles(msg, role, callback) {
         if (!res) return format.displayErrorMsg(`${msg.user.name}'s team could not be retrieved: Database error`, msg => sendMsgToUrl(msg, responseUrl));
         else if (data) findMatch(userData, data, matches => {
           if (!matches || !matches.length) return sendMsgToUrl(noMatchMsg, responseUrl);
-          else return format.formatMatches(matches, formatted => sendMsgToUrl(formatted, responseUrl));
+          else return format.formatMatches(matches, formatted => sendMsgToUrl({
+           "text": `:tada: We found some matches!  Here they are:`,
+           attachments: formatted
+         }, responseUrl));
         });
         else return sendMsgToUrl(noMatchMsg, responseUrl);
       }
