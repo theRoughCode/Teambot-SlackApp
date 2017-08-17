@@ -110,6 +110,8 @@ function parseIMsg(msg, callback) {
   } else if (callbackID === 'discover') { // turn on discoverability
     if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
     else callback("All the best team-hunting! :smile:");
+  } else if (callbackID === "contact") {  // contact user
+    contactUser(msg.user.id, actions[0].value, actions[0].name, msg.response_url, callback);
   } else if (callbackID === 'edit') {  // edit existing data
     // change user type
     if (actions[0].name === 'user_type') {
@@ -690,6 +692,48 @@ function setDiscoverable(msg, discoverable, category, callback) {
       if (!success) console.error(`ERROR: Failed to remove ${msg.user.name} from ${category} database`);
     });
   }
+}
+
+// contact user to form a team
+function contactUser(userId, matchId, type, responseUrl, callback) {
+  var text = (type === "team") ? "join your team" : "invite you to their team";
+
+  getFirstName(matchId, (success, res) => {
+    if (success) {
+      callback(null);
+      data.getUserInfo(userId, (success, info) => {
+        if (success) {
+          format.formatUser(userId, info.username, info.roles, info.skills, obj => {
+            SLACK.api("chat.postMessage", {
+              "text": `Hi, ${res}!  ${info.username} would like to ${text}!\n Here's their information:`,
+              "attachments": [obj],
+              "channel": userName,  //TODO change to matchId
+              "username": BOT_NAME
+            }, (err, response) => {
+              if (err) console.error(`Failed to send message to ${res}`);
+            });
+          });
+        } else return format.displayErrorMsg(`Failed to retrieve info for ${userId}`, msg => sendMsgToUrl(msg, responseUrl));
+      });
+    } else return callback(res);
+  });
+
+
+  SLACK.api("mpim.open", {
+    "users": `${userId},${matchId}`
+  }, (err, response) => {
+    if (err) console.error(`Failed to open multiparty dm with ${userName} and ${matchId}.\n`);
+    else {
+      const groupId = response.group.id;
+      SLACK.api("chat.postMessage", {
+        "text": "",
+        "channel": groupId,
+        "username": BOT_NAME
+      }, (err, response) => {
+        if (err) console.error(`Failed to send message to #${channel}`);
+      });
+    }
+  });
 }
 
 
