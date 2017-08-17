@@ -484,6 +484,7 @@ function setRoles(msg, role, callback) {
       if (type === "team") db.getTeams((res, data) => {
         if (!res) return format.displayErrorMsg(`${msg.user.name}'s team could not be retrieved: Database error`, msg => sendMsgToUrl(msg, responseUrl));
         else if (data) findMatch(userData, data, matches => {
+          console.log(matches);
           if (!matches) return sendMsgToUrl(noMatchMsg, responseUrl);
           else return format.formatMatches(matches, formatted => sendMsgToUrl(formatted, responseUrl));
         });
@@ -542,7 +543,6 @@ function setRoles(msg, role, callback) {
 */
 function findMatch(userData, matchArr, callback) {
     const matches = [];
-    console.log(userData);
 
     async.forEachOf(matchArr, (ts, matchId, next) => {
       db.getUserInfo(matchId, (res, matchData) => {
