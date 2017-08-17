@@ -9,9 +9,15 @@ webhookUri = process.env.WEBHOOK;
 token = process.env.API_TOKEN;
 const SLACK = new Slack(token);
 
-const BOT_CHANNEL_ID = "C6PPA5EJG";
 const BOT_CHANNEL_NAME = "bots";
-const BOT_NAME = "Teams App";
+const BOT_NAME = "Teambot";
+var BOT_CHANNEL_ID;
+
+// get bot channel id (can be null if not found)
+getChannelId(BOT_CHANNEL_NAME, id => {
+  BOT_CHANNEL_ID = id;
+  if (!id) console.error(`#${BOT_CHANNEL_NAME} is not a valid channel name`);
+});
 
 const ROLES = [
   {
@@ -59,11 +65,10 @@ function welcome(body, callback) {
 function welcomeUser(userId, channel, callback) {
   callback(null);
 
-  if (channel !== BOT_CHANNEL_ID) return;
-
-  convertToUserName(userId, username => {
-    if (username) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${username}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!");
-  });
+  if (channel === BOT_CHANNEL_ID)
+    convertToUserName(userId, username => {
+      if (username) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${username}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!");
+    });
 }
 
 // parse commands
@@ -107,7 +112,7 @@ function parseIMsg(msg, callback) {
 
 // parse incoming events
 function parseEvent(msg, callback) {
-  console.log(msg);
+  console.log(msg); //TODO
   if (msg.event.type === "url_verification")
     verifyURL(msg.challenge, callback);
   else if (msg.event.type === "member_joined_channel")
@@ -231,6 +236,18 @@ function createSkills(msg, callback) {
 
 /* HELPERS */
 
+// Get channel id of channel
+function getChannelId(channelName, callback) {
+  SLACK.api("channels.list", (err, response) => {
+    if (err) format.displayErrorMsg(`Failed to retrieve list of channels from Slack API`, msg => sendMsgToChannel(BOT_CHANNEL_NAME, msg));
+
+    for (var i = 0; i < response.channels.length; i++) {
+      if (response.channels[i].name === channelName) return callback(response.channels[i].id);
+      if (i === (response.channels.length - 1)) return callback(null);
+    }
+  });
+}
+
 // send message to webhook
 function sendMsgToUrl(msg, url = webhookUri) {
   var slack = new Slack();
@@ -284,7 +301,7 @@ function convertToUserID(userName, callback){
       if(response.members[i].id === userId || response.members[i].name === userId){
         return callback(true, response.members[i].id);
       }
-      if (i === response.members.length) format.displayErrorMsg("Failed to convert username to id: User could not be found", msg => callback(false, { text: msg }));
+      if (i === response.members.length - 1) format.displayErrorMsg("Failed to convert username to id: User could not be found", msg => callback(false, { text: msg }));
     }
   });
 }
