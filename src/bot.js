@@ -106,6 +106,7 @@ function parseIMsg(msg, callback) {
   } else if (callbackID === 'roles') {
     setRoles(msg, actions[0].value, callback);
   } else if (callbackID === 'skills') {
+    console.log(actions);
     updateSkillLevels(msg, actions[0].name, actions[0].value, callback);
   } else if (callbackID === 'discover') { // turn on discoverability
     if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
