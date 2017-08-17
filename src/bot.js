@@ -11,6 +11,7 @@ const SLACK = new Slack(token);
 
 const BOT_CHANNEL_ID = "C6PPA5EJG";
 const BOT_CHANNEL_NAME = "bots";
+const BOT_NAME = "Teams App";
 
 const ROLES = [
   {
@@ -240,7 +241,8 @@ function sendMsgToUrl(msg, url = webhookUri) {
 function sendMsgToChannel(channel, msg) {
   SLACK.api("chat.postMessage", {
     "text": msg,
-    "channel": `#${channel}`
+    "channel": `#${channel}`,
+    "username": BOT_NAME
   }, (err, response) => {
     if (err) console.error(`Failed to send message to #${channel}`);
   });
