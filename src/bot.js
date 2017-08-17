@@ -9,6 +9,8 @@ webhookUri = process.env.WEBHOOK;
 token = process.env.API_TOKEN;
 const SLACK = new Slack(token);
 
+const BOT_CHANNEL = "bots";
+
 const ROLES = [
   {
     role: "Front End",
@@ -55,10 +57,12 @@ function welcome(body, callback) {
 function welcomeUser(userId, channel, callback) {
   callback(null);
 
+  if (channel !== BOT_CHANNEL) return;
+
   convertToUserName(userId, data => {
     if (data)
       return sendMsgToUrl({
-        "channel": `#${channel}`,
+        "channel": `#${BOT_CHANNEL}`,
         "username": data,
         "text": `:wave: Welcome ${data}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
       });
