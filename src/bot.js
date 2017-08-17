@@ -653,6 +653,7 @@ function addUser(userId, userName, { roles = [], skills = [],
   if (userName === undefined) callback(false);
   db.updateUser(userId, {
     "username": userName,
+    "hackathon": data.HACKATHON,
     "roles": roles,
     "skills": skills,
     "user_type": userType,
