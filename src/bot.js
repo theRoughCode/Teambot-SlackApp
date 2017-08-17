@@ -324,7 +324,7 @@ function convertToUserName(userId, callback){
 // get first name of user
 function getFirstName(userId, callback) {
   SLACK.api("users.info", {
-    "username": userId
+    "user": userId
   }, function(err, response) {
     console.log(err);
     console.log(response);
