@@ -164,13 +164,24 @@ function getMembers(callback) {
 }
 
 // Delete user
-function deleteUser (userId, callback) {
+function deleteUser(userId, callback) {
   userRef.child(userId).set(null).then(() => callback(true), error => {
     console.error(error);
     callback(false);
   });
-  teamRef.child(userId).set(null);
-  memRef.child(userId).set(null);
+  undiscoverUser(userId, success => {});
+}
+
+// Remove from member/team list
+function undiscoverUser(userId, callback) {
+  teamRef.child(userId).set(null).then(() => callback(true), error => {
+    console.error(error);
+    return callback(false);
+  });;
+  memRef.child(userId).set(null).then(() => callback(true), error => {
+    console.error(error);
+    return callback(false);
+  });;
 }
 
 
@@ -191,5 +202,6 @@ module.exports = {
   hasUser,
   getTeams,
   getMembers,
-  deleteUser
+  deleteUser,
+  undiscoverUser
 }

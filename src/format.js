@@ -64,6 +64,12 @@ function welcomeOldUser(userName, data, callback) {
       "value": (data.user_type === "team") ? "team" : "members"
     });
   else {
+    actions.push({
+      "name": "remove",
+      "text": "Remove me!",
+      "type": "button",
+      "value": (data.user_type === "team") ? "team" : "members"
+    });
     var action_userType = {
       "name": "user_type",
       "text": "",
@@ -176,6 +182,7 @@ function formatSkillLvl(skill, actions, callback) {
 }
 
 module.exports = {
+  COLOUR,
   displayErrorMsg,
   helpMsg,
   welcomeNewUser,

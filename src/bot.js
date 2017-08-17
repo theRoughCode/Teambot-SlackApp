@@ -107,10 +107,8 @@ function parseIMsg(msg, callback) {
     setRoles(msg, actions[0].value, callback);
   } else if (callbackID === 'skills') {
     updateSkillLevels(msg, actions[0].name, actions[0].value, callback);
-  } else if (callbackID === 'discover_team') { // find teams
-    setDiscoverable(msg, actions[0].value, "team", callback);
-  } else if (callbackID === 'discover_member') {  // find members
-    setDiscoverable(msg, actions[0].value, "member", callback);
+  } else if (callbackID === 'discover') { // turn on discoverability
+    setDiscoverable(msg, true, actions[0].value, callback);
   } else if (callbackID === 'edit') {  // edit existing data
     // change user type
     if (actions[0].name === 'user_type') {
@@ -118,7 +116,7 @@ function parseIMsg(msg, callback) {
     }
     // turn on visibility
     else if (actions[0].name === "visibility") {
-      setDiscoverable(msg, "true", actions[0].value, callback);
+      setDiscoverable(msg, true, actions[0].value, callback);
     }
     // reset user info
     else if (actions[0].name === "reset") {
@@ -534,21 +532,21 @@ function setRoles(msg, role, callback) {
         attachments: [
             {
                 "fallback": "The features of this app are not supported by your device",
-                "callback_id": `discover_${type}`,
-                "color": "#3AA3E3",
+                "callback_id": "discover",
+                "color": format.COLOUR,
                 "attachment_type": "default",
                 "actions": [
                     {
                       "name": "yes",
                       "text": "Yes please!",
                       "type": "button",
-                      "value": "true"
+                      "value": type
                     },
                     {
                       "name": "no",
                       "text": "No, it's ok!",
                       "type": "button",
-                      "value": "false"
+                      "value": type
                     }
                 ]
             }
@@ -665,7 +663,7 @@ function updateSkillLevels(msg, skill, level, callback) {
 }
 
 function setDiscoverable(msg, discoverable, category, callback) {
-  if (discoverable === "true") {
+  if (discoverable) {
     db.updateVisibility(msg.user.id, true, success => {
       if(success) {
         var text = (category === "team") ? "all relevant skills" : "the skills you're looking for"
@@ -684,9 +682,18 @@ function setDiscoverable(msg, discoverable, category, callback) {
         if (!success) return format.displayErrorMsg(`Could not add ${msg.user.name} into Team database`, callback);
       });
     }
-  }
-  else {
-    callback("All the best team-hunting! :smile:");
+  } else {
+    db.updateVisibility(msg.user.id, false, success => {
+      if(success) {
+        callback(`:thumbsup: Other ${category}s will no longer be able to discover you!`);
+      }
+      else {
+        return format.displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
+      }
+    });
+    undiscoverUser(msg.user.id, success => {
+      if (!success) console.error(`ERROR: Failed to remove ${msg.user.name} from ${category} database`);
+    });
   }
 }
 
