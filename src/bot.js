@@ -113,7 +113,7 @@ function parseIMsg(msg, callback) {
 // parse incoming events
 function parseEvent(msg, callback) {
   console.log(msg); //TODO
-  if (msg.event.type === "url_verification")
+  if (msg.type === "url_verification")
     verifyURL(msg.challenge, callback);
   else if (msg.event.type === "member_joined_channel")
     welcomeUser(msg.event.user, msg.event.channel, callback);
