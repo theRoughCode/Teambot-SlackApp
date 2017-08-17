@@ -326,6 +326,8 @@ function getFirstName(userId, callback) {
   SLACK.api("users.info", {
     "username": userId
   }, function(err, response) {
+    console.log(err);
+    console.log(response);
     if (!response.ok) return format.displayErrorMsg(`Failed to get info of ${userId}: API error\n${err}`, msg => callback(false, { text: msg }));
     else return callback(true, response.user.profile.first_name);
   });
