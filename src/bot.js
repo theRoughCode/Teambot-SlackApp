@@ -175,8 +175,8 @@ function display(userId, callback) {
       const roles = (data.roles) ? data.roles.join(", ") : "N/A";
       const skills = (data.skills) ? data.skills.map(skill => {
         if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
-        else return `${skill.skill}`;
-      }).join(",\n") : "N/A";
+        else return ` - ${skill.skill}`;
+      }).join("\n") : "N/A";
       const userType = (data.user_type) ? data.user_type.substring(0, 1).toUpperCase() + data.user_type.substring(1) : "N/A";
       const userName = data.username || "N/A";
       const visible = (data.visible) ? "Yes" : "No";
