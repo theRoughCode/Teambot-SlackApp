@@ -71,7 +71,7 @@ function welcomeUserToChannel(userId, channel, callback) {
 
   if (channel === BOT_CHANNEL_ID)
     getFirstName(userId, (success, res) => {
-      if (success) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/start` to begin searching for a team or `/team help` for a list of commands!");
+      if (success) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/start` to begin searching for a team or `/teambot help` for a list of commands!");
       else return sendMsgToChannel(BOT_CHANNEL_NAME, res);
     });
 }
@@ -90,7 +90,7 @@ function parseCommands(msg, callback) {
   else if (text[0] === "list") list(text[1], msg.response_url, callback);
   // edit skills
   else if (text[0] === "skills") createSkills(msg, callback);
-  else callback("Incorrect command.  Try `/team help` for a list of commands")
+  else callback("Incorrect command.  Try `/teambot help` for a list of commands")
 }
 
 // parse interactive messages
@@ -176,7 +176,7 @@ function list(type, responseUrl, callback) {
   } else if (type === "teams" || type === "team") { // display teams
     db.getTeams((res, data) => output("team", res, data));
   } else {
-    callback("Incorrect command.  e.g. `/team list teams`");
+    callback("Incorrect command.  e.g. `/teambot list teams`");
   }
 }
 
@@ -205,7 +205,7 @@ function createSkills(msg, callback) {
   const responseUrl = msg.response_url;
 
   if (!msg.text) return callback({
-    text: "Incorrect command. Please input skills (i.e. `/team skills Node.js, Python`)!"
+    text: "Incorrect command. Please input skills (i.e. `/teambot skills Node.js, Python`)!"
   });
   var text = msg.text.replace(/\s/g,'');
   var skills = text.split(',');
