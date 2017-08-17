@@ -45,22 +45,6 @@ function welcomeNewUser(userName, callback) {
 // Welcome returning user
 function welcomeOldUser(userName, data, callback) {
   var actions = [];
-  var action_userType = {
-    "name": "user_type",
-    "text": "",
-    "type": "button",
-    "value": ""
-  };
-
-  // Switch user type
-  if(data.user_type === "team") {
-    action_userType["text"] = "Find members instead";
-    action_userType["value"] = "member";
-  } else if (data.user_type === "member") {
-    action_userType["text"] = "Find a team instead";
-    action_userType["value"] = "team";
-  }
-  actions.push(action_userType);
 
   // Set roles
   if (!data.roles) {
@@ -79,6 +63,24 @@ function welcomeOldUser(userName, data, callback) {
       "type": "button",
       "value": (data.user_type === "team") ? "team" : "members"
     });
+  else {
+    var action_userType = {
+      "name": "user_type",
+      "text": "",
+      "type": "button",
+      "value": ""
+    };
+
+    // Switch user type
+    if(data.user_type === "team") {
+      action_userType["text"] = "Find members instead";
+      action_userType["value"] = "member";
+    } else if (data.user_type === "member") {
+      action_userType["text"] = "Find a team instead";
+      action_userType["value"] = "team";
+    }
+    actions.push(action_userType);
+  }
 
   // Remove User
   actions.push({
