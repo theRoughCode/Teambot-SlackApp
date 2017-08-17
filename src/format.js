@@ -139,16 +139,6 @@ function formatInfo(roles, skills, userType, visible, callback) {
       "pretext": "Here are your preferences!",
       "fields": [
           {
-              "title": "Roles",
-              "value": roles,
-              "short": true
-          },
-          {
-              "title": "Skills",
-              "value": skills,
-              "short": true
-          },
-          {
               "title": "Looking For",
               "value": userType,
               "short": true
@@ -156,6 +146,16 @@ function formatInfo(roles, skills, userType, visible, callback) {
           {
               "title": "Discoverable?",
               "value": visible,
+              "short": true
+          },
+          {
+              "title": "Roles",
+              "value": roles,
+              "short": true
+          },
+          {
+              "title": "Skills",
+              "value": skills,
               "short": true
           }
       ]
