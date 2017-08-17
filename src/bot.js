@@ -255,6 +255,7 @@ function createSkills(msg, callback) {
 function resetUser(msg, callback) {
   const responseUrl = msg.response_url;
   const userId = msg.user_id;
+  console.log(msg);
   callback(null);
 
   db.hasUser(userId, (res, data) => {
