@@ -202,8 +202,10 @@ function createSkills(msg, callback) {
   if (!msg.text) return callback({
     text: "Incorrect command. Please input skills (i.e. `/teambot skills Node.js, Python`)!"
   });
-  var text = msg.text.replace(/\s/g,'');
-  var skills = text.split(',').splice(1, 1);
+
+  var text = msg.text.substring(msg.text.indexOf(" ") + 1).replace(/\s/g,'');
+  console.log(text);
+  var skills = text.split(',');
 
   // Remove duplicates
   var tempObj = {};
