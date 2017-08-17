@@ -66,8 +66,9 @@ function welcomeUserToChannel(userId, channel, callback) {
   callback(null);
 
   if (channel === BOT_CHANNEL_ID)
-    getFirstName(userId, res => {
-      if (res) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/start` to begin searching for a team or `/help` for a list of commands!");
+    getFirstName(userId, (success, res) => {
+      console.log(res);
+      if (success) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/start` to begin searching for a team or `/help` for a list of commands!");
       else return sendMsgToChannel(BOT_CHANNEL_NAME, res);
     });
 }
@@ -325,8 +326,8 @@ function getFirstName(userId, callback) {
   SLACK.api("users.info", {
     "username": userId
   }, function(err, response) {
-    if (!response.ok) return format.displayErrorMsg(`Failed to get info of ${userId}: API error\n${err}`, msg => callback({ text: msg }));
-    else return callback(response.user.profile.first_name);
+    if (!response.ok) return format.displayErrorMsg(`Failed to get info of ${userId}: API error\n${err}`, msg => callback(false, { text: msg }));
+    else return callback(true, response.user.profile.first_name);
   });
 }
 
