@@ -124,7 +124,7 @@ function formatUser(userId, userName, roles, skills, callback) {
         "short": true
       },
       {
-        "title": "Skills",
+        "title": "Skills (Level: out of 5)",
         "value": skills,
         "short": true
       }
@@ -154,7 +154,7 @@ function formatInfo(roles, skills, userType, visible, callback) {
               "short": true
           },
           {
-              "title": "Skills",
+              "title": "Skills (Level: out of 5)",
               "value": skills,
               "short": true
           }
