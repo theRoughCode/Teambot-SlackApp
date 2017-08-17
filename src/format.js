@@ -115,6 +115,7 @@ function formatMatches(sortedMatches, callback) {
   async.map(sortedMatches, (match, next) => {
     formatUser(match.user_id, match.user_name, match.roles, match.skills, obj => next(null, obj));
   }, (err, matches) => {
+    console.log(matches);
     if (err) return displayErrorMsg("Could not sort matches", msg => callback({ "text": msg }));
     else return callback(matches);
   });

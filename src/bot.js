@@ -557,7 +557,6 @@ function setRoles(msg, role, callback) {
       var handleMatches = function(res, data) {
         if (!res) return format.displayErrorMsg(`${msg.user.name}'s team could not be retrieved: Database error`, msg => sendMsgToUrl(msg, responseUrl));
         else if (data) findMatch(userData, data, matches => {
-          console.log(matches);
           if (!matches || !matches.length) return sendMsgToUrl(noMatchMsg, responseUrl);
           else return format.formatMatches(matches, formatted => sendMsgToUrl(formatted, responseUrl));
         });
