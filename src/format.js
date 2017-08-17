@@ -15,7 +15,7 @@ function helpMsg(callback) {
 // Welcome new users
 function welcomeNewUser(userName, callback) {
   callback({
-    text: `Hi ${userName}!  I'm here to assist you with forming a team!\nTo start, are you looking to join a team or are you part of a team looking for team members?`,
+    text: `Hi ${userName}!  I'm here to assist you with forming a team!\nTo start, are you looking to join a team or are you looking for team members to join your team?`,
     attachments: [
       {
         "text": "I want to:",
@@ -32,7 +32,7 @@ function welcomeNewUser(userName, callback) {
           },
           {
             "name": "user_member",
-            "text": "Find members for my team",
+            "text": "Find members",
             "type": "button",
             "value": "member"
           }
