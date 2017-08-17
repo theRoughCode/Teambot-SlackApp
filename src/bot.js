@@ -9,7 +9,7 @@ webhookUri = process.env.WEBHOOK;
 token = process.env.API_TOKEN;
 const SLACK = new Slack(token);
 
-const BOT_CHANNEL = "bots";
+const BOT_CHANNEL = "C6PPA5EJG";
 
 const ROLES = [
   {
