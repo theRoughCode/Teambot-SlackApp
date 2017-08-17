@@ -694,7 +694,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
         return format.displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
       }
     });
-    undiscoverUser(msg.user.id, success => {
+    data.undiscoverUser(msg.user.id, success => {
       if (!success) console.error(`ERROR: Failed to remove ${msg.user.name} from ${category} database`);
     });
   }

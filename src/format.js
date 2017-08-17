@@ -61,14 +61,14 @@ function welcomeOldUser(userName, data, callback) {
       "name": "discover",
       "text": "Discover me!",
       "type": "button",
-      "value": (data.user_type === "team") ? "team" : "members"
+      "value": (data.user_type === "team") ? "team" : "member"
     });
   else {
     actions.push({
       "name": "undiscover",
       "text": "Hide me!",
       "type": "button",
-      "value": (data.user_type === "team") ? "team" : "members"
+      "value": (data.user_type === "team") ? "team" : "member"
     });
     var action_userType = {
       "name": "user_type",
