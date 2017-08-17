@@ -440,11 +440,14 @@ function setRoles(msg, role, callback) {
   const responseUrl = msg.response_url;
 
   callback(null);
-
+  console.log(msg);
+  console.log(msg.user);
   db.getUserInfo(msg.user.id, (res, userData) => {
     const type = userData.user_type;
     var roles = userData.roles;
+    console.log(userData);
 
+    if (!res) return format.displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
     // errors is handled by parseRoles(null)
     if (role === 'done') { // no more role
       sendMsgToUrl({
@@ -480,7 +483,8 @@ function setRoles(msg, role, callback) {
 
       // Perform matchmaking
       if (type === "team") db.getTeams((res, data) => {
-        if (res && data) findMatch(userData, data, matches => {
+        if (!res) return format.displayErrorMsg(`${msg.user.name}'s team could not be retrieved: Database error`, msg => sendMsgToUrl(msg, responseUrl));
+        else if (data) findMatch(userData, data, matches => {
           if (!matches) return sendMsgToUrl(noMatchMsg, responseUrl);
           else return format.formatMatches(matches, formatted => sendMsgToUrl(formatted, responseUrl));
         });
