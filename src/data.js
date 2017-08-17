@@ -7,7 +7,7 @@ admin.initializeApp({
   databaseURL: "https://teambot-68704.firebaseio.com"
 });
 
-const HACKATHON = "htn";
+const HACKATHON = "Hack the North";
 const auth = admin.auth();
 const db = admin.database();
 const userRef = db.ref('users');
@@ -175,6 +175,7 @@ function deleteUser (userId, callback) {
 
 
 module.exports = {
+  HACKATHON,
   updateUser,
   updateTeam,
   updateMember,
