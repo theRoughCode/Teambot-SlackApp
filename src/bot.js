@@ -142,7 +142,7 @@ function parseEvent(msg, callback) {
 // Lists teams or members
 function list(type, responseUrl, callback) {
   var output = function (type, res, data) {
-    if(!res) return displayErrorMsg(msg => callback({ text: msg }));
+    if(!res) return format.displayErrorMsg(`Could not retrieve list of ${type}s`, msg => callback({ text: msg }));
     else if (!data) return callback(`No ${type}s found. :disappointed:`);
 
     const attachments = [];
@@ -202,7 +202,7 @@ function display(userId, callback) {
       // format display
       format.formatInfo(roles, skills, userType, visible, obj => callback({ "attachments" : [obj] }));
 
-    } else displayErrorMsg(msg => callback({ text: msg }));
+    } else format.displayErrorMsg(`Could not get info of ${userId}`, msg => callback({ text: msg }));
   })
 }
 
@@ -263,10 +263,10 @@ function resetUser(msg, callback) {
         if (success) sendMsgToUrl({
           "text": ":thumbsup: You've been successfully removed!  Happy hacking! :smiley:"
         }, responseUrl);
-        else displayErrorMsg(`Could not reset ${userId}`, msg => sendMsgToUrl({ "text": msg }));
+        else format.displayErrorMsg(`Could not reset ${userId}`, msg => sendMsgToUrl({ "text": msg }));
       })
     }
-    else displayErrorMsg(`Could not find ${userId}: Database error`, msg => sendMsgToUrl({ "text": msg }));
+    else format.displayErrorMsg(`Could not find ${userId}: Database error`, msg => sendMsgToUrl({ "text": msg }));
   })
 }
 
