@@ -259,7 +259,7 @@ function resetUser(userId, responseUrl, callback) {
     if (res) {
       db.deleteUser(userId, success => {
         if (success) sendMsgToUrl({
-          "text": ":thumbsup: You've been successfully removed!  Happy hacking! :smiley:"
+          "text": ":thumbsup: Your info has been successfully reset!  Type `/teambot start` to begin your search!  Happy hacking! :smiley:"
         }, responseUrl);
         else format.displayErrorMsg(`Could not reset ${userId}`, msg => sendMsgToUrl({ "text": msg }));
       })
