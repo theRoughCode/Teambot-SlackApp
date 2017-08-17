@@ -60,13 +60,8 @@ function welcomeUser(userId, channel, callback) {
 
   if (channel !== BOT_CHANNEL_ID) return;
 
-  convertToUserName(userId, data => {
-    if (data)
-      return sendMsgToUrl({
-        "channel": `#${BOT_CHANNEL_NAME}`,
-        "username": data,
-        "text": `:wave: Welcome ${data}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!"
-      });
+  convertToUserName(userId, username => {
+    if (username) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${username}!\n` + "Type `/start` to begin searching or `/help` for a list of commands!");
   });
 }
 
@@ -226,7 +221,7 @@ function createSkills(msg, callback) {
       };
     });
     db.updateSkills(msg.user_id, skillArr, success => {
-      if (!success) displayErrorMsg(res => sendMsgToUrl({ text: res }, responseUrl));
+      if (!success) format.displayErrorMsg(`Failed to update skills for ${msg.user_id}`, res => sendMsgToUrl({ text: res }, responseUrl));
     });
   });
 }
@@ -239,6 +234,16 @@ function sendMsgToUrl(msg, url = webhookUri) {
   slack.setWebhook(url);
 
   slack.webhook(msg, function(err, response) {});
+}
+
+// send message to channel
+function sendMsgToChannel(channel, msg) {
+  SLACK.api("chat.postMessage", {
+    "text": msg,
+    "channel": `#${channel}`
+  }, (err, response) => {
+    if (err) console.error(`Failed to send message to #${channel}`);
+  });
 }
 
 // display skills
