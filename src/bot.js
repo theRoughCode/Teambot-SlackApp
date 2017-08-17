@@ -204,7 +204,6 @@ function createSkills(msg, callback) {
   });
 
   var text = msg.text.substring(msg.text.indexOf(" ") + 1).replace(/\s/g,'');
-  console.log(text);
   var skills = text.split(',');
 
   // Remove duplicates
@@ -550,7 +549,7 @@ function setRoles(msg, role, callback) {
         if (!res) return format.displayErrorMsg(`${msg.user.name}'s team could not be retrieved: Database error`, msg => sendMsgToUrl(msg, responseUrl));
         else if (data) findMatch(userData, data, matches => {
           if (!matches || !matches.length) return sendMsgToUrl(noMatchMsg, responseUrl);
-          else return format.formatMatches(matches, formatted => sendMsgToUrl({
+          else return format.formatMatches(matches, type, formatted => sendMsgToUrl({
            "text": `:tada: We found some matches! :tada:\nHere they are:`,
            attachments: formatted
          }, responseUrl));

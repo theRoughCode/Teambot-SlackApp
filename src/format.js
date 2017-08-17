@@ -111,9 +111,17 @@ function welcomeOldUser(userName, data, callback) {
   });
 }
 
-function formatMatches(sortedMatches, callback) {
+function formatMatches(sortedMatches, type, callback) {
   async.map(sortedMatches, (match, next) => {
-    formatUser(match.user_id, match.user_name, match.roles, match.skills, obj => next(null, obj));
+    formatUser(match.user_id, match.user_name, match.roles, match.skills, obj => {
+      obj["actions"] = [{
+        "name": "contact",
+        "text": (type === "team") ? "Request to join" : "Invite as member",
+        "type": "button",
+        "value": match.user_id
+      }];
+      next(null, obj);
+    });
   }, (err, matches) => {
     if (err) return displayErrorMsg("Could not sort matches", msg => callback({ "text": msg }));
     else return callback(matches);
