@@ -480,23 +480,18 @@ function setRoles(msg, role, callback) {
         ]
       };
 
-      // Perform matchmaking
-      if (type === "team") db.getTeams((res, data) => {
+      var handleMatches = function(res, data) {
         if (!res) return format.displayErrorMsg(`${msg.user.name}'s team could not be retrieved: Database error`, msg => sendMsgToUrl(msg, responseUrl));
         else if (data) findMatch(userData, data, matches => {
-          console.log(matches);
-          if (!matches) return sendMsgToUrl(noMatchMsg, responseUrl);
+          if (!matches || !matches.length) return sendMsgToUrl(noMatchMsg, responseUrl);
           else return format.formatMatches(matches, formatted => sendMsgToUrl(formatted, responseUrl));
         });
         else return sendMsgToUrl(noMatchMsg, responseUrl);
-      });
-      else db.getMembers((res, data) => {
-        if (res && data) findMatch(userData, data, matches => {
-          if (!matches) return sendMsgToUrl(noMatchMsg, responseUrl);
-          else return format.formatMatches(matches, formatted => sendMsgToUrl(formatted, responseUrl));
-        });
-        else sendMsgToUrl(noMatchMsg, responseUrl);
-      });
+      }
+
+      // Perform matchmaking
+      if (type === "team") db.getTeams(handleMatches);
+      else db.getMembers(handleMatches);
 
     } else {
       if (!roles) roles = [];
