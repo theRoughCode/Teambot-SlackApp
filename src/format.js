@@ -9,7 +9,7 @@ function displayErrorMsg(errorMsg, callback) {
 
 // list commands
 function helpMsg(callback) {
-  callback({ text: "List of commands:\n  `/teambot start` to begin the search!\n  `/teambot display` to display your preferences\n  `/teambot list (members/teams)` to display the list of discoverable users" });
+  callback({ text: "List of commands:\n  `/teambot start` to begin the search!\n  `/teambot display` to display your preferences\n  `/teambot list (members/teams)` to display the list of discoverable users\n  `/teambot remove` to remove your information from the database" });
 }
 
 // Welcome new users
@@ -58,15 +58,15 @@ function welcomeOldUser(userName, data, callback) {
   // Toggle visibility
   else if (!data.visible)
     actions.push({
-      "name": "visibility",
+      "name": "discover",
       "text": "Discover me!",
       "type": "button",
       "value": (data.user_type === "team") ? "team" : "members"
     });
   else {
     actions.push({
-      "name": "remove",
-      "text": "Remove me!",
+      "name": "undiscover",
+      "text": "Undiscover me!",
       "type": "button",
       "value": (data.user_type === "team") ? "team" : "members"
     });
@@ -90,10 +90,10 @@ function welcomeOldUser(userName, data, callback) {
 
   // Remove User
   actions.push({
-    "name": "reset",
-    "text": "Reset my info",
+    "name": "remove",
+    "text": "Remove me",
     "type": "button",
-    "value": "reset"
+    "value": "remove"
   });
 
   callback({

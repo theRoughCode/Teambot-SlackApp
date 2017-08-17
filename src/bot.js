@@ -91,7 +91,7 @@ function parseCommands(msg, callback) {
   // edit skills
   else if (text[0] === "skills") createSkills(msg, callback);
   // remove user
-  else if (text[0] === "reset") resetUser(msg.user_id, msg.response_url, callback);
+  else if (text[0] === "remove") removeUser(msg.user_id, msg.response_url, callback);
   else callback("Incorrect command.  Try `/teambot help` for a list of commands")
 }
 
@@ -115,16 +115,16 @@ function parseIMsg(msg, callback) {
       editUserType(msg, actions[0].value, callback);
     }
     // turn on visibility
-    else if (actions[0].name === "visibility") {
+    else if (actions[0].name === "discover") {
       setDiscoverable(msg, true, actions[0].value, callback);
     }
-    // reset user info
-    else if (actions[0].name === "reset") {
-      resetUser(msg.user.id, msg.response_url, callback);
-    }
     // remove user
+    else if (actions[0].name === "undiscover") {
+      setDiscoverable(msg, false, actions[0].value, callback);
+    }
+    // reset user info
     else if (actions[0].name === "remove") {
-      removeUser(msg.user.id, callback);
+      removeUser(msg.user.id, msg.response_url, callback);
     }
   }
 }
@@ -250,14 +250,14 @@ function createSkills(msg, callback) {
 }
 
 // reset user info
-function resetUser(userId, responseUrl, callback) {
+function removeUser(userId, responseUrl, callback) {
   callback(null);
 
   db.hasUser(userId, (res, data) => {
     if (res) {
       db.deleteUser(userId, success => {
         if (success) sendMsgToUrl({
-          "text": ":thumbsup: Your info has been successfully reset!  Type `/teambot start` to begin your search!  Happy hacking! :smiley:"
+          "text": ":thumbsup: You have successfully been removed from the database!  Type `/teambot start` to begin your search again!  Happy hacking! :smiley:"
         }, responseUrl);
         else format.displayErrorMsg(`Could not reset ${userId}`, msg => sendMsgToUrl({ "text": msg }));
       })
@@ -554,6 +554,8 @@ function setRoles(msg, role, callback) {
       };
 
       var handleMatches = function(res, data) {
+        console.log(res);
+        console.log(data);
         if (!res) return format.displayErrorMsg(`${msg.user.name}'s team could not be retrieved: Database error`, msg => sendMsgToUrl(msg, responseUrl));
         else if (data) findMatch(userData, data, matches => {
           if (!matches || !matches.length) return sendMsgToUrl(noMatchMsg, responseUrl);
@@ -711,16 +713,6 @@ function addUser(userId, userName, { roles = [], skills = [],
     "user_type": userType,
     "visible": visible
   }, success => callback(success));
-}
-
-// remove user
-function removeUser(userId, callback) {
-  db.deleteUser(userId, success => {
-    if (success) callback({
-      "text": ":thumbsup: You've been successfully removed!  Happy hacking! :smiley:"
-    });
-    else format.displayErrorMsg(`Could not remove ${userId} from database`, msg => callback({ text: msg }));
-  });
 }
 
 module.exports = {
