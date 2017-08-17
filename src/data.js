@@ -104,7 +104,6 @@ function getField(userId, field, callback) {
 // Get user information
 function getUserInfo(userId, callback) {
   userRef.child(`${userId}`).once('value').then(snapshot => {
-    console.log("snapshot: " + snapshot);
     if (userId !== undefined && snapshot.val())
       callback(true, snapshot.val());
     else

@@ -443,10 +443,9 @@ function setRoles(msg, role, callback) {
 
   db.getUserInfo(msg.user.id, (res, userData) => {
     if (!res) return format.displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
-    
+
     const type = userData.user_type;
     var roles = userData.roles;
-    console.log(userData);
 
     // errors is handled by parseRoles(null)
     if (role === 'done') { // no more role
@@ -543,6 +542,7 @@ function setRoles(msg, role, callback) {
 */
 function findMatch(userData, matchArr, callback) {
     const matches = [];
+    console.log(userData);
 
     async.forEachOf(matchArr, (ts, matchId, next) => {
       db.getUserInfo(matchId, (res, matchData) => {
@@ -560,7 +560,7 @@ function findMatch(userData, matchArr, callback) {
       });
     }, err => {
       if (err) return callback(null);
-      else matches.sortMatches(sorted => {
+      else match.sortMatches(matches, sorted => {
         return callback(sorted);
       });
     });
