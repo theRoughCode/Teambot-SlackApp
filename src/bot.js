@@ -122,7 +122,7 @@ function parseIMsg(msg, callback) {
     }
     // reset user info
     else if (actions[0].name === "reset") {
-      resetUser(msg.user.id, callback);
+      resetUser(msg, callback);
     }
     // remove user
     else if (actions[0].name === "remove") {
@@ -254,18 +254,19 @@ function createSkills(msg, callback) {
 // reset user info
 function resetUser(msg, callback) {
   const responseUrl = msg.response_url;
+  const userId = msg.user_id;
   callback(null);
 
-  db.hasUser(user_id, (res, data) => {
+  db.hasUser(userId, (res, data) => {
     if (res) {
-      db.deleteUser(user_id, success => {
+      db.deleteUser(userId, success => {
         if (success) sendMsgToUrl({
           "text": ":thumbsup: You've been successfully removed!  Happy hacking! :smiley:"
         }, responseUrl);
-        else displayErrorMsg(`Could not reset ${user_id}`, msg => sendMsgToUrl({ "text": msg }));
+        else displayErrorMsg(`Could not reset ${userId}`, msg => sendMsgToUrl({ "text": msg }));
       })
     }
-    else displayErrorMsg(`Could not find ${user_id}: Database error`, msg => sendMsgToUrl({ "text": msg }));
+    else displayErrorMsg(`Could not find ${userId}: Database error`, msg => sendMsgToUrl({ "text": msg }));
   })
 }
 
