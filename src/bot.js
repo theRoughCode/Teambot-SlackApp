@@ -67,7 +67,7 @@ function welcomeUserToChannel(userId, channel, callback) {
 
   if (channel === BOT_CHANNEL_ID)
     convertToUserName(userId, username => {
-      if (username) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${username} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${data.HACKATHON}!\n` + "Type `/start` to begin searching for a team or `/help` for a list of commands!");
+      if (username) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${username} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/start` to begin searching for a team or `/help` for a list of commands!");
     });
 }
 
@@ -653,7 +653,7 @@ function addUser(userId, userName, { roles = [], skills = [],
   if (userName === undefined) callback(false);
   db.updateUser(userId, {
     "username": userName,
-    "hackathon": data.HACKATHON,
+    "hackathon": db.HACKATHON,
     "roles": roles,
     "skills": skills,
     "user_type": userType,
