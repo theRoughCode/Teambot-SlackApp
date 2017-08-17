@@ -281,7 +281,7 @@ function displaySkillChoice(skills, callback) {
         "value": n + 1
       });
     }, (err, actions) => {
-      format.formatSkillLvl(obj => next1(null, obj));
+      format.formatSkillLvl(skill, actions, obj => next1(null, obj));
     });
   }, (err, attachments) => {
     callback({
