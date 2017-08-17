@@ -66,7 +66,7 @@ function welcomeOldUser(userName, data, callback) {
   else {
     actions.push({
       "name": "undiscover",
-      "text": "Undiscover me!",
+      "text": "Hide me!",
       "type": "button",
       "value": (data.user_type === "team") ? "team" : "members"
     });
