@@ -182,7 +182,7 @@ function display(userId, callback) {
       const visible = (data.visible) ? "Yes" : "No";
 
       // format display
-      format.formatInfo(obj => callback({ "attachments" : [obj] }));
+      format.formatInfo(roles, skills, userType, visible, obj => callback({ "attachments" : [obj] }));
 
     } else displayErrorMsg(msg => callback({ text: msg }));
   })
