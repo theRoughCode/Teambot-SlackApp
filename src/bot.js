@@ -440,14 +440,14 @@ function setRoles(msg, role, callback) {
   const responseUrl = msg.response_url;
 
   callback(null);
-  console.log(msg);
-  console.log(msg.user);
+
   db.getUserInfo(msg.user.id, (res, userData) => {
+    if (!res) return format.displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
+    
     const type = userData.user_type;
     var roles = userData.roles;
     console.log(userData);
 
-    if (!res) return format.displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
     // errors is handled by parseRoles(null)
     if (role === 'done') { // no more role
       sendMsgToUrl({
