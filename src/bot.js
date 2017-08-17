@@ -106,7 +106,6 @@ function parseIMsg(msg, callback) {
   } else if (callbackID === 'roles') {
     setRoles(msg, actions[0].value, callback);
   } else if (callbackID === 'skills') {
-    console.log(actions);
     updateSkillLevels(msg, actions[0].name, actions[0].value, callback);
   } else if (callbackID === 'discover') { // turn on discoverability
     if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
@@ -204,7 +203,7 @@ function createSkills(msg, callback) {
     text: "Incorrect command. Please input skills (i.e. `/teambot skills Node.js, Python`)!"
   });
   var text = msg.text.replace(/\s/g,'');
-  var skills = text.split(',');
+  var skills = text.split(',').splice(1, 1);
 
   // Remove duplicates
   var tempObj = {};
