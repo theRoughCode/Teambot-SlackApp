@@ -133,11 +133,11 @@ function list(msg, callback) {
     async.forEachOf(data, (value, userId, innerCallback) => {
       db.getUserInfo(userId, (success, info) => {
         if (success) {
-          const roles = (info.roles) ? info.roles.join(", ") : "N/A";
-          const skills = (info.skills) ? info.skills.map(skill => {
+          const roles = (data.roles) ? data.roles.join(", ") : "N/A";
+          const skills = (data.skills) ? data.skills.map(skill => {
             if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
-            else return `${skill.skill}`;
-          }).join(", ") : "N/A";
+            else return ` - ${skill.skill}`;
+          }).join("\n") : "N/A";
           const userName = info.username;
 
           // if valid username
