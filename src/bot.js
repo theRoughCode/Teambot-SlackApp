@@ -141,7 +141,7 @@ function list(msg, callback) {
           const userName = info.username;
 
           // if valid username
-          if(userName) format.formatUser(obj => attachments.push(obj));
+          if(userName) format.formatUser(userId, userName, roles, skills, obj => attachments.push(obj));
           innerCallback();
         } else {
           return format.displayErrorMsg(`Could not get ${userId}'s info`, msg => sendMsgToUrl({ text: msg }, responseUrl));
