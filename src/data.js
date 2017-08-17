@@ -7,11 +7,12 @@ admin.initializeApp({
   databaseURL: "https://teambot-68704.firebaseio.com"
 });
 
+const HACKATHON = "htn";
 const auth = admin.auth();
 const db = admin.database();
 const userRef = db.ref('users');
-const teamRef = db.ref('teams');
-const memRef = db.ref('members');
+const teamRef = db.ref(`teams/${HACKATHON}`);
+const memRef = db.ref(`members/${HACKATHON}`);
 
 // Update user
 function updateUser(userId, data, callback) {
