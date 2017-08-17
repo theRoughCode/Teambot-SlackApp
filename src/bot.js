@@ -479,7 +479,7 @@ function setRoles(msg, role, callback) {
       };
 
       // Perform matchmaking
-      if (category === "team") db.getTeams((res, data) => {
+      if (type === "team") db.getTeams((res, data) => {
         if (res && data) findMatch(userData, data, matches => {
           if (!matches) return sendMsgToUrl(noMatchMsg, responseUrl);
           else return format.formatMatches(matches, formatted => sendMsgToUrl(formatted, responseUrl));
