@@ -91,7 +91,7 @@ function parseCommands(msg, callback) {
   // edit skills
   else if (text[0] === "skills") createSkills(msg, callback);
   // remove user
-  else if (text[0] === "reset") resetUser(msg, callback);
+  else if (text[0] === "reset") resetUser(msg.user_id, msg.response_url, callback);
   else callback("Incorrect command.  Try `/teambot help` for a list of commands")
 }
 
@@ -122,7 +122,7 @@ function parseIMsg(msg, callback) {
     }
     // reset user info
     else if (actions[0].name === "reset") {
-      resetUser(msg, callback);
+      resetUser(msg.user.id, msg.response_url, callback);
     }
     // remove user
     else if (actions[0].name === "remove") {
@@ -252,10 +252,7 @@ function createSkills(msg, callback) {
 }
 
 // reset user info
-function resetUser(msg, callback) {
-  const responseUrl = msg.response_url;
-  const userId = msg.user_id;
-  console.log(msg);
+function resetUser(userId, responseUrl, callback) {
   callback(null);
 
   db.hasUser(userId, (res, data) => {
