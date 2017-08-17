@@ -12,23 +12,8 @@ routes.get('/msg/:msg', function(req, res) {
   res.send();
 });
 
-// welcome message
-routes.post('/start', function(req, res) {
-  res.status(200);
-  bot.welcome(req.body, msg => res.send(msg));
-});
-/*
-routes.post('/post', function(req, res) {
-  /* token, team_id, team_domain, channel_id
-  channel_name, user_id, user_name
-  command=/ , text, response_url
-  bot.parseMsg(req.body.text);
-  res.status(200);
-  res.send();
-});*/
-
-// help
-routes.post('/team', function(req, res) {
+// slash commands
+routes.post('/slash', function(req, res) {
   /* token, team_id, team_domain, channel_id
   channel_name, user_id, user_name
   command=/ , text, response_url*/
@@ -72,34 +57,6 @@ routes.post('/events', function(req, res) {
   res.status(200);
   bot.parseEvent(req.body, msg => res.send(msg));
 })
-
-// display listed teams or members
-routes.post('/list', function(req, res) {
-  /* token, team_id, team_domain, channel_id
-  channel_name, user_id, user_name
-  command=/ , text, response_url*/
-  res.status(200);
-  bot.list(req.body, msg => res.send(msg));
-});
-
-// display personal info
-routes.post('/display', function(req, res) {
-  /* token, team_id, team_domain, channel_id
-  channel_name, user_id, user_name
-  command=/ , text, response_url*/
-  res.status(200);
-  bot.display(req.body.user_id, msg => res.send(msg));
-});
-
-// edit skills
-routes.post('/skills', function(req, res) {
-  /* token, team_id, team_domain, channel_id
-  channel_name, user_id, user_name
-  command=/ , text, response_url*/
-  res.status(200);
-  bot.createSkills(req.body, msg => res.send(msg));
-})
-
 
 
 module.exports = routes;

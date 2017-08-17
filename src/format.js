@@ -9,7 +9,7 @@ function displayErrorMsg(errorMsg, callback) {
 
 // list commands
 function helpMsg(callback) {
-  callback({ text: "List of commands:\n  `/start` to begin the search!\n  `/display` to display your preferences\n  `/list (members/teams)` to display the list of discoverable users" });
+  callback({ text: "List of commands:\n  `/team start` to begin the search!\n  `/team display` to display your preferences\n  `/team list (members/teams)` to display the list of discoverable users" });
 }
 
 // Welcome new users

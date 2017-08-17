@@ -67,7 +67,6 @@ function welcomeUserToChannel(userId, channel, callback) {
 
   if (channel === BOT_CHANNEL_ID)
     getFirstName(userId, (success, res) => {
-      console.log(res);
       if (success) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/start` to begin searching for a team or `/team help` for a list of commands!");
       else return sendMsgToChannel(BOT_CHANNEL_NAME, res.text);
     });
@@ -75,8 +74,18 @@ function welcomeUserToChannel(userId, channel, callback) {
 
 // parse commands
 function parseCommands(msg, callback) {
-  const text = msg.text.toLowerCase();
-  if (text === "help") format.helpMsg(callback);
+  const text = msg.text.toLowerCase().split(" ");
+
+  // list commands
+  if (text[0] === "help" || text[0] === "commands") format.helpMsg(callback);
+  // welcome message
+  else if (text[0] === "start") welcome(msg, callback);
+  // display personal info
+  else if (text[0] === "display") display(msg.user_id, callback);
+  // display listed teams or members
+  else if (text[0] === "list") list(text[1], msg.response_url, callback);
+  // edit skills
+  else if (text[0] === "skills") createSkills(msg, callback);
   else callback("Incorrect command.  Try `/team help` for a list of commands")
 }
 
@@ -121,10 +130,7 @@ function parseEvent(msg, callback) {
 }
 
 // Lists teams or members
-function list(msg, callback) {
-  const responseUrl = msg.response_url;
-  const text = msg.text.toLowerCase();
-
+function list(type, responseUrl, callback) {
   var output = function (type, res, data) {
     if(!res) return displayErrorMsg(msg => callback({ text: msg }));
     else if (!data) return callback(`No ${type}s found. :disappointed:`);
@@ -161,12 +167,12 @@ function list(msg, callback) {
     });
   };
 
-  if(text === "members" || text === "member") { // display members
+  if(type === "members" || type === "member") { // display members
     db.getMembers((res, data) => output("member", res, data));
-  } else if (text === "teams" || text === "team") { // display teams
+  } else if (type === "teams" || type === "team") { // display teams
     db.getTeams((res, data) => output("team", res, data));
   } else {
-    callback("Incorrect command.  e.g. _/list teams_");
+    callback("Incorrect command.  e.g. `/team list teams`");
   }
 }
 
@@ -195,7 +201,7 @@ function createSkills(msg, callback) {
   const responseUrl = msg.response_url;
 
   if (!msg.text) return callback({
-    text: "Incorrect command. Please input skills!"
+    text: "Incorrect command. Please input skills (i.e. `/team skills Node.js, Python`)!"
   });
   var text = msg.text.replace(/\s/g,'');
   var skills = text.split(',');
@@ -326,8 +332,6 @@ function getFirstName(userId, callback) {
   SLACK.api("users.info", {
     "user": userId
   }, function(err, response) {
-    console.log(err);
-    console.log(response);
     if (!response.ok) return format.displayErrorMsg(`Failed to get info of ${userId}: API error\n${err}`, msg => callback(false, { text: msg }));
     else return callback(true, response.user.profile.first_name);
   });
