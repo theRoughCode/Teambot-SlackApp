@@ -121,8 +121,12 @@ function formatMatches(sortedMatches, callback) {
 }
 
 function formatUser(userId, userName, roles, skills, callback) {
-  console.log(roles);
-  console.log(skills);
+  const formRoles = (roles) ? roles.join(", ") : "N/A";
+  const formSkills = (skills) ? skills.map(skill => {
+    if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
+    else return ` - ${skill.skill}`;
+  }).join("\n") : "N/A";
+
   callback({
     "fallback": "Required plain-text summary of the attachment.",
     "color": COLOUR,
@@ -130,12 +134,12 @@ function formatUser(userId, userName, roles, skills, callback) {
     "fields": [
       {
         "title": "Roles",
-        "value": roles,
+        "value": formRoles,
         "short": true
       },
       {
         "title": "Skills (Level: out of 5)",
-        "value": skills,
+        "value": formSkills,
         "short": true
       }
     ]
@@ -143,6 +147,12 @@ function formatUser(userId, userName, roles, skills, callback) {
 }
 
 function formatInfo(roles, skills, userType, visible, callback) {
+  const formRoles = (roles) ? roles.join(", ") : "N/A";
+  const formSkills = (skills) ? skills.map(skill => {
+    if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
+    else return ` - ${skill.skill}`;
+  }).join("\n") : "N/A";
+
   callback({
       "fallback": "Required plain-text summary of the attachment.",
       "color": COLOUR,
@@ -160,12 +170,12 @@ function formatInfo(roles, skills, userType, visible, callback) {
           },
           {
               "title": "Roles",
-              "value": roles,
+              "value": formRoles,
               "short": true
           },
           {
               "title": "Skills (Level: out of 5)",
-              "value": skills,
+              "value": formSkills,
               "short": true
           }
       ]

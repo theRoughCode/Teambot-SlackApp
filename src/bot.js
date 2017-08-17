@@ -150,15 +150,10 @@ function list(type, responseUrl, callback) {
     async.forEachOf(data, (value, userId, innerCallback) => {
       db.getUserInfo(userId, (success, info) => {
         if (success) {
-          const roles = (info.roles) ? info.roles.join(", ") : "N/A";
-          const skills = (info.skills) ? info.skills.map(skill => {
-            if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
-            else return ` - ${skill.skill}`;
-          }).join("\n") : "N/A";
           const userName = info.username;
 
           // if valid username
-          if(userName) format.formatUser(userId, userName, roles, skills, obj => attachments.push(obj));
+          if(userName) format.formatUser(userId, userName, info.roles, info.skills, obj => attachments.push(obj));
           innerCallback();
         } else {
           return format.displayErrorMsg(`Could not get ${userId}'s info`, msg => sendMsgToUrl({ text: msg }, responseUrl));
@@ -189,17 +184,12 @@ function list(type, responseUrl, callback) {
 function display(userId, callback) {
   db.getUserInfo(userId, (res, info) => {
     if (res) {
-      const roles = (info.roles) ? info.roles.join(", ") : "N/A";
-      const skills = (info.skills) ? info.skills.map(skill => {
-        if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
-        else return ` - ${skill.skill}`;
-      }).join("\n") : "N/A";
       const userType = (info.user_type) ? info.user_type.substring(0, 1).toUpperCase() + info.user_type.substring(1) : "N/A";
       const userName = info.username || "N/A";
       const visible = (info.visible) ? "Yes" : "No";
 
       // format display
-      format.formatInfo(roles, skills, userType, visible, obj => callback({ "attachments" : [obj] }));
+      format.formatInfo(info.roles, info.skills, userType, visible, obj => callback({ "attachments" : [obj] }));
 
     } else format.displayErrorMsg(`Could not get info of ${userId}`, msg => callback({ text: msg }));
   })
