@@ -48,16 +48,20 @@ const ROLES = [
 
 // welcome message
 function welcome(body, callback) {
-  const userName = body.user_name;
   const userId = body.user_id;
   const responseUrl = body.response_url;
   callback(null);
 
-  db.hasUser(userId, (res, data) => {
-    // user exists in db
-    if (res) return format.welcomeOldUser(userName, userId, data, msg => sendMsgToUrl(msg, responseUrl));
-    // user does not exist
-    else return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
+  getFirstName(userId, (success, userName) => {
+    if (success) {
+      db.hasUser(userId, (res, data) => {
+        // user exists in db
+        if (res) return format.welcomeOldUser(userName, data, msg => sendMsgToUrl(msg, responseUrl));
+        // user does not exist
+        else return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
+      });
+    }
+    else return sendMsgToChannel(BOT_CHANNEL_NAME, userName);
   });
 }
 
@@ -68,7 +72,7 @@ function welcomeUserToChannel(userId, channel, callback) {
   if (channel === BOT_CHANNEL_ID)
     getFirstName(userId, (success, res) => {
       if (success) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/start` to begin searching for a team or `/team help` for a list of commands!");
-      else return sendMsgToChannel(BOT_CHANNEL_NAME, res.text);
+      else return sendMsgToChannel(BOT_CHANNEL_NAME, res);
     });
 }
 
@@ -76,10 +80,10 @@ function welcomeUserToChannel(userId, channel, callback) {
 function parseCommands(msg, callback) {
   const text = msg.text.toLowerCase().split(" ");
 
-  // list commands
-  if (text[0] === "help" || text[0] === "commands") format.helpMsg(callback);
   // welcome message
-  else if (text[0] === "start") welcome(msg, callback);
+  if (!text.length || text[0] === "start") welcome(msg, callback);
+  // list commands
+  else if (text[0] === "help" || text[0] === "commands") format.helpMsg(callback);
   // display personal info
   else if (text[0] === "display") display(msg.user_id, callback);
   // display listed teams or members
@@ -332,7 +336,7 @@ function getFirstName(userId, callback) {
   SLACK.api("users.info", {
     "user": userId
   }, function(err, response) {
-    if (!response.ok) return format.displayErrorMsg(`Failed to get info of ${userId}: API error\n${err}`, msg => callback(false, { text: msg }));
+    if (!response.ok) return format.displayErrorMsg(`Failed to get info of ${userId}: API error\n${err}`, msg => callback(msg));
     else return callback(true, response.user.profile.first_name);
   });
 }

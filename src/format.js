@@ -43,7 +43,7 @@ function welcomeNewUser(userName, callback) {
 }
 
 // Welcome returning user
-function welcomeOldUser(userName, userId, data, callback) {
+function welcomeOldUser(userName, data, callback) {
   var actions = [];
   var action_userType = {
     "name": "user_type",
