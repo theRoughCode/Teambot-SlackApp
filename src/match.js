@@ -1,7 +1,7 @@
 const async = require('async');
 
 // Gives a score on quality of match
-function rateUser(searcher, user, callback) {
+function rateUser(userData, matchData, callback) {
   const userRoles = userData.roles || [];
   const userSkills = userData.skills || [];
   const matchRoles = matchData.roles || [];
