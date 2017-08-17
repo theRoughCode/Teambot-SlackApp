@@ -28,12 +28,12 @@ routes.post('/post', function(req, res) {
 });*/
 
 // help
-routes.post('/help', function(req, res) {
+routes.post('/team', function(req, res) {
+  /* token, team_id, team_domain, channel_id
+  channel_name, user_id, user_name
+  command=/ , text, response_url*/
   res.status(200);
-  bot.helpMsg(msg => {
-    msg.response_type = "ephemeral";
-    res.send(msg);
-  });
+  bot.parseCommands(req.body, msg => res.send(msg));
 });
 
 // interactive messages

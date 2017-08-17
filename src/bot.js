@@ -66,9 +66,11 @@ function welcomeUser(userId, channel, callback) {
   });
 }
 
-// list commands
-function helpMsg(callback) {
-  callback({ text: "List of commands:\n  `/start` to begin the search!\n  `/display` to display your preferences\n  `/list (members/teams)` to display the list of discoverable users" });
+// parse commands
+function parseCommands(msg, callback) {
+  const text = msg.text.toLowerCase();
+  if (text === "help") format.helpMsg(callback);
+  else callback("Incorrect command.  Try `/team help` for a list of commands")
 }
 
 // parse interactive messages
@@ -137,13 +139,12 @@ function list(msg, callback) {
           if(userName) format.formatUser(obj => attachments.push(obj));
           innerCallback();
         } else {
-          return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+          return format.displayErrorMsg(`Could not get ${userId}'s info`, msg => sendMsgToUrl({ text: msg }, responseUrl));
         }
       });
     }, function (err) {
       if (err) {
-        console.error(err.message);
-        return displayErrorMsg(msg => sendMsgToUrl({ text: msg }, responseUrl));
+        return format.displayErrorMsg(`Could not get list of ${type}s.\n${err.message}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
       } else {
         return sendMsgToUrl({
          "text": `List of ${type}s:`,
@@ -654,7 +655,7 @@ function removeUser(userId, callback) {
 
 module.exports = {
   welcome,
-  helpMsg,
+  parseCommands,
   parseIMsg,
   parseEvent,
   list,

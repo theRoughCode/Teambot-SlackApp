@@ -7,6 +7,11 @@ function displayErrorMsg(errorMsg, callback) {
   console.error(`ERROR: ${errorMsg}`);
 }
 
+// list commands
+function helpMsg(callback) {
+  callback({ text: "List of commands:\n  `/start` to begin the search!\n  `/display` to display your preferences\n  `/list (members/teams)` to display the list of discoverable users" });
+}
+
 // Welcome new users
 function welcomeNewUser(userName, callback) {
   callback({
@@ -170,6 +175,7 @@ function formatSkillLvl(skill, actions, callback) {
 
 module.exports = {
   displayErrorMsg,
+  helpMsg,
   welcomeNewUser,
   welcomeOldUser,
   formatMatches,
