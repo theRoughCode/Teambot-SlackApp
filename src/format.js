@@ -70,7 +70,7 @@ function welcomeOldUser(userName, userId, data, callback) {
   else if (!data.visible)
     actions.push({
       "name": "visibility",
-      "text": "Turn on discoverability",
+      "text": "Discover me!",
       "type": "button",
       "value": (data.user_type === "team") ? "team" : "members"
     });
