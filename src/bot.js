@@ -57,6 +57,8 @@ function welcome(body, callback) {
 function welcomeUser(userId, channel, callback) {
   callback(null);
 
+  console.log(channel);
+
   if (channel !== BOT_CHANNEL) return;
 
   convertToUserName(userId, data => {
