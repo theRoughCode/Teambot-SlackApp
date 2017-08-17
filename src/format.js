@@ -84,10 +84,10 @@ function welcomeOldUser(userName, data, callback) {
 
   // Remove User
   actions.push({
-    "name": "remove",
-    "text": "Remove me",
+    "name": "reset",
+    "text": "Reset my info",
     "type": "button",
-    "value": "remove"
+    "value": "reset"
   });
 
   callback({

@@ -90,6 +90,8 @@ function parseCommands(msg, callback) {
   else if (text[0] === "list") list(text[1], msg.response_url, callback);
   // edit skills
   else if (text[0] === "skills") createSkills(msg, callback);
+  // remove user
+  else if (text[0] === "reset") resetUser(msg, callback);
   else callback("Incorrect command.  Try `/teambot help` for a list of commands")
 }
 
@@ -117,6 +119,10 @@ function parseIMsg(msg, callback) {
     // turn on visibility
     else if (actions[0].name === "visibility") {
       setDiscoverable(msg, "true", actions[0].value, callback);
+    }
+    // reset user info
+    else if (actions[0].name === "reset") {
+      resetUser(msg.user.id, callback);
     }
     // remove user
     else if (actions[0].name === "remove") {
@@ -243,6 +249,24 @@ function createSkills(msg, callback) {
       if (!success) format.displayErrorMsg(`Failed to update skills for ${msg.user_id}`, res => sendMsgToUrl({ text: res }, responseUrl));
     });
   });
+}
+
+// reset user info
+function resetUser(msg, callback) {
+  const responseUrl = msg.response_url;
+  callback(null);
+
+  db.hasUser(user_id, (res, data) => {
+    if (res) {
+      db.deleteUser(user_id, success => {
+        if (success) sendMsgToUrl({
+          "text": ":thumbsup: You've been successfully removed!  Happy hacking! :smiley:"
+        }, responseUrl);
+        else displayErrorMsg(`Could not reset ${user_id}`, msg => sendMsgToUrl({ "text": msg }));
+      })
+    }
+    else displayErrorMsg(`Could not find ${user_id}: Database error`, msg => sendMsgToUrl({ "text": msg }));
+  })
 }
 
 /* HELPERS */
