@@ -247,7 +247,7 @@ function createSkills(msg, callback) {
       if (!success) skillArr = [];
       async.forEachOf(skills, (skill, index, next) => {
         if (index === skills.indexOf(skill)) {
-          if (!skills.length) {
+          if (!skillArr.length) {
             skillArr.push({
               "skill": skill
             });
