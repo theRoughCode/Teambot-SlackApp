@@ -362,16 +362,15 @@ function getFirstName(userId, callback) {
 
 // get DM channel ID
 function getDMChannel(userId, callback) {
-  console.log(userId);
   SLACK.api("im.list", (err, response) => {
-    if (!response.ok) return format.displayErrorMsg(`Failed to retrieve IM list.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+    if (!response.ok) return callback(response.error, null);
 
     async.forEachOf(response.ims, (obj, index, next) => {
       if (obj.user === userId) {
-        return callback(obj.id);
+        return callback(null, obj.id);
       }
     }, err => {
-      if (err) return (null);
+      if (err) return callback(err, null);
     });
   });
 }
@@ -769,8 +768,8 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
           });
 
           // TODO change to matchId
-          getDMChannel(userId, channelId => {
-            if(!channelId) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+          getDMChannel(userId, (err, channelId) => {
+            if(err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
 
             SLACK.api("chat.postMessage", {
               "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
@@ -798,8 +797,8 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
 
   var text = (data.type === "team") ? "their" : "your";
 
-  getChannelId(data.userId, channelId => {
-    if (!channelId) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+  getDMChannel(data.userId, (err, channelId) => {
+    if (err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
 
     SLACK.api("chat.postMessage", {
       "text": `Hi, ${data.userName}!  ${data.matchName} has accepted your request to join ${text} team.  Go and send <@${data.matchId}|${data.matchUserName}> a direct message!`,
@@ -831,8 +830,8 @@ function declineTeamRequest(matchUserName, data, responseUrl, callback) {
   callback(null);
   var text = (data.type === "team") ? "their" : "your";
 
-  getChannelId(data.userId, channelId => {
-    if (!channelId) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+  getDMChannel(data.userId, (err, channelId) => {
+    if (err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
 
     SLACK.api("chat.postMessage", {
       "text": `Hi, ${data.userName}, ${data.matchName} has declined your request to join ${text} team.  Don't give up! Search for more matches using ` + "`/teambot search`!", // convert to string in order for API to properly parse it
