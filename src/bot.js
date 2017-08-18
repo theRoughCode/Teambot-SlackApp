@@ -861,7 +861,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     "username": BOT_NAME
   }, (err, response) => {
     if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
-  }), 500);
+  }), 5000);
 }
 
 function declineTeamRequest(matchUserName, data, responseUrl, callback) {
