@@ -111,7 +111,9 @@ function parseIMsg(msg, callback) {
     if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
     else callback("All the best team-hunting! :smile:");
   } else if (callbackID === "contact") {  // contact user
-    contactUser(msg.user.id, actions[0].value, actions[0].name, msg.response_url, callback);
+    notifyMatchedUser(msg.user.id, actions[0].value, actions[0].name, msg.response_url, callback);
+  } else if (callbackID === "respond") {
+  //  if (actions[0].name === "accept")
   } else if (callbackID === 'edit') {  // edit existing data
     // change user type
     if (actions[0].name === 'user_type') {
@@ -695,7 +697,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
 }
 
 // Contact user to form a team
-function contactUser(userId, matchId, type, responseUrl, callback) {
+function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
   var text = (type === "team") ? "join your team" : "invite you to their team";
 
   // Get first name of match
@@ -723,18 +725,25 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
                 "name": "accept",
                 "text": "Yes",
                 "type": "button",
-                "value": "accept"
+                "style": "primary",
+                "value": userId
               },
               {
                 "name": "decline",
                 "text": "No",
                 "type": "button",
-                "value": "decline"
+                "style": "danger",
+                "value": userId,
+                "confirm": {
+                  "title": "Are you sure?",
+                  "ok_text": "Yes",
+                  "dismiss_text": "No"
+                }
               }
             ]
           });
           SLACK.api("chat.postMessage", {
-            "text": `Hi, ${matchName}!  You've got a match!  ${userName} would like to ${text}! :tada:\n Here's more about them:`,
+            "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
             "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
             "channel": userId,  //TODO change to matchId
             "username": BOT_NAME
@@ -745,6 +754,21 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
       });
     });
   });
+}
+
+function acceptTeamRequest(userId, matchId, responseUrl, callback) {
+  SLACK.api("chat.postMessage", {
+    "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
+    "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
+    "channel": userId,  //TODO change to matchId
+    "username": BOT_NAME
+  }, (err, response) => {
+    if (err) console.error(`Failed to send message to ${res}`);
+  });
+}
+
+function declineTeamRequest(userId, matchId, responseUrl, callback) {
+
 }
 
 
