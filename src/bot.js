@@ -754,16 +754,16 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
           // Get Instant Messaging DM ID of match
           SLACK.api("im.list", (err, response) => {
             if (err) return format.displayErrorMsg(`Failed to retrieve IM list.\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
-
+            console.log("1:" + response);
             async.forEachOf(response.ims, (obj, index, next) => {
               if (obj.user === userId) { //TODO change to matchId
                 SLACK.api("chat.postMessage", {
                   "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
                   "as_user": true,
                   "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
-                  "channel": obj.id,
-                  "username": BOT_NAME
+                  "channel": obj.id
                 }, (err, response) => {
+                  console.log(response);
                   if (err) format.displayErrorMsg(`Failed to send message to ${matchName}`, msg => sendMsgToUrl(msg, responseUrl));
                   return;
                 });
