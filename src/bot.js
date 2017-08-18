@@ -836,7 +836,27 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     "channel": data.userId,
     "username": BOT_NAME
   }, (err, response) => {
-    if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+    if (!response.ok) return format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    else sendMsgToUrl({
+      "text": `${data.userName} has been notified!  All the best and happy hacking! :smile:`,
+      "attachments": JSON.stringify([
+        {
+          "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
+          "fallback": "The features of this app are not supported by your device",
+          "callback_id": "remove",
+          "color": format.COLOUR,
+          "attachment_type": "default",
+          "actions": [
+            {
+              "name": "remove",
+              "text": "Remove me!",
+              "type": "button",
+              "style": "danger",
+              "value": "remove"
+            }
+          ]
+      }]),  // convert to string in order for API to properly parse it
+    }, responseUrl);
   });
 
   setTimeout(SLACK.api("chat.postMessage", {
@@ -860,7 +880,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     "channel": data.userId,
     "username": BOT_NAME
   }, (err, response) => {
-    if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+    if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
   }), 5000);
 }
 
@@ -869,14 +889,14 @@ function declineTeamRequest(matchUserName, data, responseUrl, callback) {
   var text = (data.type === "team") ? "their" : "your";
 
   getDMChannel(data.userId, (err, channelId) => {
-    if (err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+    if (err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
 
     SLACK.api("chat.postMessage", {
       "text": `Hi, ${data.userName}, ${data.matchName} has declined your request to join ${text} team.  Don't give up! Search for more matches using ` + "`/teambot search`!", // convert to string in order for API to properly parse it
       "channel": channelId,
       "username": BOT_NAME
     }, (err, response) => {
-      if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+      if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
     });
   });
 }
