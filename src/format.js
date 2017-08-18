@@ -230,7 +230,7 @@ function formatInfo(roles, skills, userType, visible, callback) {
 function formatSkillLvl(skill, actions, callback) {
   callback({
     "fallback": "The features of this app are not supported by your device",
-    "callback_id": "skills",
+    "callback_id": "skillsLvl",
     "color": COLOUR,
     "attachment_type": "default",
     "title": skill,
@@ -244,7 +244,7 @@ function formatSkills(skillArr, callback) {
     text: `Here are your skills (Level: out of ${MAX_SKILL_LVL}):`,
     attachments: skillArr.map(skill => {
 
-      var actions =[
+      var actions = [
         {
           "name": skill.skill,
           "text": "Choose level...",
@@ -265,7 +265,6 @@ function formatSkills(skillArr, callback) {
         }
       ];
 
-      console.log(actions);
       return {
         "text": (skill.level) ? `${skill.skill} (Level: ${skill.level})` : `${skill.skill}`,
         "fallback": "The features of this app are not supported by your device",

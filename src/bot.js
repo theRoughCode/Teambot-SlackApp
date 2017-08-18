@@ -109,8 +109,10 @@ function parseIMsg(msg, callback) {
     setUserType(msg, actions[0].value, callback);
   } else if (callbackID === 'roles') {
     setRoles(msg, actions[0].value, callback);
-  } else if (callbackID === 'skills') {
-    updateSkillLevels(msg, actions[0].name, actions[0].value, callback);
+  } else if (callbackID === 'skills' || callbackID === 'skillsLvl') {
+    callback(null);
+    var fun = (callbackID === 'skills') ? displaySkills : displaySkillChoice;
+    updateSkillLevels(msg, actions[0].name, actions[0].value, fun);
   } else if (callbackID === 'discover') { // turn on discoverability
     if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
     else callback("All the best team-hunting! :smile:");
@@ -714,8 +716,6 @@ function updateSkillLevels(msg, skill, level, callback) {
 
   db.getSkills(userId, (res, skills) => {
     if (!res) return format.displayErrorMsg(`Could not retrieve skills for ${userId}: Database error`, msg => callback({ text: msg }));
-
-    callback(null);
 
     for (var i = skills.length - 1; i >= 0; i--) {
       if(skills[i].skill === skill) {
