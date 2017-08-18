@@ -355,10 +355,12 @@ function displaySkillChoice(skills, callback) {
         "style": "danger",
         "value": skill
       });
-      format.formatSkillLvl(skill, actions, obj => next1(null, obj));
+      console.log(actions);
+      format.formatSkillLvl(skill, actions, obj => {
+        next1(null, obj);
+      });
     });
   }, (err, attachments) => {
-    console.log(attachments);
     callback({
       text: "List the level of proficiency of each skill:",
       attachments: attachments
