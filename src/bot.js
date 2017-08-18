@@ -111,7 +111,7 @@ function parseIMsg(msg, callback) {
     setRoles(msg, actions[0].value, callback);
   } else if (callbackID === 'skills' || callbackID === 'skillsLvl') {
     callback(null);
-    if (callbackID === 'skills')  updateSkillLevels(msg, actions[0].name, actions[0].selected_options[0].value, displaySkills);
+    if (callbackID === 'skills') updateSkillLevels(msg, actions[0].name, actions[0].selected_options[0].value, displaySkills);
     else updateSkillLevels(msg, actions[0].name, actions[0].value, displaySkillChoice);
   } else if (callbackID === 'discover') { // turn on discoverability
     if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
@@ -217,7 +217,10 @@ function createSkills(msg, callback) {
 
   var text = msg.text.substring("skills".length).replace(/\s/g,'');
 
-  if (!text) return displaySkills(msg.user_id, responseUrl, callback);
+  if (!text) return db.getSkills(msg.user_id, (success, skillArr) => {
+    if (!success) skillArr = [];
+    displaySkills(skillArr, msg => sendMsgToUrl(msg, responseUrl));
+  });
 
   var skills = text.split(',');
 
@@ -279,13 +282,10 @@ function createSkills(msg, callback) {
 }
 
 // display skills
-function displaySkills(userId, responseUrl, callback) {
-  callback(null);
-  db.getSkills(userId, (success, skillArr) => {
-    if (!success || !skillArr.length) return sendMsgToUrl({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" }, responseUrl);
+function displaySkills(skillArr, callback) {
+  if (!skillArr.length) return callback({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" });
 
-    format.formatSkills(skillArr, obj => sendMsgToUrl(obj, responseUrl));
-  });
+  format.formatSkills(skillArr, obj => callback(obj));
 }
 
 // reset user info
@@ -721,7 +721,7 @@ function updateSkillLevels(msg, skill, level, callback) {
       if(skills[i].skill === skill) {
         if (level === "-1") skills.splice(i, 1);  // remove skill
         else skills[i]["level"] = level;
-        console.log(level);
+
         db.updateSkills(userId, skills, success => {
           async.forEachOf(skills, (value, index, next) => {
             if (!value.level) skillArr.push(value.skill);
