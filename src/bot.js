@@ -709,9 +709,9 @@ function updateSkillLevels(msg, skill, level, callback) {
 
     callback(null);
 
-    for (var i = 0; i < skills.length; i++) {
-      if(skills[i] && skills[i].skill === skill) {
-        if (level === "-1") skills[i] = null;
+    for (var i = skills.length - 1; i >= 0; i--) {
+      if(skills[i].skill === skill) {
+        if (level === "-1") skills.splice(i, 1);
         else skills[i]["level"] = level;
 
         db.updateSkills(userId, skills, success => {
