@@ -362,7 +362,7 @@ function displaySkillChoice(skills, callback) {
     });
   }, (err, attachments) => {
     callback({
-      text: "List the level of proficiency of each skill:",
+      text: `List the level of proficiency of each skill (${format.MAX_SKILL_LVL} = best):`,
       attachments: attachments
     });
   });
