@@ -113,6 +113,7 @@ function parseIMsg(msg, callback) {
   } else if (callbackID === "contact") {  // contact user
     notifyMatchedUser(msg.user.id, actions[0].value, actions[0].name, msg.response_url, callback);
   } else if (callbackID === "respond") {
+    console.log(JSON.parse(actions[0].value));
   //  if (actions[0].name === "accept")
   } else if (callbackID === 'edit') {  // edit existing data
     // change user type
@@ -714,6 +715,14 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 
         format.formatUser(userId, info.username, info.roles, info.skills, obj => {
           const attachments = [obj];
+          const value = {
+            "userId": userId,
+            "username": info.username,
+            "userName": userName,
+            "matchId": matchId,
+            "matchName:": matchName,
+            "type": type
+          }
           attachments.push({
             "text": (type === "team") ? "Would you to to accept them into your team?" : "Would you like to join their team?",
             "fallback": "The features of this app are not supported by your device",
@@ -726,14 +735,14 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
                 "text": "Yes",
                 "type": "button",
                 "style": "primary",
-                "value": userId
+                "value": JSON.stringify(value)
               },
               {
                 "name": "decline",
                 "text": "No",
                 "type": "button",
                 "style": "danger",
-                "value": userId,
+                "value": JSON.stringify(value),
                 "confirm": {
                   "title": "Are you sure?",
                   "ok_text": "Yes",
@@ -742,13 +751,25 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
               }
             ]
           });
-          SLACK.api("chat.postMessage", {
-            "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
-            "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
-            "channel": userId,  //TODO change to matchId
-            "username": BOT_NAME
-          }, (err, response) => {
-            if (err) console.error(`Failed to send message to ${res}`);
+          // Get Instant Messaging DM ID of match
+          SLACK.api("im.list", (err, response) => {
+            if (err) return format.displayErrorMsg(`Failed to retrieve IM list.\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+
+            async.forEachOf(response.ims, (obj, index, next) => {
+              if (obj.user === userId) { //TODO change to matchId
+                SLACK.api("chat.postMessage", {
+                  "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
+                  "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
+                  "channel": obj.id,
+                  "username": BOT_NAME
+                }, (err, response) => {
+                  if (err) format.displayErrorMsg(`Failed to send message to ${matchName}`, msg => sendMsgToUrl(msg, responseUrl));
+                  return;
+                });
+              }
+            }, err => {
+              if (err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+            });
           });
         });
       });
