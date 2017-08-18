@@ -1,5 +1,6 @@
 const async = require('async');
 const COLOUR = "#3AA3E3";
+const MAX_SKILL_LVL = 4;
 
 // display error message
 function displayErrorMsg(errorMsg, callback) {
@@ -182,7 +183,7 @@ function formatUser(userId, userName, roles, skills, callback) {
         "short": true
       },
       {
-        "title": "Skills (Level: out of 5)",
+        "title": `Skills (Level: out of ${MAX_SKILL_LVL})`,
         "value": formSkills,
         "short": true
       }
@@ -239,6 +240,7 @@ function formatSkillLvl(skill, actions, callback) {
 
 module.exports = {
   COLOUR,
+  MAX_SKILL_LVL,
   displayErrorMsg,
   helpMsg,
   welcomeNewUser,

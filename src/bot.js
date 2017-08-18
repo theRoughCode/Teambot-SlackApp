@@ -340,7 +340,7 @@ function displaySkillChoice(skills, callback) {
   });
 
   async.map(skills, (skill, next1) => {
-    async.times(4, (n, next2) => {
+    async.times(format.MAX_SKILL_LVL, (n, next2) => {
       next2(null, {
         "name": `${skill}`,
         "text": ":star:".repeat(n + 1),
