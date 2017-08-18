@@ -136,6 +136,7 @@ function formatMatches(sortedMatches, type, callback) {
           {
             "name": "yes",
             "text": "Discover me!",
+            "style": "primary",
             "type": "button",
             "value": type
           }
@@ -152,6 +153,7 @@ function formatMatches(sortedMatches, type, callback) {
           {
             "name": "remove",
             "text": "Remove me",
+            "style": "danger",
             "type": "button",
             "value": "remove"
           }
