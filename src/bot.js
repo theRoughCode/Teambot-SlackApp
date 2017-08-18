@@ -283,25 +283,9 @@ function createSkills(msg, callback) {
 
 // display skills
 function displaySkills(skillArr, callback) {
-  var helper = function(skillArr1) {
-    if (!skillArr1.length) return callback({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" });
+  if (!skillArr.length) return callback({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" });
 
-    format.formatSkills(skillArr, obj => callback(obj));
-  }
-
-  // if obj, convert to array
-  if (!(skillArr instanceof Array)) {
-    var skills = skillArr;
-    skillArr = [];
-    async.forEachOf(skills, (value, index, next) => {
-      if (!value.level) skillArr.push(value.skill);
-      next();
-    }, err => {
-      if (err) return format.displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => callback({ "text": msg }));
-      else return helper(skillArr);
-    });
-  } else helper(skillArr);
-
+  format.formatSkills(skillArr, obj => callback(obj));
 }
 
 // reset user info
@@ -356,36 +340,48 @@ function sendMsgToChannel(channel, msg) {
 
 // display skills
 function displaySkillChoice(skills, callback) {
-  console.log(skills);
-  if(!skills.length) return callback({
-    text: ":thumbsup: Excellent! Your skill levels are all set!"
-  });
+  var helper = function(skills) {
+    if(!skills.length) return callback({
+      text: ":thumbsup: Excellent! Your skill levels are all set!"
+    });
 
-  async.map(skills, (skill, next1) => {
-    async.times(format.MAX_SKILL_LVL, (n, next2) => {
-      next2(null, {
-        "name": skill,
-        "text": ":star:".repeat(n + 1),
-        "type": "button",
-        "value": n + 1
+    async.map(skills, (skill, next1) => {
+      async.times(format.MAX_SKILL_LVL, (n, next2) => {
+        next2(null, {
+          "name": skill,
+          "text": ":star:".repeat(n + 1),
+          "type": "button",
+          "value": n + 1
+        });
+      }, (err, actions) => {
+        actions.push({
+          "name": skill,
+          "text": "Remove skill",
+          "type": "button",
+          "style": "danger",
+          "value": "-1"
+        });
+        format.formatSkillLvl(skill, actions, obj => next1(null, obj));
       });
-    }, (err, actions) => {
-      actions.push({
-        "name": skill,
-        "text": "Remove skill",
-        "type": "button",
-        "style": "danger",
-        "value": "-1"
+    }, (err, attachments) => {
+      callback({
+        text: `List the level of proficiency of each skill (${format.MAX_SKILL_LVL} = best):`,
+        attachments: attachments
       });
-      format.formatSkillLvl(skill, actions, obj => next1(null, obj));
     });
-  }, (err, attachments) => {
-    console.log(attachments);
-    callback({
-      text: `List the level of proficiency of each skill (${format.MAX_SKILL_LVL} = best):`,
-      attachments: attachments
+  }
+
+  // if array of objects
+  if (skills.length && (typeof skills[0] === 'string' || skills[0] instanceof String)) {
+    const skillArr = [];
+    async.forEachOf(skills, (value, index, next) => {
+      if (!value.level) skillArr.push(value.skill);
+      next();
+    }, err => {
+      if (err) return format.displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => callback({ "text": msg }));
+      else helper(skillArr);
     });
-  });
+  } else helper(skills);
 }
 
 // Convert from username to id
@@ -729,7 +725,6 @@ function findMatch(userData, type, callback) {
 // Update skill Levels
 function updateSkillLevels(msg, skill, level, callback) {
   const responseUrl = msg.response_url;
-  const skillArr = [];
   const userId = msg.user.id;
 
   db.getSkills(userId, (res, skills) => {
