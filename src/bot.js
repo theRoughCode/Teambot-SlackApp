@@ -715,20 +715,20 @@ function updateSkillLevels(msg, skill, level, callback) {
   const userId = msg.user.id;
 
   db.getSkills(userId, (res, skills) => {
-    if (!res) return format.displayErrorMsg(`Could not retrieve skills for ${userId}: Database error`, msg => callback({ text: msg }));
+    if (!res) return console.error(`Could not retrieve skills for ${userId}: Database error`);
 
     for (var i = skills.length - 1; i >= 0; i--) {
       if(skills[i].skill === skill) {
         if (level === "-1") skills.splice(i, 1);  // remove skill
         else skills[i]["level"] = level;
-
+        console.log(skills);
         db.updateSkills(userId, skills, success => {
           async.forEachOf(skills, (value, index, next) => {
             if (!value.level) skillArr.push(value.skill);
             next();
           }, err => {
             if (err) return format.displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => sendMsgToUrl({ text: msg }, responseUrl));
-            return displaySkillChoice(skillArr, msg => sendMsgToUrl(msg, responseUrl));
+            return callback(skillArr, msg => sendMsgToUrl(msg, responseUrl));
           });
         });
       }
