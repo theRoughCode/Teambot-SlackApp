@@ -92,6 +92,10 @@ function parseCommands(msg, callback) {
   else if (text[0] === "skills") createSkills(msg, callback);
   // remove user
   else if (text[0] === "remove") removeUser(msg.user_id, msg.response_url, callback);
+  // search for matches
+  else if (text[0] === "search") {
+
+  }
   else callback("Incorrect command.  Try `/teambot help` for a list of commands")
 }
 
@@ -542,6 +546,9 @@ function setRoles(msg, role, callback) {
         replace_original: true
       }, responseUrl);
 
+      findMatch(userData, type, msg => sendMsgToUrl(msg, responseUrl));
+
+      /*
       const noMatchMsg = {
         text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
         attachments: [
@@ -582,7 +589,7 @@ function setRoles(msg, role, callback) {
 
       // Perform matchmaking
       if (type === "team") db.getTeams(handleMatches);
-      else db.getMembers(handleMatches);
+      else db.getMembers(handleMatches);*/
 
     } else {
       if (!roles) roles = [];
@@ -623,33 +630,83 @@ function setRoles(msg, role, callback) {
   });
 }
 
-// Return array of matches
+// Return msg with formatted array of matches
 /*
 [{ "user_id","user_name","rating","roles","skills","ts" }]
 */
-function findMatch(userData, matchArr, callback) {
-    const matches = [];
+function findMatch(userData, type, callback) {
+  const noMatchMsg = {
+    text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
+    attachments: [
+        {
+            "fallback": "The features of this app are not supported by your device",
+            "callback_id": "discover",
+            "color": format.COLOUR,
+            "attachment_type": "default",
+            "actions": [
+                {
+                  "name": "yes",
+                  "text": "Yes please!",
+                  "type": "button",
+                  "value": type
+                },
+                {
+                  "name": "no",
+                  "text": "No, it's ok!",
+                  "type": "button",
+                  "value": type
+                }
+            ]
+        }
+    ]
+  };
 
-    async.forEachOf(matchArr, (ts, matchId, next) => {
-      db.getUserInfo(matchId, (res, matchData) => {
-        match.rateUser(userData, matchData, rating => {
-          if(rating) matches.push({
-            "user_id": matchId,
-            "user_name": matchData.username,
-            "rating": rating,
-            "roles": matchData.roles,
-            "skills": matchData.skills,
-            "ts": ts
+  var handleMatches = function(data) {
+    if (data) {
+      const matches = [];
+
+      async.forEachOf(data, (ts, matchId, next) => {
+        db.getUserInfo(matchId, (res, matchData) => {
+          match.rateUser(userData, matchData, rating => {
+            if(rating) matches.push({
+              "user_id": matchId,
+              "user_name": matchData.username,
+              "rating": rating,
+              "roles": matchData.roles,
+              "skills": matchData.skills,
+              "ts": ts
+            });
+            next();
           });
-          next();
+        });
+      }, err => {
+        if (err || !matches.length) return callback(noMatchMsg);
+        else match.sortMatches(matches, sorted => {
+          return format.formatMatches(matches, type, formatted => callback({
+           "text": `:tada: We found some matches! :tada:\nHere they are:`,
+           attachments: formatted
+         }));
         });
       });
-    }, err => {
-      if (err) return callback(null);
-      else match.sortMatches(matches, sorted => {
-        return callback(sorted);
-      });
-    });
+    }
+    else return callback(noMatchMsg);
+  }
+
+  // Perform matchmaking
+  if (type === "team") db.getTeams((res, data) => {
+    if(!res) {
+      console.error(`Teams could not be retrieved: Database error`);
+      return callback(null);
+    }
+    else handleMatches(data);
+  });
+  else db.getMembers((res, data) => {
+    if(!res) {
+      console.error(`Members could not be retrieved: Database error`);
+      return callback(null);
+    }
+    else handleMatches(data);
+  });
 }
 
 // Update Skill Levels
