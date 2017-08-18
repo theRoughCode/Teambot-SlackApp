@@ -839,7 +839,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
   });
 
-  SLACK.api("chat.postMessage", {
+  setTimeout(SLACK.api("chat.postMessage", {
     "attachments": JSON.stringify([
       {
       "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
@@ -861,7 +861,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     "username": BOT_NAME
   }, (err, response) => {
     if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
-  });
+  }), 500);
 }
 
 function declineTeamRequest(matchUserName, data, responseUrl, callback) {
