@@ -707,7 +707,7 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
             SLACK.api("chat.postMessage", {
               "text": `Hi, ${res}!  ${info.username} would like to ${text}!\n Here's their information:`,
               "attachments": [obj],
-              "channel": userName,  //TODO change to matchId
+              "channel": userId,  //TODO change to matchId
               "username": BOT_NAME
             }, (err, response) => {
               if (err) console.error(`Failed to send message to ${res}`);
@@ -718,11 +718,10 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
     } else return callback(res);
   });
 
-  console.log(`${userId},${matchId},U46SQ9EF7`);
   SLACK.api("mpim.open", {
     "users": `${userId},${matchId},U46SQ9EF7`
   }, (err, response) => {
-    if (err) console.error(`Failed to open multiparty dm with ${userName} and ${matchId}.\nError: ${response.error}`);
+    if (err) return format.displayErrorMsg(`Failed to open multiparty dm with ${userName} and ${matchId}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
     else {
       console.log(response);
       const groupId = response.group.id;
