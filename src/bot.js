@@ -785,20 +785,17 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
               }
             ]
           });
-          // TODO change to matchId
-          // DM matched user
-          getDMChannel(userId, (err, channelId) => {
-            if(err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
 
-            SLACK.api("chat.postMessage", {
-              "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
-              "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
-              "channel": channelId,
-              "username": BOT_NAME
-            }, (err, response) => {
-              if (!response.ok) return format.displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
-              else return sendMsgToUrl({ "text": `Your request has been sent to ${matchName}! :smile:` }, responseUrl);
-            });
+          // DM matched user
+          SLACK.api("chat.postMessage", {
+            "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
+            "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
+            // TODO change to matchId
+            "channel": userId, 
+            "username": BOT_NAME
+          }, (err, response) => {
+            if (!response.ok) return format.displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+            else return sendMsgToUrl({ "text": `Your request has been sent to ${matchName}! :smile:` }, responseUrl);
           });
         });
       });
