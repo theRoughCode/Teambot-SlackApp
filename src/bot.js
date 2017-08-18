@@ -360,6 +360,21 @@ function getFirstName(userId, callback) {
   });
 }
 
+// get DM channel ID
+function getDMChannel(userId, callback) {
+  SLACK.api("im.list", (err, response) => {
+    if (!response.ok) return format.displayErrorMsg(`Failed to retrieve IM list.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+
+    async.forEachOf(response.ims, (obj, index, next) => {
+      if (obj.user === userId) {
+        return callback(obj.id);
+      }
+    }, err => {
+      if (err) return (null);
+    });
+  });
+}
+
 // Role selection
 function selectRoles(roles, callback, defaultButton = null) {
   async.map(ROLES, (role, next) => {
@@ -752,24 +767,18 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
             ]
           });
 
-          // Get Instant Messaging DM ID of match
-          SLACK.api("im.list", (err, response) => {
-            if (!response.ok) return format.displayErrorMsg(`Failed to retrieve IM list.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+          // TODO change to matchId
+          getDMChannel(userId, channelId => {
+            if(!channelId) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
 
-            async.forEachOf(response.ims, (obj, index, next) => {
-              if (obj.user === userId) { //TODO change to matchId
-                SLACK.api("chat.postMessage", {
-                  "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
-                  "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
-                  "channel": obj.id,
-                  "username": BOT_NAME
-                }, (err, response) => {
-                  if (!response.ok) format.displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
-                  return;
-                });
-              }
-            }, err => {
-              if (err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+            SLACK.api("chat.postMessage", {
+              "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
+              "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
+              "channel": channelId,
+              "username": BOT_NAME
+            }, (err, response) => {
+              if (!response.ok) format.displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+              return;
             });
           });
         });
@@ -785,42 +794,52 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 */
 function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
   callback(null);
-  console.log(data);
+
   var text = (data.type === "team") ? "their" : "your";
-  SLACK.api("chat.postMessage", {
-    "text": `Hi, ${data.userName}!  ${data.matchName} has accepted your request to join ${text} team.  Go and send <@${data.matchId}|${data.matchUserName}> a direct message!`,
-    "attachments": JSON.stringify([{
-      "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
-      "fallback": "The features of this app are not supported by your device",
-      "callback_id": "remove",
-      "color": format.COLOUR,
-      "attachment_type": "default",
-      "actions": [
-        {
-          "name": "remove",
-          "text": "Remove me!",
-          "type": "button",
-          "style": "danger",
-          "value": "remove"
-        }
-      ]
-    }]),  // convert to string in order for API to properly parse it
-    "channel": data.userId,
-    "username": BOT_NAME
-  }, (err, response) => {
-    if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+
+  getChannelId(data.userId, channelId => {
+    if (!channelId) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+
+    SLACK.api("chat.postMessage", {
+      "text": `Hi, ${data.userName}!  ${data.matchName} has accepted your request to join ${text} team.  Go and send <@${data.matchId}|${data.matchUserName}> a direct message!`,
+      "attachments": JSON.stringify([{
+        "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
+        "fallback": "The features of this app are not supported by your device",
+        "callback_id": "remove",
+        "color": format.COLOUR,
+        "attachment_type": "default",
+        "actions": [
+          {
+            "name": "remove",
+            "text": "Remove me!",
+            "type": "button",
+            "style": "danger",
+            "value": "remove"
+          }
+        ]
+      }]),  // convert to string in order for API to properly parse it
+      "channel": channelId,
+      "username": BOT_NAME
+    }, (err, response) => {
+      if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+    });
   });
 }
 
 function declineTeamRequest(matchUserName, data, responseUrl, callback) {
   callback(null);
   var text = (data.type === "team") ? "their" : "your";
-  SLACK.api("chat.postMessage", {
-    "text": `Hi, ${data.userName}, ${data.matchName} has declined your request to join ${text} team.  Don't give up! Search for more matches using ` + "`/teambot search`!", // convert to string in order for API to properly parse it
-    "channel": data.userId,
-    "username": BOT_NAME
-  }, (err, response) => {
-    if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+
+  getChannelId(data.userId, channelId => {
+    if (!channelId) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+
+    SLACK.api("chat.postMessage", {
+      "text": `Hi, ${data.userName}, ${data.matchName} has declined your request to join ${text} team.  Don't give up! Search for more matches using ` + "`/teambot search`!", // convert to string in order for API to properly parse it
+      "channel": channelId,
+      "username": BOT_NAME
+    }, (err, response) => {
+      if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+    });
   });
 }
 
