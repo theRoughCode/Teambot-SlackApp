@@ -1,6 +1,6 @@
 var admin = require("firebase-admin");
 
-var serviceAccount = require("./teambot-68704-firebase-adminsdk-inu4i-8189c53812.json");
+var serviceAccount = JSON.parse(process.env.FIREBASE);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
