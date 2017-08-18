@@ -71,7 +71,7 @@ function welcomeUserToChannel(userId, channel, callback) {
 
   if (channel === BOT_CHANNEL_ID)
     getFirstName(userId, (success, res) => {
-      if (success) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/start` to begin searching for a team or `/teambot help` for a list of commands!");
+      if (success) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/teambot` or `/teambot start` to begin searching for a team or `/teambot help` for a list of commands!");
       else return sendMsgToChannel(BOT_CHANNEL_NAME, res);
     });
 }
