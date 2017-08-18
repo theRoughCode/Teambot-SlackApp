@@ -243,32 +243,35 @@ function formatSkills(skillArr, callback) {
   callback({
     text: `Here are your skills (Level: out of ${MAX_SKILL_LVL}):`,
     attachments: skillArr.map(skill => {
+      var actions =[
+        {
+          "name": skill,
+          "text": "Choose level...",
+          "type": "select",
+          "options": Array(MAX_SKILL_LVL).map(lvl => {
+            return {
+              "text": ":star:".repeat(lvl + 1),
+              "value": lvl + 1
+            }
+          })
+        },
+        {
+          "name": skill,
+          "text": "Remove skill",
+          "type": "button",
+          "style": "danger",
+          "value": "-1"
+        }
+      ];
+
+      console.log(actions);
       return {
         "text": (skill.level) ? `${skill.skill} (Level: ${skill.level})` : `${skill.skill}`,
         "fallback": "The features of this app are not supported by your device",
         "callback_id": "skills",
         "color": COLOUR,
         "attachment_type": "default",
-        "actions": [
-          {
-            "name": skill,
-            "text": "Choose level...",
-            "type": "select",
-            "options": Array(MAX_SKILL_LVL).map(lvl => {
-              return {
-                "text": ":star:".repeat(lvl + 1),
-                "value": lvl + 1
-              }
-            })
-          },
-          {
-            "name": skill,
-            "text": "Remove skill",
-            "type": "button",
-            "style": "danger",
-            "value": "-1"
-          }
-        ]
+        "actions": actions
       };
     })
   });
