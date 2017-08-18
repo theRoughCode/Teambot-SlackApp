@@ -547,50 +547,7 @@ function setRoles(msg, role, callback) {
       }, responseUrl);
 
       findMatch(userData, type, msg => sendMsgToUrl(msg, responseUrl));
-
-      /*
-      const noMatchMsg = {
-        text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
-        attachments: [
-            {
-                "fallback": "The features of this app are not supported by your device",
-                "callback_id": "discover",
-                "color": format.COLOUR,
-                "attachment_type": "default",
-                "actions": [
-                    {
-                      "name": "yes",
-                      "text": "Yes please!",
-                      "type": "button",
-                      "value": type
-                    },
-                    {
-                      "name": "no",
-                      "text": "No, it's ok!",
-                      "type": "button",
-                      "value": type
-                    }
-                ]
-            }
-        ]
-      };
-
-      var handleMatches = function(res, data) {
-        if (!res) return format.displayErrorMsg(`${msg.user.name}'s team could not be retrieved: Database error`, msg => sendMsgToUrl(msg, responseUrl));
-        else if (data) findMatch(userData, data, matches => {
-          if (!matches || !matches.length) return sendMsgToUrl(noMatchMsg, responseUrl);
-          else return format.formatMatches(matches, type, formatted => sendMsgToUrl({
-           "text": `:tada: We found some matches! :tada:\nHere they are:`,
-           attachments: formatted
-         }, responseUrl));
-        });
-        else return sendMsgToUrl(noMatchMsg, responseUrl);
-      }
-
-      // Perform matchmaking
-      if (type === "team") db.getTeams(handleMatches);
-      else db.getMembers(handleMatches);*/
-
+      
     } else {
       if (!roles) roles = [];
       roles.push(role);  // add role to list

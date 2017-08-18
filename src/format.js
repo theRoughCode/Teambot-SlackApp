@@ -125,7 +125,40 @@ function formatMatches(sortedMatches, type, callback) {
     });
   }, (err, matches) => {
     if (err) return displayErrorMsg("Could not sort matches", msg => callback({ "text": msg }));
-    else return callback(matches);
+    else {
+      // None of the matches, add to database
+      matches.push({
+        "text": `I would like to keep searching.  Make me discoverable by other ${type}s!`,
+        "fallback": "Required plain-text summary of the attachment.",
+        "color": COLOUR,
+        "callback_id": "discover",
+        "actions": [
+          {
+            "name": "yes",
+            "text": "Discover me!",
+            "type": "button",
+            "value": type
+          }
+        ]
+      });
+
+      // None of the matches, remove user
+      matches.push({
+        "text": `I would like to form a team on my own, thanks ${BOT_NAME}!  Please remove me and my preferences!`,
+        "fallback": "Required plain-text summary of the attachment.",
+        "color": COLOUR,
+        "callback_id": "remove",
+        "actions": [
+          {
+            "name": "remove",
+            "text": "Remove me",
+            "type": "button",
+            "value": "remove"
+          }
+        ]
+      });
+      return callback(matches);
+    }
   });
 }
 
