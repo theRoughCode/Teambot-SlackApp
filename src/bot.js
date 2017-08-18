@@ -251,18 +251,18 @@ function createSkills(msg, callback) {
             skillArr.push({
               "skill": skill
             });
-            next();
+            return next();
           } else {
             for (var i = 0; i < skillArr.length; i++) {
               if (skillArr[i].skill === skill) {
                 skillArr[i].level = null;
-                next();
+                return next();
               }
               else if (i === skillArr.length - 1) {
                 skillArr.push({
                   "skill": skill
                 });
-                next();
+                return next();
               }
             }
           }
@@ -348,6 +348,13 @@ function displaySkillChoice(skills, callback) {
         "value": n + 1
       });
     }, (err, actions) => {
+      actions.push({
+        "name": `removeSkill`,
+        "text": "Remove skill",
+        "type": "button",
+        "style": "danger",
+        "value": skill
+      });
       format.formatSkillLvl(skill, actions, obj => next1(null, obj));
     });
   }, (err, attachments) => {
@@ -716,7 +723,7 @@ function updateSkillLevels(msg, skill, level, callback) {
             next();
           }, err => {
             if (err) return format.displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => sendMsgToUrl({ text: msg }, responseUrl));
-            displaySkillChoice(skillArr, msg => sendMsgToUrl(msg, responseUrl));
+            return displaySkillChoice(skillArr, msg => sendMsgToUrl(msg, responseUrl));
           });
         });
       }
