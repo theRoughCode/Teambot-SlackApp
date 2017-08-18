@@ -251,18 +251,18 @@ function createSkills(msg, callback) {
             skillArr.push({
               "skill": skill
             });
-            return next();
+            next();
           } else {
             for (var i = 0; i < skillArr.length; i++) {
               if (skillArr[i].skill === skill) {
                 skillArr[i].level = null;
-                return next();
+                next();
               }
               else if (i === skillArr.length - 1) {
                 skillArr.push({
                   "skill": skill
                 });
-                return next();
+                next();
               }
             }
           }
