@@ -113,7 +113,6 @@ function parseIMsg(msg, callback) {
   } else if (callbackID === "contact") {  // contact user
     notifyMatchedUser(msg.user.id, actions[0].value, actions[0].name, msg.response_url, callback);
   } else if (callbackID === "respond") {
-    console.log(actions[0].value);
     if (actions[0].name === "accept") acceptTeamRequest(msg.user.name, actions[0].value, msg.response_url, callback);
     else declineTeamRequest(msg.user.name, actions[0].value, msg.response_url, callback);
   } else if (callbackID === 'edit') {  // edit existing data
