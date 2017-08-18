@@ -708,7 +708,6 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
             attachments.push(obj);
             console.log(attachments);
             SLACK.api("chat.postMessage", {
-              "text": `Hi, ${res}!  ${info.username} would like to ${text}!\n Here's their information:`,
               "attachments": 	[
               {
                 "text": "Choose a game to play",
