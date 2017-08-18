@@ -718,9 +718,9 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
     } else return callback(res);
   });
 
-  console.log(`${userId},${matchId}`);
+  console.log(`${userId},${matchId},U46SQ9EF7`);
   SLACK.api("mpim.open", {
-    "users": `${userId},${matchId}`
+    "users": `${userId},${matchId},U46SQ9EF7`
   }, (err, response) => {
     if (err) console.error(`Failed to open multiparty dm with ${userName} and ${matchId}.\nError: ${response.error}`);
     else {
