@@ -245,16 +245,20 @@ function createSkills(msg, callback) {
 
     db.getSkills(msg.user_id, (success, skillArr) => {
       if (!success) skillArr = [];
-      console.log(skillArr);
-      console.log(skills);
       async.forEachOf(skills, (skill, index, next) => {
-        console.log(skill + ", " + index);
         if (index === skills.indexOf(skill)) {
           for (var i = 0; i < skillArr.length; i++) {
-            if (skillArr[i].skill === skill) skillArr[i].level = null;
-            else if (i === skillArr.length - 1) skillArr.push({
-              "skill": skill
-            });
+            if (skillArr[i].skill === skill) {
+              skillArr[i].level = null;
+              next();
+              break;
+            }
+            else if (i === skillArr.length - 1) {
+              skillArr.push({
+                "skill": skill
+              });
+              next();
+            }
           }
         }
       }, err => {
