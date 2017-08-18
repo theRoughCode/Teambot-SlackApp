@@ -709,10 +709,11 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
             console.log(attachments);
             SLACK.api("chat.postMessage", {
               "text": `Hi, ${res}!  ${info.username} would like to ${text}!\n Here's their information:`,
-              "attachments": attachments,
+              "attachments": 	[{"pretext": "pre-hello", "text": "text-world"}],
               "channel": userId,  //TODO change to matchId
               "username": BOT_NAME
             }, (err, response) => {
+              console.log(response);
               if (err) console.error(`Failed to send message to ${res}`);
             });
           });
