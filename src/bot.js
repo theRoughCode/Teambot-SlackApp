@@ -358,6 +358,7 @@ function displaySkillChoice(skills, callback) {
       format.formatSkillLvl(skill, actions, obj => next1(null, obj));
     });
   }, (err, attachments) => {
+    console.log(attachments);
     callback({
       text: "List the level of proficiency of each skill:",
       attachments: attachments
