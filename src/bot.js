@@ -711,9 +711,31 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
         if (!success) return format.displayErrorMsg(`Failed to retrieve info for ${userId}`, msg => sendMsgToUrl(msg, responseUrl));
 
         format.formatUser(userId, info.username, info.roles, info.skills, obj => {
+          const attachments = [obj];
+          attachments.push({
+            "text": (type === "team") ? "Would you to to accept them into your team?" : "Would you like to join their team?",
+            "fallback": "The features of this app are not supported by your device",
+            "callback_id": "respond",
+            "color": COLOUR,
+            "attachment_type": "default",
+            "actions": [
+              {
+                "name": "accept",
+                "text": "Yes",
+                "type": "button",
+                "value": "accept"
+              },
+              {
+                "name": "reject",
+                "text": "No",
+                "type": "button",
+                "value": "reject"
+              }
+            ]
+          });
           SLACK.api("chat.postMessage", {
-            "text": `Hi, ${matchName}!  You've got a match!  ${userName} would like to ${text}!\n Here's their information:`,
-            "attachments": JSON.stringify([obj]),  // convert to string in order for API to properly parse it
+            "text": `Hi, ${matchName}!  You've got a match!  ${userName} would like to ${text}! :tada:\n Here's more about them:`,
+            "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
             "channel": userId,  //TODO change to matchId
             "username": BOT_NAME
           }, (err, response) => {
