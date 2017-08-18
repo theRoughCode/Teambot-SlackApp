@@ -716,7 +716,7 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
             "text": (type === "team") ? "Would you to to accept them into your team?" : "Would you like to join their team?",
             "fallback": "The features of this app are not supported by your device",
             "callback_id": "respond",
-            "color": COLOUR,
+            "color": format.COLOUR,
             "attachment_type": "default",
             "actions": [
               {
