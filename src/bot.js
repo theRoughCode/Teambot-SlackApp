@@ -704,10 +704,12 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
       db.getUserInfo(userId, (success, info) => {
         if (success) {
           format.formatUser(userId, info.username, info.roles, info.skills, obj => {
-            console.log([obj]);
+            var attachments = [];
+            attachments.push(obj);
+            console.log(attachments);
             SLACK.api("chat.postMessage", {
               "text": `Hi, ${res}!  ${info.username} would like to ${text}!\n Here's their information:`,
-              "attachments": [obj],
+              "attachments": attachments,
               "channel": userId,  //TODO change to matchId
               "username": BOT_NAME
             }, (err, response) => {
