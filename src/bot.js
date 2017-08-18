@@ -784,8 +784,8 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
             ]
           });
 
-          // TODO change to matchId
-          getDMChannel(userId, (err, channelId) => {
+          // DM matched user
+          getDMChannel(matchId, (err, channelId) => {
             if(err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
 
             SLACK.api("chat.postMessage", {
