@@ -112,6 +112,7 @@ function parseIMsg(msg, callback) {
   } else if (callbackID === 'skills' || callbackID === 'skillsLvl') {
     callback(null);
     var fun = (callbackID === 'skills') ? displaySkills : displaySkillChoice;
+    console.log(actions[0]);
     updateSkillLevels(msg, actions[0].name, actions[0].value, fun);
   } else if (callbackID === 'discover') { // turn on discoverability
     if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
@@ -721,7 +722,7 @@ function updateSkillLevels(msg, skill, level, callback) {
       if(skills[i].skill === skill) {
         if (level === "-1") skills.splice(i, 1);  // remove skill
         else skills[i]["level"] = level;
-        console.log(skills);
+        console.log(level);
         db.updateSkills(userId, skills, success => {
           async.forEachOf(skills, (value, index, next) => {
             if (!value.level) skillArr.push(value.skill);
