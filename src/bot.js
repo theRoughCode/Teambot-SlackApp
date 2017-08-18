@@ -726,10 +726,10 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
                 "value": "accept"
               },
               {
-                "name": "reject",
+                "name": "decline",
                 "text": "No",
                 "type": "button",
-                "value": "reject"
+                "value": "decline"
               }
             ]
           });
