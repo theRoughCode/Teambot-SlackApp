@@ -242,17 +242,30 @@ function createSkills(msg, callback) {
   callback(null);
   displaySkillChoice(skills, res => {
     sendMsgToUrl(res, responseUrl);
-    var skillArr = skills.filter((skill, index, self) => {
-      return index === self.indexOf(skill);  // remove duplicates
-    }).map(skill => {
-      return {
-        skill: skill,
-        level: null
-      };
+
+    db.getSkills(msg.user_id, (success, skillArr) => {
+      if (!success) skillArr = [];
+
+      async.forEachOf(skills, (skill, index, next) => {
+        if (index === skills.indexOf(skill)) {
+          for (var i = 0; i < skillArr.length; i++) {
+            if (skillArr[i].skill === skill) skillArr[i].level = null;
+            else if (i === skillArr.length - 1) skillArr.push({
+              "skill": skill
+            });
+          }
+        }
+      }, err => {
+        if (err) return format.displayErrorMsg(err, skillArr => sendMsgToUrl({ text: skillArr }, skillArrponseUrl));
+        console.log(skillArr);
+
+        db.updateSkills(msg.user_id, skillArr, success => {
+          if (!success) format.displayErrorMsg(`Failed to update skills for ${msg.user_id}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
+        });
+      });
+
     });
-    db.updateSkills(msg.user_id, skillArr, success => {
-      if (!success) format.displayErrorMsg(`Failed to update skills for ${msg.user_id}`, res => sendMsgToUrl({ text: res }, responseUrl));
-    });
+
   });
 }
 
@@ -325,7 +338,7 @@ function displaySkillChoice(skills, callback) {
     });
   }, (err, attachments) => {
     callback({
-      text: "How proficient are you at:",
+      text: "List the level of proficiency of each skill:",
       attachments: attachments
     });
   });

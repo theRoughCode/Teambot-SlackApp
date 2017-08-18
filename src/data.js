@@ -1,6 +1,6 @@
-var admin = require("firebase-admin");
+const admin = require("firebase-admin");
 
-var serviceAccount = JSON.parse(process.env.FIREBASE);
+const serviceAccount = JSON.parse(process.env.FIREBASE);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -21,6 +21,7 @@ function updateUser(userId, data, callback) {
     username -- user's username as a string
     roles -- list of interested roles
     skills -- list of skills and their level from 1 to 5 as an integer
+      [{ skill, level }]
     user_type -- indicates whether looking for a "team" or "member"
     visible -- true if user is visible for search
   */
