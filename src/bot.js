@@ -694,29 +694,34 @@ function setDiscoverable(msg, discoverable, category, callback) {
   }
 }
 
-// contact user to form a team
+// Contact user to form a team
 function contactUser(userId, matchId, type, responseUrl, callback) {
   var text = (type === "team") ? "join your team" : "invite you to their team";
 
-  getFirstName(matchId, (success, res) => {
-    if (success) {
-      callback(null);
+  // Get first name of match
+  getFirstName(matchId, (success, matchName) => {
+    if (!success) return callback(matchName);
+
+    // Get first name of user
+    getFirstName(userId, (success, userName) => {
+      if (!success) return callback(userName);
+      else callback(null);
+
       db.getUserInfo(userId, (success, info) => {
-        if (success) {
-          format.formatUser(userId, info.username, info.roles, info.skills, obj => {
-            SLACK.api("chat.postMessage", {
-              "text": `Hi, ${res}!  ${info.username} would like to ${text}!\n Here's their information:`,
-              "attachments": JSON.stringify([obj]),  // convert to string in order for API to properly parse it
-              "channel": userId,  //TODO change to matchId
-              "username": BOT_NAME
-            }, (err, response) => {
-              console.log(response);
-              if (err) console.error(`Failed to send message to ${res}`);
-            });
+        if (!success) return format.displayErrorMsg(`Failed to retrieve info for ${userId}`, msg => sendMsgToUrl(msg, responseUrl));
+
+        format.formatUser(userId, info.username, info.roles, info.skills, obj => {
+          SLACK.api("chat.postMessage", {
+            "text": `Hi, ${matchName}!  You've got a match!  ${userName} would like to ${text}!\n Here's their information:`,
+            "attachments": JSON.stringify([obj]),  // convert to string in order for API to properly parse it
+            "channel": userId,  //TODO change to matchId
+            "username": BOT_NAME
+          }, (err, response) => {
+            if (err) console.error(`Failed to send message to ${res}`);
           });
-        } else return format.displayErrorMsg(`Failed to retrieve info for ${userId}`, msg => sendMsgToUrl(msg, responseUrl));
+        });
       });
-    } else return callback(res);
+    });
   });
 }
 
