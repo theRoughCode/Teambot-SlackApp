@@ -256,8 +256,10 @@ function formatSkills(skillArr, callback) {
               "text": "Choose level...",
               "type": "select",
               "options": Array(MAX_SKILL_LVL).map(lvl => {
-                "text": ":star:".repeat(n + 1),
-                "value": n + 1
+                return {
+                  "text": ":star:".repeat(lvl + 1),
+                  "value": lvl + 1
+                }
               })
             },
             {
