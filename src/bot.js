@@ -703,6 +703,7 @@ function updateSkillLevels(msg, skill, level, callback) {
   const responseUrl = msg.response_url;
   const skillArr = [];
   const userId = msg.user.id;
+  console.log(skill + ", " + level);
 
   db.getSkills(userId, (res, skills) => {
     if (!res) return format.displayErrorMsg(`Could not retrieve skills for ${userId}: Database error`, msg => callback({ text: msg }));
