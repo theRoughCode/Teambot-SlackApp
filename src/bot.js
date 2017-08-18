@@ -356,7 +356,7 @@ function sendMsgToChannel(channel, msg) {
 
 // display skills
 function displaySkillChoice(skills, callback) {
-
+  console.log(skills);
   if(!skills.length) return callback({
     text: ":thumbsup: Excellent! Your skill levels are all set!"
   });
