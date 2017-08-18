@@ -759,6 +759,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
               if (obj.user === userId) { //TODO change to matchId
                 SLACK.api("chat.postMessage", {
                   "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
+                  "as_user": true,
                   "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
                   "channel": obj.id,
                   "username": BOT_NAME

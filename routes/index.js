@@ -40,7 +40,6 @@ routes.post('/interact', function(req, res) {
     "trigger_id"
   }
   */
-  console.log(req.body);
   res.status(200);
   bot.parseIMsg(req.body, msg => res.send(msg));
 });
