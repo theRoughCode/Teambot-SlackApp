@@ -144,7 +144,7 @@ function formatMatches(sortedMatches, type, callback) {
 
       // None of the matches, remove user
       matches.push({
-        "text": `I would like to form a team on my own, thanks ${BOT_NAME}!  Please remove me and my preferences!`,
+        "text": `I would like to form a team on my own. Please remove me and my preferences!`,
         "fallback": "Required plain-text summary of the attachment.",
         "color": COLOUR,
         "callback_id": "remove",
