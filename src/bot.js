@@ -790,8 +790,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
           SLACK.api("chat.postMessage", {
             "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
             "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
-            // TODO change to matchId
-            "channel": userId, 
+            "channel": matchId,
             "username": BOT_NAME
           }, (err, response) => {
             if (!response.ok) return format.displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
