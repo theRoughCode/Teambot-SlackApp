@@ -859,7 +859,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     }, responseUrl);
   });
 
-  setTimeout(SLACK.api("chat.postMessage", {
+  setTimeout(() => SLACK.api("chat.postMessage", {
     "attachments": JSON.stringify([
       {
       "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
