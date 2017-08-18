@@ -272,7 +272,7 @@ function formatSkills(skillArr, callback) {
           ]
         }]
       };
-    });
+    })
   });
 }
 
