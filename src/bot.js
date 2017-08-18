@@ -710,7 +710,7 @@ function updateSkillLevels(msg, skill, level, callback) {
     callback(null);
 
     for (var i = 0; i < skills.length; i++) {
-      if(skills[i].skill === skill) {
+      if(skills[i] && skills[i].skill === skill) {
         if (level === "-1") skills[i] = null;
         else skills[i]["level"] = level;
 
