@@ -704,6 +704,7 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
       db.getUserInfo(userId, (success, info) => {
         if (success) {
           format.formatUser(userId, info.username, info.roles, info.skills, obj => {
+            console.log([obj]);
             SLACK.api("chat.postMessage", {
               "text": `Hi, ${res}!  ${info.username} would like to ${text}!\n Here's their information:`,
               "attachments": [obj],
@@ -716,23 +717,6 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
         } else return format.displayErrorMsg(`Failed to retrieve info for ${userId}`, msg => sendMsgToUrl(msg, responseUrl));
       });
     } else return callback(res);
-  });
-
-  SLACK.api("mpim.open", {
-    "users": `${userId},${matchId},U46SQ9EF7`
-  }, (err, response) => {
-    if (err) return format.displayErrorMsg(`Failed to open multiparty dm with ${userName} and ${matchId}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
-    else {
-      console.log(response);
-      const groupId = response.group.id;
-      SLACK.api("chat.postMessage", {
-        "text": "",
-        "channel": groupId,
-        "username": BOT_NAME
-      }, (err, response) => {
-        if (err) console.error(`Failed to send message to #${channel}`);
-      });
-    }
   });
 }
 
