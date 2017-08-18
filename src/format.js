@@ -114,7 +114,7 @@ function welcomeOldUser(userName, data, callback) {
 function formatMatches(sortedMatches, type, callback) {
   async.map(sortedMatches, (match, next) => {
     formatUser(match.user_id, match.user_name, match.roles, match.skills, obj => {
-      obj["callback_id"] = "contact";
+      obj["callback_id"] = "request";
       obj["actions"] = [{
         "name": type,
         "text": (type === "team") ? "Request to join" : "Invite as member",

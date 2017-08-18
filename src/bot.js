@@ -114,7 +114,7 @@ function parseIMsg(msg, callback) {
   } else if (callbackID === 'discover') { // turn on discoverability
     if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
     else callback("All the best team-hunting! :smile:");
-  } else if (callbackID === "contact") {  // contact user
+  } else if (callbackID === "request") {  // contact user
     notifyMatchedUser(msg.user.id, actions[0].value, actions[0].name, msg.response_url, callback);
   } else if (callbackID === "respond") {
     var data = JSON.parse(actions[0].value);
@@ -122,6 +122,8 @@ function parseIMsg(msg, callback) {
     else declineTeamRequest(msg.user.name, data, msg.response_url, callback);
   } else if (callbackID === "remove") {
     removeUser(msg.user.id, msg.response_url, callback);
+  } else if (callbackID === "contact") {  // form new conversation between matched users
+    contactUser(actions[0].value, msg.response_url, callback);
   } else if (callbackID === 'edit') {  // edit existing data
     // change user type
     if (actions[0].name === 'user_type') {
@@ -262,7 +264,7 @@ function removeUser(userId, responseUrl, callback) {
     if (res) {
       db.deleteUser(userId, success => {
         if (success) sendMsgToUrl({
-          "text": ":thumbsup: You have successfully been removed from the database!  Type `/teambot start` to begin your search again!  Happy hacking! :smiley:"
+          "text": ":thumbsup: You have successfully been removed from the database!  Type `/teambot start` to begin your search again!  Happy hacking! :robot_face:"
         }, responseUrl);
         else format.displayErrorMsg(`Could not reset ${userId}`, msg => sendMsgToUrl({ "text": msg }));
       })
@@ -794,8 +796,8 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
               "channel": channelId,
               "username": BOT_NAME
             }, (err, response) => {
-              if (!response.ok) format.displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
-              return;
+              if (!response.ok) return format.displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+              else return sendMsgToUrl({ "text": `Your request has been sent to ${matchName}! :smile:` }, responseUrl);
             });
           });
         });
@@ -820,12 +822,12 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
       {
       "text": ` Go and send <@${data.matchId}|${data.matchUserName}> a direct message!`,
       "fallback": "The features of this app are not supported by your device",
-      "callback_id": "message",
+      "callback_id": "contact",
       "color": format.COLOUR,
       "attachment_type": "default",
       "actions": [
         {
-          "name": "message",
+          "name": "contact",
           "text": "Message them!",
           "type": "button",
           "style": "primary",
@@ -838,7 +840,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
   }, (err, response) => {
     if (!response.ok) return format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
     else sendMsgToUrl({
-      "text": `${data.userName} has been notified!  All the best and happy hacking! :smile:`,
+      "text": `${data.userName} has been notified!  All the best and happy hacking! :robot_face:`,
       "attachments": JSON.stringify([
         {
           "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
@@ -881,22 +883,37 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     "username": BOT_NAME
   }, (err, response) => {
     if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
-  }), 5000);
+  }), 2000);
 }
 
 function declineTeamRequest(matchUserName, data, responseUrl, callback) {
   callback(null);
   var text = (data.type === "team") ? "their" : "your";
 
-  getDMChannel(data.userId, (err, channelId) => {
+  SLACK.api("chat.postMessage", {
+    "text": `Hi, ${data.userName}, ${data.matchName} has declined your request to join ${text} team.  Don't give up! Search for more matches using ` + "`/teambot search`!",
+    "channel": data.userId,
+    "username": BOT_NAME
+  }, (err, response) => {
+    if (!response.ok) return format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    else return sendMsgToUrl({ "text": `You have declined ${data.userName}'s request!` }, responseUrl);
+  });
+}
+
+// form new conversation
+function contactUser(matchId, responseUrl, callback) {
+  callback(null);
+
+  getDMChannel(matchId, (err, channelId) => {
     if (err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
 
     SLACK.api("chat.postMessage", {
-      "text": `Hi, ${data.userName}, ${data.matchName} has declined your request to join ${text} team.  Don't give up! Search for more matches using ` + "`/teambot search`!", // convert to string in order for API to properly parse it
+      "text": `Congratulations on forming your team!  All the best and happy hacking! :robot_face:`,
       "channel": channelId,
       "username": BOT_NAME
     }, (err, response) => {
-      if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+      if (!response.ok) return format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+      else return sendMsgToUrl({ "text": `A new conversation between the two of you has been initiated!  Go ahead, it's time to form a life-long friendship! :hugging_face:` }, responseUrl);
     });
   });
 }
