@@ -362,6 +362,7 @@ function getFirstName(userId, callback) {
 
 // get DM channel ID
 function getDMChannel(userId, callback) {
+  console.log(userId);
   SLACK.api("im.list", (err, response) => {
     if (!response.ok) return format.displayErrorMsg(`Failed to retrieve IM list.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
 
