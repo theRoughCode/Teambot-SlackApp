@@ -751,13 +751,14 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
               }
             ]
           });
-          console.log(attachments);
+
           // Get Instant Messaging DM ID of match
           SLACK.api("im.list", (err, response) => {
             if (err) return format.displayErrorMsg(`Failed to retrieve IM list.\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
 
             async.forEachOf(response.ims, (obj, index, next) => {
               if (obj.user === userId) { //TODO change to matchId
+                console.log(obj);
                 SLACK.api("chat.postMessage", {
                   "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
                   "as_user": false,
