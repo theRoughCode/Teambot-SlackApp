@@ -92,11 +92,13 @@ function updateVisibility(userId, visible, callback) {
 
 // Get field
 function getField(userId, field, callback) {
+  if (userId === undefined) return callback(false, null);
+
   userRef.child(`${userId}/${field}`).once('value').then(snapshot => {
-    if (userId !== undefined && snapshot.val())
+    if (snapshot.val())
       callback(true, snapshot.val());
     else
-      callback(false, null);
+      callback(true, []);
   }, error => {
     console.error(error);
     callback(false, null);
@@ -105,8 +107,10 @@ function getField(userId, field, callback) {
 
 // Get user information
 function getUserInfo(userId, callback) {
+  if (userId === undefined) return callback(false, null);
+
   userRef.child(`${userId}`).once('value').then(snapshot => {
-    if (userId !== undefined && snapshot.val())
+    if (snapshot.val())
       callback(true, snapshot.val());
     else
       callback(false, null);
