@@ -718,11 +718,11 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
     } else return callback(res);
   });
 
-
+  console.log(`${userId},${matchId}`);
   SLACK.api("mpim.open", {
     "users": `${userId},${matchId}`
   }, (err, response) => {
-    if (err) console.error(`Failed to open multiparty dm with ${userName} and ${matchId}.\n`);
+    if (err) console.error(`Failed to open multiparty dm with ${userName} and ${matchId}.\nError: ${response.error}`);
     else {
       console.log(response);
       const groupId = response.group.id;
