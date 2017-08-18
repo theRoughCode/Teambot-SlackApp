@@ -261,6 +261,7 @@ function createSkills(msg, callback) {
             }
           }
         }
+        console.log(skillArr);
       }, err => {
         if (err) return format.displayErrorMsg(err, msg => sendMsgToUrl({ text: msg }, skillArrponseUrl));
         console.log(skillArr);
