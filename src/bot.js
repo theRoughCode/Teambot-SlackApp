@@ -116,7 +116,7 @@ function parseIMsg(msg, callback) {
     var data = JSON.parse(actions[0].value);
     if (actions[0].name === "accept") acceptTeamRequest(msg.user.name, data, msg.response_url, callback);
     else declineTeamRequest(msg.user.name, data, msg.response_url, callback);
-  } else if (callbackID === "respond") {
+  } else if (callbackID === "remove") {
     removeUser(msg.user.id, msg.response_url, callback);
   } else if (callbackID === 'edit') {  // edit existing data
     // change user type
