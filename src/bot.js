@@ -783,9 +783,9 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
               }
             ]
           });
-
+          // TODO change to matchId
           // DM matched user
-          getDMChannel(matchId, (err, channelId) => {
+          getDMChannel(userId, (err, channelId) => {
             if(err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
 
             SLACK.api("chat.postMessage", {
@@ -814,32 +814,53 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
 
   var text = (data.type === "team") ? "their" : "your";
 
-  getDMChannel(data.userId, (err, channelId) => {
-    if (err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+  SLACK.api("chat.postMessage", {
+    "text": `Hi, ${data.userName}!  ${data.matchName} has accepted your request to join ${text} team :tada:.`,
+    "attachments": JSON.stringify([
+      {
+      "text": ` Go and send <@${data.matchId}|${data.matchUserName}> a direct message!`,
+      "fallback": "The features of this app are not supported by your device",
+      "callback_id": "message",
+      "color": format.COLOUR,
+      "attachment_type": "default",
+      "actions": [
+        {
+          "name": "message",
+          "text": "Message them!",
+          "type": "button",
+          "style": "primary",
+          "value": data.matchId
+        }
+      ]
+    }]),  // convert to string in order for API to properly parse it
+    "channel": data.userId,
+    "username": BOT_NAME
+  }, (err, response) => {
+    if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
+  });
 
-    SLACK.api("chat.postMessage", {
-      "text": `Hi, ${data.userName}!  ${data.matchName} has accepted your request to join ${text} team.  Go and send <@${data.matchId}|${data.matchUserName}> a direct message!`,
-      "attachments": JSON.stringify([{
-        "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
-        "fallback": "The features of this app are not supported by your device",
-        "callback_id": "remove",
-        "color": format.COLOUR,
-        "attachment_type": "default",
-        "actions": [
-          {
-            "name": "remove",
-            "text": "Remove me!",
-            "type": "button",
-            "style": "danger",
-            "value": "remove"
-          }
-        ]
-      }]),  // convert to string in order for API to properly parse it
-      "channel": channelId,
-      "username": BOT_NAME
-    }, (err, response) => {
-      if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
-    });
+  SLACK.api("chat.postMessage", {
+    "attachments": JSON.stringify([
+      {
+      "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
+      "fallback": "The features of this app are not supported by your device",
+      "callback_id": "remove",
+      "color": format.COLOUR,
+      "attachment_type": "default",
+      "actions": [
+        {
+          "name": "remove",
+          "text": "Remove me!",
+          "type": "button",
+          "style": "danger",
+          "value": "remove"
+        }
+      ]
+    }]),  // convert to string in order for API to properly parse it
+    "channel": data.userId,
+    "username": BOT_NAME
+  }, (err, response) => {
+    if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
   });
 }
 
