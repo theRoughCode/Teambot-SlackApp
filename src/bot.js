@@ -247,19 +247,27 @@ function createSkills(msg, callback) {
       if (!success) skillArr = [];
       async.forEachOf(skills, (skill, index, next) => {
         if (index === skills.indexOf(skill)) {
-          for (var i = 0; i < skillArr.length; i++) {
-            if (skillArr[i].skill === skill) {
-              skillArr[i].level = null;
-              next();
-              break;
-            }
-            else if (i === skillArr.length - 1) {
-              skillArr.push({
-                "skill": skill
-              });
-              next();
+          if (!skills.length) {
+            skillArr.push({
+              "skill": skill
+            });
+            next();
+          } else {
+            for (var i = 0; i < skillArr.length; i++) {
+              if (skillArr[i].skill === skill) {
+                skillArr[i].level = null;
+                next();
+                break;
+              }
+              else if (i === skillArr.length - 1) {
+                skillArr.push({
+                  "skill": skill
+                });
+                next();
+              }
             }
           }
+
         }
         console.log(skillArr);
       }, err => {
