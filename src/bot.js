@@ -266,20 +266,15 @@ function createSkills(msg, callback) {
               }
             }
           }
-
         }
-
       }, err => {
         if (err) return format.displayErrorMsg(err, msg => sendMsgToUrl({ text: msg }, skillArrponseUrl));
-        console.log(skillArr);
 
         db.updateSkills(msg.user_id, skillArr, success => {
           if (!success) format.displayErrorMsg(`Failed to update skills for ${msg.user_id}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
         });
       });
-
     });
-
   });
 }
 
@@ -342,23 +337,20 @@ function displaySkillChoice(skills, callback) {
   async.map(skills, (skill, next1) => {
     async.times(format.MAX_SKILL_LVL, (n, next2) => {
       next2(null, {
-        "name": `${skill}`,
+        "name": skill,
         "text": ":star:".repeat(n + 1),
         "type": "button",
         "value": n + 1
       });
     }, (err, actions) => {
       actions.push({
-        "name": `removeSkill`,
+        "name": skill,
         "text": "Remove skill",
         "type": "button",
         "style": "danger",
-        "value": skill
+        "value": -1
       });
-      console.log(actions);
-      format.formatSkillLvl(skill, actions, obj => {
-        next1(null, obj);
-      });
+      format.formatSkillLvl(skill, actions, obj => next1(null, obj));
     });
   }, (err, attachments) => {
     callback({
@@ -719,7 +711,9 @@ function updateSkillLevels(msg, skill, level, callback) {
 
     for (var i = 0; i < skills.length; i++) {
       if(skills[i].skill === skill) {
-        skills[i]["level"] = level;
+        if (level === -1) skills[i] = null;
+        else skills[i]["level"] = level;
+
         db.updateSkills(userId, skills, success => {
           async.forEachOf(skills, (value, index, next) => {
             if (!value.level) skillArr.push(value.skill);
