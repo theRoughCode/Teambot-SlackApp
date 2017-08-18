@@ -283,9 +283,25 @@ function createSkills(msg, callback) {
 
 // display skills
 function displaySkills(skillArr, callback) {
-  if (!skillArr.length) return callback({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" });
+  var helper = function(skillArr1) {
+    if (!skillArr1.length) return callback({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" });
 
-  format.formatSkills(skillArr, obj => callback(obj));
+    format.formatSkills(skillArr, obj => callback(obj));
+  }
+
+  // if obj, convert to array
+  if (!(skillArr instanceof Array)) {
+    var skills = skillArr;
+    skillArr = [];
+    async.forEachOf(skills, (value, index, next) => {
+      if (!value.level) skillArr.push(value.skill);
+      next();
+    }, err => {
+      if (err) return format.displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => callback({ "text": msg }));
+      else return helper(skillArr);
+    });
+  } else helper(skillArr);
+
 }
 
 // reset user info
@@ -340,6 +356,7 @@ function sendMsgToChannel(channel, msg) {
 
 // display skills
 function displaySkillChoice(skills, callback) {
+
   if(!skills.length) return callback({
     text: ":thumbsup: Excellent! Your skill levels are all set!"
   });
@@ -723,13 +740,9 @@ function updateSkillLevels(msg, skill, level, callback) {
         else skills[i]["level"] = level;
 
         db.updateSkills(userId, skills, success => {
-          async.forEachOf(skills, (value, index, next) => {
-            if (!value.level) skillArr.push(value.skill);
-            next();
-          }, err => {
-            if (err) return format.displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => sendMsgToUrl({ text: msg }, responseUrl));
-            return callback(skillArr, msg => sendMsgToUrl(msg, responseUrl));
-          });
+          return callback(skills, msg => sendMsgToUrl(msg, responseUrl));
+
+          // TODO
         });
       }
     }
