@@ -215,7 +215,7 @@ function createSkills(msg, callback) {
     text: "Incorrect command. Please input skills (i.e. `/teambot skills Node.js, Python`)!"
   });
 
-  var text = msg.text.substring(msg.text.indexOf(" ") + 1).replace(/\s/g,'');
+  var text = msg.text.substring("skills".length).replace(/\s/g,'');
   var skills = text.split(',');
 
   // Remove duplicates
@@ -547,7 +547,7 @@ function setRoles(msg, role, callback) {
       }, responseUrl);
 
       findMatch(userData, type, msg => sendMsgToUrl(msg, responseUrl));
-      
+
     } else {
       if (!roles) roles = [];
       roles.push(role);  // add role to list
