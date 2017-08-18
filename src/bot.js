@@ -794,7 +794,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
             "username": BOT_NAME
           }, (err, response) => {
             if (!response.ok) return format.displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
-            else return sendMsgToUrl({ "text": `Your request has been sent to ${matchName}! :smile:` }, responseUrl);
+            else return sendMsgToUrl({ "text": `Your request has been sent to ${matchName}!  *slackbot* will send you a message when ${matchName} replies! :smile:` }, responseUrl);
           });
         });
       });
