@@ -280,7 +280,7 @@ function createSkills(msg, callback) {
 function displaySkills(userId, responseUrl, callback) {
   callback(null);
   db.getSkills(userId, (success, skillArr) => {
-    if (!success) return sendMsgToUrl({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" }, responseUrl);
+    if (!success || !skillArr.length) return sendMsgToUrl({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" }, responseUrl);
 
     format.formatSkills(skillArr, obj => {
       console.log(obj);
