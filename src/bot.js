@@ -251,28 +251,26 @@ function createSkills(msg, callback) {
             skillArr.push({
               "skill": skill
             });
-            next();
+            return next();
           } else {
             for (var i = 0; i < skillArr.length; i++) {
               if (skillArr[i].skill === skill) {
                 skillArr[i].level = null;
-                next();
-                break;
+                return next();
               }
               else if (i === skillArr.length - 1) {
                 skillArr.push({
                   "skill": skill
                 });
-                next();
+                return next();
               }
             }
           }
 
         }
-        console.log(skillArr);
+
       }, err => {
         if (err) return format.displayErrorMsg(err, msg => sendMsgToUrl({ text: msg }, skillArrponseUrl));
-        console.log(skillArr);
 
         db.updateSkills(msg.user_id, skillArr, success => {
           if (!success) format.displayErrorMsg(`Failed to update skills for ${msg.user_id}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
