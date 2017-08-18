@@ -100,7 +100,6 @@ function parseIMsg(msg, callback) {
   msg = JSON.parse(msg.payload);
   const callbackID = msg.callback_id;
   const actions = msg.actions;
-  console.log(callbackID);
 
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
@@ -752,6 +751,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
               }
             ]
           });
+          console.log(attachments);
           // Get Instant Messaging DM ID of match
           SLACK.api("im.list", (err, response) => {
             if (err) return format.displayErrorMsg(`Failed to retrieve IM list.\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
