@@ -211,11 +211,12 @@ function display(userId, callback) {
 function createSkills(msg, callback) {
   const responseUrl = msg.response_url;
 
-  if (!msg.text) return callback({
+  var text = msg.text.substring("skills".length).replace(/\s/g,'');
+
+  if (!text) return callback({
     text: "Incorrect command. Please input skills (i.e. `/teambot skills Node.js, Python`)!"
   });
 
-  var text = msg.text.substring("skills".length).replace(/\s/g,'');
   var skills = text.split(',');
 
   // Remove duplicates
