@@ -268,7 +268,7 @@ function removeUser(userId, responseUrl, callback) {
 // Get channel id of channel
 function getChannelId(channelName, callback) {
   SLACK.api("channels.list", (err, response) => {
-    if (err) format.displayErrorMsg(`Failed to retrieve list of channels from Slack API`, msg => sendMsgToChannel(BOT_CHANNEL_NAME, msg));
+    if (!response.ok) return format.displayErrorMsg(`Failed to retrieve list of channels from Slack API.\nError: ${response.error}`, msg => sendMsgToChannel(BOT_CHANNEL_NAME, msg));
 
     for (var i = 0; i < response.channels.length; i++) {
       if (response.channels[i].name === channelName) return callback(response.channels[i].id);
@@ -292,7 +292,7 @@ function sendMsgToChannel(channel, msg) {
     "channel": `#${channel}`,
     "username": BOT_NAME
   }, (err, response) => {
-    if (err) console.error(`Failed to send message to #${channel}`);
+    if (!response.ok) console.error(`Failed to send message to #${channel}.\nError: ${response.error}`);
   });
 }
 
@@ -325,7 +325,7 @@ function displaySkillChoice(skills, callback) {
 function convertToUserID(userName, callback){
   // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
   SLACK.api("users.list", function(err, response) {
-    if (response.error) format.displayErrorMsg(`Failed to convert username of ${userName} to id: Database error`, msg => callback(false, { text: msg }));
+    if (!response.ok) format.displayErrorMsg(`Failed to convert username of ${userName} to id: Database error\nError:${response.error}`, msg => callback(false, { text: msg }));
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userId || response.members[i].name === userId){
         return callback(true, response.members[i].id);
@@ -339,7 +339,7 @@ function convertToUserID(userName, callback){
 function convertToUserName(userId, callback){
   // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
   SLACK.api("users.list", function(err, response) {
-    if (response.error) format.displayErrorMsg(`Failed to convert id of ${userId} to username: Database error`, msg => callback({ text: msg }));
+    if (!response.ok) format.displayErrorMsg(`Failed to convert id of ${userId} to username: Database error\nError: ${response.error}`, msg => callback({ text: msg }));
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userId || response.members[i].name === userId){
         return callback(response.members[i].name);
@@ -354,7 +354,7 @@ function getFirstName(userId, callback) {
   SLACK.api("users.info", {
     "user": userId
   }, function(err, response) {
-    if (!response.ok) return format.displayErrorMsg(`Failed to get info of ${userId}: API error\n${err}`, msg => callback(msg));
+    if (!response.ok) return format.displayErrorMsg(`Failed to get info of ${userId}: API error\nError: ${err}`, msg => callback(msg));
     else return callback(true, response.user.profile.first_name);
   });
 }
@@ -754,7 +754,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 
           // Get Instant Messaging DM ID of match
           SLACK.api("im.list", (err, response) => {
-            if (err) return format.displayErrorMsg(`Failed to retrieve IM list.\nError: ${err}`, msg => sendMsgToUrl(msg, responseUrl));
+            if (!response.ok) return format.displayErrorMsg(`Failed to retrieve IM list.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
             console.log(response);
             async.forEachOf(response.ims, (obj, index, next) => {
               console.log(userId + ", " + obj.user);
@@ -767,7 +767,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
                   "username": BOT_NAME
                 }, (err, response) => {
                   console.log(response);
-                  if (err) format.displayErrorMsg(`Failed to send message to ${matchName}`, msg => sendMsgToUrl(msg, responseUrl));
+                  if (!response.ok) format.displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl(msg, responseUrl));
                   return;
                 });
               }
@@ -788,7 +788,7 @@ function acceptTeamRequest(userId, matchId, responseUrl, callback) {
     "channel": userId,  //TODO change to matchId
     "username": BOT_NAME
   }, (err, response) => {
-    if (err) console.error(`Failed to send message to ${res}`);
+    if (!response.ok) console.error(`Failed to send message to ${res}`);
   });
 }
 
