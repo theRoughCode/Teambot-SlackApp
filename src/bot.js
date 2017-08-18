@@ -348,7 +348,7 @@ function displaySkillChoice(skills, callback) {
         "text": "Remove skill",
         "type": "button",
         "style": "danger",
-        "value": -1
+        "value": "-1"
       });
       format.formatSkillLvl(skill, actions, obj => next1(null, obj));
     });
@@ -703,7 +703,6 @@ function updateSkillLevels(msg, skill, level, callback) {
   const responseUrl = msg.response_url;
   const skillArr = [];
   const userId = msg.user.id;
-  console.log(skill + ", " + level);
 
   db.getSkills(userId, (res, skills) => {
     if (!res) return format.displayErrorMsg(`Could not retrieve skills for ${userId}: Database error`, msg => callback({ text: msg }));
@@ -712,7 +711,7 @@ function updateSkillLevels(msg, skill, level, callback) {
 
     for (var i = 0; i < skills.length; i++) {
       if(skills[i].skill === skill) {
-        if (level === -1) skills[i] = null;
+        if (level === "-1") skills[i] = null;
         else skills[i]["level"] = level;
 
         db.updateSkills(userId, skills, success => {
