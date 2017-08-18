@@ -724,6 +724,7 @@ function contactUser(userId, matchId, type, responseUrl, callback) {
   }, (err, response) => {
     if (err) console.error(`Failed to open multiparty dm with ${userName} and ${matchId}.\n`);
     else {
+      console.log(response);
       const groupId = response.group.id;
       SLACK.api("chat.postMessage", {
         "text": "",
