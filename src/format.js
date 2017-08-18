@@ -168,7 +168,7 @@ function formatMatches(sortedMatches, type, callback) {
 function formatUser(userId, userName, roles, skills, callback) {
   const formRoles = (roles) ? roles.join(", ") : "N/A";
   const formSkills = (skills) ? skills.map(skill => {
-    if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
+    if(skill.level) return ` - ${skill.skill} (Level: ${skill.level})`;
     else return ` - ${skill.skill}`;
   }).join("\n") : "N/A";
 
@@ -194,7 +194,7 @@ function formatUser(userId, userName, roles, skills, callback) {
 function formatInfo(roles, skills, userType, visible, callback) {
   const formRoles = (roles) ? roles.join(", ") : "N/A";
   const formSkills = (skills) ? skills.map(skill => {
-    if(skill.level) return `${skill.skill} (Level: ${skill.level})`;
+    if(skill.level) return ` - ${skill.skill} (Level: ${skill.level})`;
     else return ` - ${skill.skill}`;
   }).join("\n") : "N/A";
 
@@ -219,7 +219,7 @@ function formatInfo(roles, skills, userType, visible, callback) {
               "short": true
           },
           {
-              "title": "Skills (Level: out of 5)",
+              "title": `Skills (Level: out of ${MAX_SKILL_LVL})`,
               "value": formSkills,
               "short": true
           }
@@ -238,6 +238,42 @@ function formatSkillLvl(skill, actions, callback) {
   });
 }
 
+// format for display of skills
+function formatSkills(skillArr, callback) {
+  callback({
+    text: `Here are your skills (Level: out of ${MAX_SKILL_LVL}):`,
+    attachments: skillArr.map(skill => {
+      return {
+        "attachments": [{
+          "text": (skill.level) ? `${skill.skill} (Level: ${skill.level})` : `${skill.skill}`,
+          "fallback": "The features of this app are not supported by your device",
+          "callback_id": "skills",
+          "color": COLOUR,
+          "attachment_type": "default",
+          "actions": [
+            {
+              "name": skill,
+              "text": "Choose level...",
+              "type": "select",
+              "options": Array(MAX_SKILL_LVL).map(lvl => {
+                "text": ":star:".repeat(n + 1),
+                "value": n + 1
+              })
+            },
+            {
+              "name": skill,
+              "text": "Remove skill",
+              "type": "button",
+              "style": "danger",
+              "value": "-1"
+            }
+          ]
+        }]
+      };
+    });
+  });
+}
+
 module.exports = {
   COLOUR,
   MAX_SKILL_LVL,
@@ -248,5 +284,6 @@ module.exports = {
   formatMatches,
   formatUser,
   formatInfo,
-  formatSkillLvl
+  formatSkillLvl,
+  formatSkills
 }

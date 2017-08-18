@@ -215,9 +215,7 @@ function createSkills(msg, callback) {
 
   var text = msg.text.substring("skills".length).replace(/\s/g,'');
 
-  if (!text) return callback({
-    text: "Incorrect command. Please input skills (i.e. `/teambot skills Node.js, Python`)!"
-  });
+  if (!text) return displaySkills(msg.user_id, responseUrl, callback);
 
   var skills = text.split(',');
 
@@ -275,6 +273,16 @@ function createSkills(msg, callback) {
         });
       });
     });
+  });
+}
+
+// display skills
+function displaySkills(userId, responseUrl, callback) {
+  callback(null);
+  db.getSkills(userId, (success, skillArr) => {
+    if (!success) return sendMsgToUrl({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" }, responseUrl);
+
+    format.formatSkills(skillArr, obj => sendMsgToUrl(obj, responseUrl));
   });
 }
 
@@ -698,7 +706,7 @@ function findMatch(userData, type, callback) {
   });
 }
 
-// Update Skill Levels
+// Update skill Levels
 function updateSkillLevels(msg, skill, level, callback) {
   const responseUrl = msg.response_url;
   const skillArr = [];
@@ -711,7 +719,7 @@ function updateSkillLevels(msg, skill, level, callback) {
 
     for (var i = skills.length - 1; i >= 0; i--) {
       if(skills[i].skill === skill) {
-        if (level === "-1") skills.splice(i, 1);
+        if (level === "-1") skills.splice(i, 1);  // remove skill
         else skills[i]["level"] = level;
 
         db.updateSkills(userId, skills, success => {
