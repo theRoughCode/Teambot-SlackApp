@@ -83,12 +83,10 @@ function welcomeUserToChannel(userId, channel, callback) {
 function parseCommands(msg, callback) {
   const text = msg.text.toLowerCase().split(" ");
 
-  // welcome message
+  // welcome message or display personal info
   if (!(text[0].replace(" ","").length) || text[0] === "start") welcome(msg, callback);
   // list commands
   else if (text[0] === "help" || text[0] === "commands") format.helpMsg(callback);
-  // display personal info
-  else if (text[0] === "display") display(msg.user_id, msg.response_url, callback);
   // display listed teams or members
   else if (text[0] === "list") list(text[1], msg.response_url, callback);
   // edit skills
@@ -321,7 +319,7 @@ function removeUser(userId, responseUrl, callback) {
         else format.displayErrorMsg(`Could not reset ${userId}`, msg => sendMsgToUrl({ "text": msg }));
       })
     }
-    else format.displayErrorMsg(`Could not find ${userId}: Database error`, msg => sendMsgToUrl({ "text": msg }));
+    else sendMsgToUrl({ "text": "You are not in our database!" }, responseUrl);
   })
 }
 
