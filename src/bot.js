@@ -975,7 +975,7 @@ function declineTeamRequest(matchUserName, data, responseUrl, callback) {
         "color": format.COLOUR,
         "attachment_type": "default"
       }
-    ]);
+    ]),
     "channel": data.userId,
     "username": BOT_NAME
   }, (err, response) => {
