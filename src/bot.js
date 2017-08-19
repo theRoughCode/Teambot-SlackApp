@@ -116,7 +116,7 @@ function parseIMsg(msg, callback) {
       const value = (actions[0].selected_options) ? actions[0].selected_options[0].value : actions[0].value;
 
       updateSkillLevels(msg, actions[0].name, value, displaySkills);
-      
+
     } else updateSkillLevels(msg, actions[0].name, actions[0].value, displaySkillChoice);
 
   } else if (callbackID === 'discover') { // turn on discoverability
@@ -224,6 +224,8 @@ function createSkills(msg, callback) {
   var text = msg.text.substring("skills".length).replace(/\s/g,'');
 
   if (!text) return db.getSkills(msg.user_id, (success, skillArr) => {
+    callback(null);
+    
     if (!success) skillArr = [];
     displaySkills(skillArr, msg => sendMsgToUrl(msg, responseUrl));
   });
