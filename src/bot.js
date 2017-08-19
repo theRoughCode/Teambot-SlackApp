@@ -285,7 +285,7 @@ function createSkills(msg, callback) {
 // display skills
 function displaySkills(skillArr, callback) {
   if (!skillArr.length) return callback({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" });
-
+  console.log(skillArr);
   format.formatSkills(skillArr, obj => callback(obj));
 }
 
@@ -341,7 +341,6 @@ function sendMsgToChannel(channel, msg) {
 
 // display skills
 function displaySkillChoice(skills, callback) {
-  console.log(skills);
   var helper = function(skills) {
     if(!skills.length) return callback({
       text: ":thumbsup: Excellent! Your skill levels are all set!"
@@ -380,7 +379,6 @@ function displaySkillChoice(skills, callback) {
       if (!value.level) skillArr.push(value.skill);
       next();
     }, err => {
-      console.log(skillArr);
       if (err) return format.displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => callback({ "text": msg }));
       else helper(skillArr);
     });
