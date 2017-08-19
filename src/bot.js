@@ -56,7 +56,10 @@ function welcome(body, callback) {
     if (success) {
       db.hasUser(userId, (res, data) => {
         // user exists in db
-        if (res) return format.welcomeOldUser(userName, data, msg => sendMsgToUrl(msg, responseUrl));
+        if (res) {
+          sendMsgToUrl({ "text": `Welcome back ${userName}!`});
+          display(userId, responseUrl, () => {});
+        }
         // user does not exist
         else return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
       });
@@ -207,18 +210,8 @@ function display(userId, responseUrl, callback) {
   callback(null)
   db.getUserInfo(userId, (res, info) => {
     if (res) {
-      const userType = (info.user_type) ? info.user_type.substring(0, 1).toUpperCase() + info.user_type.substring(1) : "N/A";
-      const userName = info.username || "N/A";
-      const visible = (info.visible) ? "Yes" : "No";
-
       // format display
-      format.formatInfo(info.roles, info.skills, userType, visible, obj => sendMsgToUrl({ "attachments" : [obj] }, responseUrl));
-
-      // format buttons
-      getFirstName(userId, (success, userName) => {
-        if (success) return format.welcomeOldUser(userName, info, msg => sendMsgToUrl(msg, responseUrl));
-        else return format.displayErrorMsg(`Could not get info of ${userId}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
-      });
+      format.formatInfo(info, attachments => sendMsgToUrl({ "attachments" : attachments }, responseUrl));
 
     } else format.displayErrorMsg(`Could not get info of ${userId}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
   })

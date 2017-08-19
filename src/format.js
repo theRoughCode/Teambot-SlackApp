@@ -43,75 +43,6 @@ function welcomeNewUser(userName, callback) {
   });
 }
 
-// Welcome returning user
-function welcomeOldUser(userName, data, callback) {
-  var actions = [];
-
-  // Set roles
-  if (!data.roles) {
-    actions.push({
-      "name": "roles",
-      "text": "Pick roles",
-      "type": "button",
-      "value": "roles"
-    });
-  }
-  // Toggle visibility
-  else if (!data.visible)
-    actions.push({
-      "name": "discover",
-      "text": "Discover me!",
-      "type": "button",
-      "value": (data.user_type === "team") ? "team" : "member"
-    });
-  else {
-    actions.push({
-      "name": "undiscover",
-      "text": "Hide me!",
-      "type": "button",
-      "value": (data.user_type === "team") ? "team" : "member"
-    });
-    var action_userType = {
-      "name": "user_type",
-      "text": "",
-      "type": "button",
-      "value": ""
-    };
-
-    // Switch user type
-    if(data.user_type === "team") {
-      action_userType["text"] = "Find members instead";
-      action_userType["value"] = "member";
-    } else if (data.user_type === "member") {
-      action_userType["text"] = "Find a team instead";
-      action_userType["value"] = "team";
-    }
-    actions.push(action_userType);
-  }
-
-  // Remove User
-  actions.push({
-    "name": "remove",
-    "text": "Remove me",
-    "type": "button",
-    "value": "remove"
-  });
-
-  callback({
-    text: `Welcome back ${userName}! What would you like to do?`,
-    attachments: [
-      {
-        "text": "Select an action:",
-        "fallback": "The features of this app are not supported by your device",
-        "callback_id": "edit",
-        "color": COLOUR,
-        "attachment_type": "default",
-        "actions": actions
-      }
-    ]
-  });
-}
-
 function formatMatches(sortedMatches, type, callback) {
   async.map(sortedMatches, (match, next) => {
     formatUser(match.user_id, match.user_name, match.roles, match.skills, obj => {
@@ -191,39 +122,109 @@ function formatUser(userId, userName, roles, skills, callback) {
   });
 }
 
-function formatInfo(roles, skills, userType, visible, callback) {
+function formatInfo(data, callback) { //TODO
+  const userType = (data.user_type) ? data.user_type.substring(0, 1).toUpperCase() + data.user_type.substring(1) : "N/A";
+  const visible = (data.visible) ? "Yes" : "No";
   const formRoles = (roles) ? roles.join(", ") : "N/A";
   const formSkills = (skills) ? skills.map(skill => {
     if(skill.level) return ` - ${skill.skill} (Level: ${skill.level})`;
     else return ` - ${skill.skill}`;
   }).join("\n") : "N/A";
 
+  displayButtons(data, buttons => {
+    callback([
+      {
+        "fallback": "Required plain-text summary of the attachment.",
+        "color": COLOUR,
+        "pretext": "Here are your preferences!",
+        "fields": [
+            {
+                "title": "Looking For",
+                "value": userType,
+                "short": true
+            },
+            {
+                "title": "Discoverable?",
+                "value": visible,
+                "short": true
+            },
+            {
+                "title": "Roles",
+                "value": formRoles,
+                "short": true
+            },
+            {
+                "title": `Skills (Level: out of ${MAX_SKILL_LVL})`,
+                "value": formSkills,
+                "short": true
+            }
+        ]
+      }, buttons
+    ]);
+  });
+}
+
+// Welcome returning user
+function displayButtons(data, callback) {
+  var actions = [];
+
+  // Set roles
+  if (!data.roles) {
+    actions.push({
+      "name": "roles",
+      "text": "Pick roles",
+      "type": "button",
+      "value": "roles"
+    });
+  }
+  // Toggle visibility
+  else if (!data.visible)
+    actions.push({
+      "name": "discover",
+      "text": "Discover me!",
+      "type": "button",
+      "value": (data.user_type === "team") ? "team" : "member"
+    });
+  else {
+    actions.push({
+      "name": "undiscover",
+      "text": "Hide me!",
+      "type": "button",
+      "value": (data.user_type === "team") ? "team" : "member"
+    });
+    var action_userType = {
+      "name": "user_type",
+      "text": "",
+      "type": "button",
+      "value": ""
+    };
+
+    // Switch user type
+    if(data.user_type === "team") {
+      action_userType["text"] = "Find members instead";
+      action_userType["value"] = "member";
+    } else if (data.user_type === "member") {
+      action_userType["text"] = "Find a team instead";
+      action_userType["value"] = "team";
+    }
+    actions.push(action_userType);
+  }
+
+  // Remove User
+  actions.push({
+    "name": "remove",
+    "text": "Remove me",
+    "type": "button",
+    "value": "remove"
+  });
+
   callback({
-      "fallback": "Required plain-text summary of the attachment.",
-      "color": COLOUR,
-      "pretext": "Here are your preferences!",
-      "fields": [
-          {
-              "title": "Looking For",
-              "value": userType,
-              "short": true
-          },
-          {
-              "title": "Discoverable?",
-              "value": visible,
-              "short": true
-          },
-          {
-              "title": "Roles",
-              "value": formRoles,
-              "short": true
-          },
-          {
-              "title": `Skills (Level: out of ${MAX_SKILL_LVL})`,
-              "value": formSkills,
-              "short": true
-          }
-      ]
+    "text": "Select an action:",
+    "fallback": "The features of this app are not supported by your device",
+    "callback_id": "edit",
+    "color": COLOUR,
+    "attachment_type": "default",
+    "actions": actions
   });
 }
 
@@ -283,7 +284,6 @@ module.exports = {
   displayErrorMsg,
   helpMsg,
   welcomeNewUser,
-  welcomeOldUser,
   formatMatches,
   formatUser,
   formatInfo,
