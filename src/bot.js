@@ -340,7 +340,7 @@ function updateLastMsg(userId, newTs, newChannelId, callback) {
         "ts": res.ts
       }, (err, response) => {
         if (!response.ok) {
-          console.error(`ERROR: Failed to delete last msg for ${userId}`);
+          console.error(`ERROR: Failed to delete last msg for ${userId} (channel: ${res.channel_id}, ts: ${res.ts})\nERROR: ${response.error}`);
           callback(false);
         }
         if (newTs) db.updateLastMsg(userId, newTs, newChannelId, callback);
