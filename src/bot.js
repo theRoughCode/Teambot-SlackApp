@@ -85,7 +85,7 @@ function parseCommands(msg, callback) {
   // list commands
   else if (text[0] === "help" || text[0] === "commands") format.helpMsg(callback);
   // display personal info
-  else if (text[0] === "display") display(msg.user_id, callback);
+  else if (text[0] === "display") display(msg.user_id, msg.response_url, callback);
   // display listed teams or members
   else if (text[0] === "list") list(text[1], msg.response_url, callback);
   // edit skills
@@ -203,7 +203,8 @@ function list(type, responseUrl, callback) {
 }
 
 // display user info
-function display(userId, callback) {
+function display(userId, responseUrl, callback) {
+  callback(null)
   db.getUserInfo(userId, (res, info) => {
     if (res) {
       const userType = (info.user_type) ? info.user_type.substring(0, 1).toUpperCase() + info.user_type.substring(1) : "N/A";
@@ -211,9 +212,15 @@ function display(userId, callback) {
       const visible = (info.visible) ? "Yes" : "No";
 
       // format display
-      format.formatInfo(info.roles, info.skills, userType, visible, obj => callback({ "attachments" : [obj] }));
+      format.formatInfo(info.roles, info.skills, userType, visible, obj => sendMsgToUrl({ "attachments" : [obj] }, responseUrl));
 
-    } else format.displayErrorMsg(`Could not get info of ${userId}`, msg => callback({ text: msg }));
+      // format buttons
+      getFirstName(userId, (success, userName) => {
+        if (success) return format.welcomeOldUser(userName, info, msg => sendMsgToUrl(msg, responseUrl));
+        else return format.displayErrorMsg(`Could not get info of ${userId}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
+      });
+
+    } else format.displayErrorMsg(`Could not get info of ${userId}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
   })
 }
 
@@ -225,7 +232,7 @@ function createSkills(msg, callback) {
 
   if (!text) return db.getSkills(msg.user_id, (success, skillArr) => {
     callback(null);
-    
+
     if (!success) skillArr = [];
     displaySkills(skillArr, msg => sendMsgToUrl(msg, responseUrl));
   });
