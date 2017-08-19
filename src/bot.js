@@ -168,7 +168,7 @@ function parseIMsg(msg, callback) {
           removeUser(msg.user.id, msg.response_url, callback);
         }
       }
-    }
+    } else callback(null);
   });
 }
 
