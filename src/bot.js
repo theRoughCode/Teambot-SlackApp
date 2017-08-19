@@ -176,8 +176,10 @@ function parseIMsg(msg, callback) {
 function parseEvent(msg, callback) {
   if (msg.type === "url_verification")
     verifyURL(msg.challenge, callback);
-  else if (msg.event.type === "member_joined_channel")
+  else if (msg.event.type === "member_joined_channel"){
     welcomeUserToChannel(msg.event.user, msg.event.channel, callback);
+    console.log(msg);
+  }
 }
 
 // Lists teams or members
