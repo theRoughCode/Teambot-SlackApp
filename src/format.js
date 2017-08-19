@@ -136,7 +136,7 @@ function formatInfo(data, callback) { //TODO
       {
         "fallback": "Required plain-text summary of the attachment.",
         "color": COLOUR,
-        "title": "Here are your preferences!",
+        "pretext": "Here are your preferences!",
         "fields": [
             {
                 "title": "Looking For",
@@ -233,6 +233,7 @@ function displayButtons(data, callback) {
     "name": "remove",
     "text": "Remove me",
     "type": "button",
+    "style": "danger",
     "value": "remove",
     "confirm": {
       "title": "Are you sure?",

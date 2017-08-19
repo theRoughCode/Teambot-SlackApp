@@ -325,6 +325,11 @@ function removeUser(userId, responseUrl, callback) {
 
 /* HELPERS */
 
+// Delete previous message
+function deleteMsg() {
+
+}
+
 // Get channel id of channel
 function getChannelId(channelName, callback) {
   SLACK.api("channels.list", (err, response) => {

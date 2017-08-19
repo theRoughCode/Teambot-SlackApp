@@ -23,6 +23,7 @@ routes.post('/slash', function(req, res) {
 
 // interactive messages
 routes.post('/interact', function(req, res) {
+  console.log(req.body.message_ts);
   /*
   {
     "actions": [{"name","type","value"/"selected_options:[{"value"}]"}],
