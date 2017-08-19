@@ -110,64 +110,66 @@ function parseIMsg(msg, callback) {
   const actions = msg.actions;
 
   // delete previous unfinished message to prevent altering info
-  updateLastMsg(msg.user.id, msg.message_ts, msg.response_url, () => {})
+  updateLastMsg(msg.user.id, msg.message_ts, msg.response_url, success => {
+    if (success) {
+      if (callbackID === 'user_type') {
+        setUserType(msg, actions[0].value, callback);
+      } else if (callbackID === 'roles') {
+        setRoles(msg, actions[0].value, (actions[0].name === "add"), callback);
+      } else if (callbackID === 'skills' || callbackID === 'skillsLvl') {
+        callback(null);
 
-  if (callbackID === 'user_type') {
-    setUserType(msg, actions[0].value, callback);
-  } else if (callbackID === 'roles') {
-    setRoles(msg, actions[0].value, (actions[0].name === "add"), callback);
-  } else if (callbackID === 'skills' || callbackID === 'skillsLvl') {
-    callback(null);
+        // change existing skills
+        if (callbackID === 'skills') {
+          const value = (actions[0].selected_options) ? actions[0].selected_options[0].value : actions[0].value;
 
-    // change existing skills
-    if (callbackID === 'skills') {
-      const value = (actions[0].selected_options) ? actions[0].selected_options[0].value : actions[0].value;
+          updateSkillLevels(msg, actions[0].name, value, displaySkills);
 
-      updateSkillLevels(msg, actions[0].name, value, displaySkills);
+        }
+        // set new skills
+        else updateSkillLevels(msg, actions[0].name, actions[0].value, displaySkillChoice);
 
+      } else if (callbackID === 'discover') { // turn on discoverability
+        if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
+        else callback("All the best team-hunting! :smile:");
+      } else if (callbackID === "request") {  // contact user
+        notifyMatchedUser(msg.user.id, actions[0].value, actions[0].name, msg.response_url, callback);
+      } else if (callbackID === "respond") {
+        var data = JSON.parse(actions[0].value);
+        if (actions[0].name === "accept") acceptTeamRequest(msg.user.name, data, msg.response_url, callback);
+        else declineTeamRequest(msg.user.name, data, msg.response_url, callback);
+      } else if (callbackID === "remove") {
+        removeUser(msg.user.id, msg.response_url, callback);
+      } else if (callbackID === "contact") {  // form new conversation between matched users
+        contactUser(actions[0].value, msg.response_url, callback);
+      } else if (callbackID === 'edit') {  // edit existing data
+        // change user type
+        if (actions[0].name === 'user_type') {
+          editUserType(msg, actions[0].value, callback);
+        }
+        // set roles
+        else if (actions[0].name === "roles") {
+          setRoles(msg, null, true, callback);
+        }
+        else if (actions[0].name === "skills") {
+          callback(null);
+          updateSkillLevels(msg, null, null, displaySkills);
+        }
+        // turn on visibility
+        else if (actions[0].name === "discover") {
+          setDiscoverable(msg, true, actions[0].value, callback);
+        }
+        // remove user
+        else if (actions[0].name === "undiscover") {
+          setDiscoverable(msg, false, actions[0].value, callback);
+        }
+        // reset user info
+        else if (actions[0].name === "remove") {
+          removeUser(msg.user.id, msg.response_url, callback);
+        }
+      }
     }
-    // set new skills
-    else updateSkillLevels(msg, actions[0].name, actions[0].value, displaySkillChoice);
-
-  } else if (callbackID === 'discover') { // turn on discoverability
-    if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
-    else callback("All the best team-hunting! :smile:");
-  } else if (callbackID === "request") {  // contact user
-    notifyMatchedUser(msg.user.id, actions[0].value, actions[0].name, msg.response_url, callback);
-  } else if (callbackID === "respond") {
-    var data = JSON.parse(actions[0].value);
-    if (actions[0].name === "accept") acceptTeamRequest(msg.user.name, data, msg.response_url, callback);
-    else declineTeamRequest(msg.user.name, data, msg.response_url, callback);
-  } else if (callbackID === "remove") {
-    removeUser(msg.user.id, msg.response_url, callback);
-  } else if (callbackID === "contact") {  // form new conversation between matched users
-    contactUser(actions[0].value, msg.response_url, callback);
-  } else if (callbackID === 'edit') {  // edit existing data
-    // change user type
-    if (actions[0].name === 'user_type') {
-      editUserType(msg, actions[0].value, callback);
-    }
-    // set roles
-    else if (actions[0].name === "roles") {
-      setRoles(msg, null, true, callback);
-    }
-    else if (actions[0].name === "skills") {
-      callback(null);
-      updateSkillLevels(msg, null, null, displaySkills);
-    }
-    // turn on visibility
-    else if (actions[0].name === "discover") {
-      setDiscoverable(msg, true, actions[0].value, callback);
-    }
-    // remove user
-    else if (actions[0].name === "undiscover") {
-      setDiscoverable(msg, false, actions[0].value, callback);
-    }
-    // reset user info
-    else if (actions[0].name === "remove") {
-      removeUser(msg.user.id, msg.response_url, callback);
-    }
-  }
+  });
 }
 
 // parse incoming events
@@ -334,13 +336,20 @@ function removeUser(userId, responseUrl, callback) {
 // Delete previous message and update with new one
 function updateLastMsg(userId, newTs, newURL, callback) {
   db.getLastMsg(userId, (success, res) => {
+    // has last msg
     if (res) {
+      // delete last msg
       if (!newTs || newTs > res.ts) {
         sendMsgToUrl({ "text": null }, res.responseUrl);
-        if (newTs) return db.updateLastMsg(userId, newTs, newURL, callback);
+        if (newTs) db.updateLastMsg(userId, newTs, newURL, () => {});
+        return callback(true);
       }
-      else sendMsgToUrl({ "text": "This message has timed out.  To start a new conversation, use `/teambot`"});
-    } else if (newTs) db.updateLastMsg(userId, newTs, newURL, callback);
+      // delete current msg
+      else {
+        sendMsgToUrl({ "text": "This message has timed out.  To start a new conversation, use `/teambot`"}, res.responseUrl);
+        return callback(false);
+      }
+    } else if (newTs) db.updateLastMsg(userId, newTs, newURL, () => callback(true)));
   });
 }
 
