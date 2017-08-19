@@ -106,6 +106,8 @@ function parseIMsg(msg, callback) {
   const callbackID = msg.callback_id;
   const actions = msg.actions;
 
+  console.log(msg.message_ts);
+
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
   } else if (callbackID === 'roles') {
