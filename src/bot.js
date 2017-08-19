@@ -367,7 +367,7 @@ function getChannelId(channelName, callback) {
 // send message to webhook
 function sendMsgToUrl(msg, url) {
   var slack = new Slack();
-
+  console.log(msg);
   if (!url) {
     url = webhookUri;
     slack.setWebhook(url);
