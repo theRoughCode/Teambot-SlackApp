@@ -24,6 +24,7 @@ function updateUser(userId, data, callback) {
       [{ skill, level }]
     user_type -- indicates whether looking for a "team" or "member"
     visible -- true if user is visible for search
+    info -- additional info
   */
   userRef.child(userId).set(data).then(() => {
     callback(true);
@@ -98,6 +99,11 @@ function updateLastMsg(userId, ts, responseUrl, callback) {
   }, callback);
 }
 
+// Update additional info
+function updateInfo(userId, info, callback) {
+  updateField(userId, "info", info, callback);
+}
+
 // Get field
 function getField(userId, field, callback) {
   if (userId === undefined) return callback(false, null);
@@ -151,6 +157,11 @@ function getVisibility(userId, callback) {
 // Get latest message
 function getLastMsg(userId, callback) {
   getField(userId, "last_msg", callback);
+}
+
+// Get additional info
+function getInfo(userId, callback) {
+  getField(userId, "info", callback);
 }
 
 // Returns true if user is in database
@@ -213,12 +224,14 @@ module.exports = {
   updateType,
   updateVisibility,
   updateLastMsg,
+  updateInfo,
   getUserInfo,
   getRoles,
   getSkills,
   getType,
   getVisibility,
   getLastMsg,
+  getInfo,
   hasUser,
   getTeams,
   getMembers,

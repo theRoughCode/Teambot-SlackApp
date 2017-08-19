@@ -10,7 +10,7 @@ function displayErrorMsg(errorMsg, callback) {
 
 // list commands
 function helpMsg(callback) {
-  callback({ text: "List of commands:\n  `/teambot` or `/teambot start` to edit your team profile!\n  `/teambot list (members/teams)` to display the list of discoverable users\n  `/teambot remove` to remove your information from the database" });
+  callback({ text: "List of commands:\n  `/teambot` or `/teambot start` to edit your team profile!\n  `/teambot info` to update your description and let others know more about you and what you want to work on!\n `/teambot list (members/teams)` to display the list of discoverable users\n  `/teambot remove` to remove your information from the database" });
 }
 
 // Welcome new users
@@ -45,7 +45,7 @@ function welcomeNewUser(userName, callback) {
 
 function formatMatches(sortedMatches, type, callback) {
   async.map(sortedMatches, (match, next) => {
-    formatUser(match.user_id, match.user_name, match.roles, match.skills, obj => {
+    formatUser(match.user_id, match.user_name, match.roles, match.skills, match.info, obj => {
       obj["callback_id"] = "request";
       obj["actions"] = [{
         "name": type,
@@ -96,12 +96,13 @@ function formatMatches(sortedMatches, type, callback) {
   });
 }
 
-function formatUser(userId, userName, roles, skills, callback) {
+function formatUser(userId, userName, roles, skills, info, callback) {
   const formRoles = (roles) ? roles.join(", ") : "N/A";
   const formSkills = (skills) ? skills.map(skill => {
     if(skill.level) return ` - ${skill.skill} (Level: ${skill.level})`;
     else return ` - ${skill.skill}`;
   }).join("\n") : "N/A";
+  const info = info || "N/A";
 
   callback({
     "fallback": "Required plain-text summary of the attachment.",
@@ -117,6 +118,11 @@ function formatUser(userId, userName, roles, skills, callback) {
         "title": `Skills (Level: out of ${MAX_SKILL_LVL})`,
         "value": formSkills,
         "short": true
+      },
+      {
+        "title": `Additional Info`,
+        "value": info,
+        "short": false
       }
     ]
   });
@@ -130,6 +136,7 @@ function formatInfo(data, callback) {
     if(skill.level) return ` - ${skill.skill} (Level: ${skill.level})`;
     else return ` - ${skill.skill}`;
   }).join("\n") : "N/A";
+  const info = data.info || "N/A";
 
   displayButtons(data, buttons => {
     callback([
@@ -154,9 +161,14 @@ function formatInfo(data, callback) {
                 "short": true
             },
             {
-                "title": `Skills (Level: out of ${MAX_SKILL_LVL})`,
+                "title": `Skills`,
                 "value": formSkills,
                 "short": true
+            },
+            {
+              "title": `Additional Info`,
+              "value": info,
+              "short": false
             }
         ]
       }, buttons

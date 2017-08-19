@@ -95,6 +95,8 @@ function parseCommands(msg, callback) {
   else if (text[0] === "remove") removeUser(msg.user_id, msg.response_url, callback);
   // search for matches
   else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);
+  // add addtional info
+  else if (text[0] === "info") addInfo(userId, responseUrl, info, callbackmsg.user_id, msg.response_url, text.splice(0, 1).join(" "), callback);
   else callback("Incorrect command.  Try `/teambot help` for a list of commands");
 }
 
@@ -190,7 +192,7 @@ function list(type, responseUrl, callback) {
           const userName = info.username;
 
           // if valid username
-          if(userName) format.formatUser(userId, userName, info.roles, info.skills, obj => attachments.push(obj));
+          if(userName) format.formatUser(userId, userName, info.roles, info.skills, info.info, obj => attachments.push(obj));
           innerCallback();
         } else {
           return format.displayErrorMsg(`Could not get ${userId}'s info`, msg => sendMsgToUrl({ text: msg }, responseUrl));
@@ -763,6 +765,7 @@ function findMatch(userData, callback) {
               "rating": rating,
               "roles": matchData.roles,
               "skills": matchData.skills,
+              "info": matchData.info,
               "ts": ts
             });
             next();
@@ -875,7 +878,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
       db.getUserInfo(userId, (success, info) => {
         if (!success) return format.displayErrorMsg(`Failed to retrieve info for ${userId}`, msg => sendMsgToUrl(msg, responseUrl));
 
-        format.formatUser(userId, info.username, info.roles, info.skills, obj => {
+        format.formatUser(userId, info.username, info.roles, info.skills, info.info, obj => {
           const attachments = [
             {
               "title": `New Match!`,
@@ -934,6 +937,16 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
       });
     });
   });
+}
+
+// Add additional info
+function addInfo(userId, responseUrl, info, callback) {
+  callback(null);
+
+  db.updateInfo(userId, info, success => {
+    if(!success) return format.displayErrorMsg(`Failed to update additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    else return sendMsgToUrl(":thumbsup: Your description has been updated!");
+  })
 }
 
 /*
