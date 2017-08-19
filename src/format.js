@@ -176,6 +176,13 @@ function displayButtons(data, callback) {
       "type": "button",
       "value": "roles"
     });
+  } else {
+    actions.push({
+      "name": "roles",
+      "text": "Change roles",
+      "type": "button",
+      "value": "roles"
+    });
   }
   // Toggle visibility
   else if (!data.visible)

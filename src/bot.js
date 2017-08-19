@@ -140,6 +140,10 @@ function parseIMsg(msg, callback) {
     if (actions[0].name === 'user_type') {
       editUserType(msg, actions[0].value, callback);
     }
+    // set roles
+    else if (actions[0].name === "roles") {
+      setRoles(msg, null, callback);
+    }
     // turn on visibility
     else if (actions[0].name === "discover") {
       setDiscoverable(msg, true, actions[0].value, callback);
@@ -615,16 +619,16 @@ function setRoles(msg, role, callback) {
 
     } else {
       if (!roles) roles = [];
-      roles.push(role);  // add role to list
+      if(role) roles.push(role);  // add role to list
 
       selectRoles(roles, attachments => {
         db.updateRoles(msg.user.id, roles, success => {
           if (success) {
+            var text = (role) ? "Awesome!  Before we begin our search, tell us more about you!\n" : "";
             sendMsgToUrl({
-              "text": `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
+              "text": `${text}What roles are you looking to fill?`,
               "replace_original": true,
-              "attachments": attachments,
-              "response_type": "ephemeral"
+              "attachments": attachments
             }, responseUrl);
           }
           else {
