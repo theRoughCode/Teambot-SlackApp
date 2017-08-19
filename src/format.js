@@ -247,7 +247,7 @@ function formatSkills(skillArr, callback) {
       var actions = [
         {
           "name": skill.skill,
-          "text": "Choose level...",
+          "text": "Change level...",
           "type": "select",
           "options": [... Array(MAX_SKILL_LVL).keys()].map(lvl => {
             return {
