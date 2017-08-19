@@ -340,7 +340,7 @@ function updateLastMsg(userId, newTs, newURL, callback) {
     if (res) {
       // delete last msg
       if (!newTs || newTs > res.ts) {
-        sendMsgToUrl({ "text": null }, res.responseUrl);
+        sendMsgToUrl({ "text": null }, res.response_url);
         if (newTs) db.updateLastMsg(userId, newTs, newURL, () => {});
         return callback(true);
       }
