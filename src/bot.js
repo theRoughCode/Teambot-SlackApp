@@ -52,6 +52,9 @@ function welcome(body, callback) {
   const responseUrl = body.response_url;
   callback(null);
 
+  // delete prev message
+  updateLastMsg(userId, null, null, () => {});
+
   getFirstName(userId, (success, userName) => {
     if (success) {
       db.hasUser(userId, (res, data) => {
@@ -107,7 +110,7 @@ function parseIMsg(msg, callback) {
   const actions = msg.actions;
 
   // delete previous unfinished message to prevent altering info
-  deleteLastMsg(msg.user.id, msg.message_ts, msg.channel.id, () => {})
+  updateLastMsg(msg.user.id, msg.message_ts, msg.channel.id, () => {})
 
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
@@ -329,10 +332,8 @@ function removeUser(userId, responseUrl, callback) {
 /* HELPERS */
 
 // Delete previous message and update with new one
-function deleteLastMsg(userId, newTs, newChannelId, callback) {
+function updateLastMsg(userId, newTs, newChannelId, callback) {
   db.getLastMsg(userId, (success, res) => {
-    console.log(success);
-    console.log(res);
     if (res) {
       SLACK.api("chat.update", {
         "channel": res.channel_id,
@@ -342,9 +343,9 @@ function deleteLastMsg(userId, newTs, newChannelId, callback) {
           console.error(`ERROR: Failed to delete last msg for ${userId}`);
           callback(false);
         }
-        return db.updateLastMsg(userId, newTs, newChannelId, callback);
+        if (newTs) db.updateLastMsg(userId, newTs, newChannelId, callback);
       });
-    } else return db.updateLastMsg(userId, newTs, newChannelId, callback);
+    } else if (newTes) db.updateLastMsg(userId, newTs, newChannelId, callback);
   });
 }
 
