@@ -89,10 +89,8 @@ function parseCommands(msg, callback) {
   // remove user
   else if (text[0] === "remove") removeUser(msg.user_id, msg.response_url, callback);
   // search for matches
-  else if (text[0] === "search") {
-
-  }
-  else callback("Incorrect command.  Try `/teambot help` for a list of commands")
+  else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);
+  else callback("Incorrect command.  Try `/teambot help` for a list of commands");
 }
 
 // parse interactive messages
@@ -644,7 +642,6 @@ function setRoles(msg, role, add, callback) {
   db.getUserInfo(msg.user.id, (res, userData) => {
     if (!res) return format.displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
 
-    const type = userData.user_type;
     var roles = userData.roles;
 
     // errors is handled by parseRoles(null)
@@ -654,7 +651,7 @@ function setRoles(msg, role, add, callback) {
         replace_original: true
       }, responseUrl);
 
-      findMatch(userData, type, msg => sendMsgToUrl(msg, responseUrl));
+      findMatch(userData, msg => sendMsgToUrl(msg, responseUrl));
 
     } else {
       if (!roles) roles = [];
@@ -702,11 +699,22 @@ function setRoles(msg, role, add, callback) {
   });
 }
 
+// Search for matches
+function search(userId, responseUrl, callback) {
+  callback(null);
+
+  db.getUserInfo(userId, (res, userData) => {
+    if (!res) return format.displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
+    else findMatch(userData, msg => sendMsgToUrl(msg, responseUrl));
+  });
+}
+
 // Return msg with formatted array of matches
 /*
 [{ "user_id","user_name","rating","roles","skills","ts" }]
 */
-function findMatch(userData, type, callback) {
+function findMatch(userData, callback) {
+  const type = userData.user_type;
   const noMatchMsg = {
     text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
     attachments: [

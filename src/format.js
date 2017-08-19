@@ -122,7 +122,7 @@ function formatUser(userId, userName, roles, skills, callback) {
   });
 }
 
-function formatInfo(data, callback) { //TODO
+function formatInfo(data, callback) {
   const userType = (data.user_type) ? data.user_type.substring(0, 1).toUpperCase() + data.user_type.substring(1) : "N/A";
   const visible = (data.visible) ? "Yes" : "No";
   const formRoles = (data.roles) ? data.roles.join(", ") : "N/A";
