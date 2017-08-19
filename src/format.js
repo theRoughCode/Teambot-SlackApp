@@ -77,13 +77,13 @@ function formatMatches(sortedMatches, type, callback) {
 
       // None of the matches, remove user
       matches.push({
-        "text": `I would like to form a team on my own. Please remove me and my preferences!`,
+        "text": `I'm not ready to form a team just yet!  Remove me for now!`,
         "fallback": "Required plain-text summary of the attachment.",
         "color": COLOUR,
-        "callback_id": "remove",
+        "callback_id": "discover",
         "actions": [
           {
-            "name": "remove",
+            "name": "no",
             "text": "Remove me",
             "style": "danger",
             "type": "button",
