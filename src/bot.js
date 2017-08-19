@@ -549,6 +549,7 @@ function setUserType(msg, type, callback) {
             "name": "done",
             "text": "Begin search",
             "type": "button",
+            "style": "primary",
             "value": "done"
         }
       ]
@@ -669,6 +670,7 @@ function setRoles(msg, role, add, callback) {
             "name": "done",
             "text": "Begin search",
             "type": "button",
+            "style": "primary",
             "value": "done"
           }
         ]
