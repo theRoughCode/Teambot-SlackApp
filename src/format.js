@@ -102,7 +102,7 @@ function formatUser(userId, userName, roles, skills, info, callback) {
     if(skill.level) return ` - ${skill.skill} (Level: ${skill.level})`;
     else return ` - ${skill.skill}`;
   }).join("\n") : "N/A";
-  const info = info || "N/A";
+  const formInfo = info || "N/A";
 
   callback({
     "fallback": "Required plain-text summary of the attachment.",
@@ -121,7 +121,7 @@ function formatUser(userId, userName, roles, skills, info, callback) {
       },
       {
         "title": `Additional Info`,
-        "value": info,
+        "value": formInfo,
         "short": false
       }
     ]
