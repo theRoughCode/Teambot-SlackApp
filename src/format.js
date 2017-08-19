@@ -4,7 +4,7 @@ const MAX_SKILL_LVL = 4;
 
 // display error message
 function displayErrorMsg(errorMsg, callback) {
-  callback("Oops, something went wrong! :thinking-face:\nPlease contact an organizer! :telephone_receiver:");
+  callback("Oops, something went wrong! :thinking_face:\nPlease contact an organizer! :telephone_receiver:");
   console.error(`ERROR: ${errorMsg}`);
 }
 
@@ -16,7 +16,7 @@ function helpMsg(callback) {
 // Welcome new users
 function welcomeNewUser(userName, callback) {
   callback({
-    text: `Hi ${userName}!  I'm here to assist you with forming a team!\nTo start, are you looking to join a team or are you looking for team members to join your team?`,
+    text: `Hi ${userName}!  Allow me to assist you with forming a team!\nTo start, are you looking to join a team or are you looking for team members to join your team?`,
     attachments: [
       {
         "text": "I want to:",
