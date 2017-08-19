@@ -59,7 +59,12 @@ function welcome(body, callback) {
     // user exists in db
     if (res) return display(userId, responseUrl, () => {});
     // user does not exist
-    else return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
+    else {
+      getFirstName(userId, (success, userName) => {
+        if (success) return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
+        else return format.welcomeNewUser(data.username, msg => sendMsgToUrl(msg, responseUrl));
+      });
+    }
   });
 }
 
