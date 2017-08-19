@@ -107,9 +107,7 @@ function parseIMsg(msg, callback) {
   const actions = msg.actions;
 
   // delete previous unfinished message to prevent altering info
-  deleteLastMsg(msg.user.id, msg.message_ts, msg.channel.id, success => {
-    if (!success) console.error(`ERROR: Failed to delete last message for ${msg.user.id}`);
-  })
+  deleteLastMsg(msg.user.id, msg.message_ts, msg.channel.id, () => {})
 
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
@@ -333,6 +331,8 @@ function removeUser(userId, responseUrl, callback) {
 // Delete previous message and update with new one
 function deleteLastMsg(userId, newTs, newChannelId, callback) {
   db.getLastMsg(userId, (success, res) => {
+    console.log(success);
+    console.log(res);
     if (success) {
       SLACK.api("chat.update", {
         "channel": res.channel_id,
