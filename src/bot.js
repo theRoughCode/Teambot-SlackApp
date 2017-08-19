@@ -336,7 +336,7 @@ function updateLastMsg(userId, newTs, newURL, callback) {
   db.getLastMsg(userId, (success, res) => {
     if (res) {
       if (!newTs || newTs > res.ts) {
-        sendMsgToUrl(null, res.responseUrl);
+        sendMsgToUrl({ "text": null }, res.responseUrl);
         if (newTs) return db.updateLastMsg(userId, newTs, newURL, callback);
       }
       else sendMsgToUrl({ "text": "This message has timed out.  To start a new conversation, use `/teambot`"});
