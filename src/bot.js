@@ -57,7 +57,7 @@ function welcome(body, callback) {
       db.hasUser(userId, (res, data) => {
         // user exists in db
         if (res) {
-          sendMsgToUrl({ "text": `Welcome back ${userName}!`});
+          sendMsgToUrl({ "text": `Welcome back ${userName}!`}, responseUrl);
           display(userId, responseUrl, () => {});
         }
         // user does not exist
