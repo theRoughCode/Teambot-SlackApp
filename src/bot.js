@@ -52,6 +52,8 @@ function welcome(body, callback) {
   const responseUrl = body.response_url;
   callback(null);
 
+  console.log(body);
+
   getFirstName(userId, (success, userName) => {
     if (success) {
       db.hasUser(userId, (res, data) => {
@@ -105,8 +107,6 @@ function parseIMsg(msg, callback) {
   msg = JSON.parse(msg.payload);
   const callbackID = msg.callback_id;
   const actions = msg.actions;
-
-  console.log(msg.message_ts);
 
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
@@ -327,9 +327,22 @@ function removeUser(userId, responseUrl, callback) {
 
 /* HELPERS */
 
-// Delete previous message
-function deleteMsg() {
-
+// Delete previous message and update with new one
+function deleteLastMsg(userId, newTs, newChannelId, callback) {
+  db.getLastMsg(userId, (success, res) => {
+    if (success) {
+      SLACK.api("chat.update", {
+        "channel": res.channel_id,
+        "ts": res.ts
+      }, (err, response) => {
+        if (!response.ok) {
+          console.error(`ERROR: Failed to delete last msg for ${userId}`);
+          return callback(false);
+        }
+        else return db.updateLastMsg(userId, newTs, newChannelId, callback);
+      });
+    } else return db.updateLastMsg(userId, newTs, newChannelId, callback);
+  });
 }
 
 // Get channel id of channel

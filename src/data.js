@@ -90,6 +90,14 @@ function updateVisibility(userId, visible, callback) {
   updateField(userId, "visible", visible, callback);
 }
 
+// Update latest message
+function updateLastMsg(userId, channelId, ts, callback) {
+  updateField(userId, "last_msg", {
+    "channel_id": channelId,
+    "ts": ts
+  }, callback);
+}
+
 // Get field
 function getField(userId, field, callback) {
   if (userId === undefined) return callback(false, null);
@@ -138,6 +146,11 @@ function getType(userId, callback) {
 // Get visibility
 function getVisibility(userId, callback) {
   getField(userId, "visible", callback);
+}
+
+// Get latest message
+function getLastMsg(userId, callback) {
+  getField(userId, "last_msg", callback);
 }
 
 // Returns true if user is in database
@@ -199,11 +212,13 @@ module.exports = {
   updateSkills,
   updateType,
   updateVisibility,
+  updateLastMsg,
   getUserInfo,
   getRoles,
   getSkills,
   getType,
   getVisibility,
+  getLastMsg,
   hasUser,
   getTeams,
   getMembers,
