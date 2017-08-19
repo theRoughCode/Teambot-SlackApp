@@ -109,10 +109,8 @@ function parseIMsg(msg, callback) {
   const callbackID = msg.callback_id;
   const actions = msg.actions;
 
-  console.log(msg.message_ts);
-
   // delete previous unfinished message to prevent altering info
-  updateLastMsg(msg.user.id, msg.message_ts, msg.channel.id, () => {})
+  updateLastMsg(msg.user.id, msg.message_ts, msg.response_url, () => {})
 
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
@@ -334,20 +332,15 @@ function removeUser(userId, responseUrl, callback) {
 /* HELPERS */
 
 // Delete previous message and update with new one
-function updateLastMsg(userId, newTs, newChannelId, callback) {
+function updateLastMsg(userId, newTs, newURL, callback) {
   db.getLastMsg(userId, (success, res) => {
     if (res) {
-      SLACK.api("chat.update", {
-        "channel": res.channel_id,
-        "ts": res.ts
-      }, (err, response) => {
-        if (!response.ok) {
-          console.error(`ERROR: Failed to delete last msg for ${userId} (channel: ${res.channel_id}, ts: ${res.ts})\nERROR: ${response.error}`);
-          callback(false);
-        }
-        if (newTs) db.updateLastMsg(userId, newTs, newChannelId, callback);
-      });
-    } else if (newTes) db.updateLastMsg(userId, newTs, newChannelId, callback);
+      if (!newTs || newTs > res.ts) {
+        sendMsgToUrl(null, res.responseUrl);
+        if (newTs) return db.updateLastMsg(userId, newTs, newURL, callback);
+      }
+      else sendMsgToUrl({ "text": "This message has timed out.  To start a new conversation, use `/teambot`"});
+    } else if (newTes) db.updateLastMsg(userId, newTs, newURL, callback);
   });
 }
 

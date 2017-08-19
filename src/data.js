@@ -91,9 +91,9 @@ function updateVisibility(userId, visible, callback) {
 }
 
 // Update latest message
-function updateLastMsg(userId, ts, channelId, callback) {
+function updateLastMsg(userId, ts, responseUrl, callback) {
   updateField(userId, "last_msg", {
-    "channel_id": channelId,
+    "response_url": responseUrl,
     "ts": ts
   }, callback);
 }
