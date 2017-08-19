@@ -148,6 +148,7 @@ function parseIMsg(msg, callback) {
       setRoles(msg, null, true, callback);
     }
     else if (actions[0].name === "skills") {
+      callback(null);
       updateSkillLevels(msg, null, null, displaySkills);
     }
     // turn on visibility

@@ -194,12 +194,6 @@ function displayButtons(data, callback) {
       "value": "roles"
     });
   } else {
-    actions.push({
-      "name": "roles",
-      "text": "Change roles",
-      "type": "button",
-      "value": "roles"
-    });
     // Toggle visibility
     if (!data.visible)
       actions.push({  // TODO: replace with search button
@@ -215,10 +209,17 @@ function displayButtons(data, callback) {
         "type": "button",
         "value": (data.user_type === "team") ? "team" : "member"
       });
+
+    actions.push({
+      "name": "roles",
+      "text": "Change roles",
+      "type": "button",
+      "value": "roles"
+    });
   }
 
   // Set skills
-  if (data.skills) 
+  if (data.skills)
     actions.push({
       "name": "skills",
       "text": "Change skills",
