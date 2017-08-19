@@ -833,7 +833,15 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
         if (!success) return format.displayErrorMsg(`Failed to retrieve info for ${userId}`, msg => sendMsgToUrl(msg, responseUrl));
 
         format.formatUser(userId, info.username, info.roles, info.skills, obj => {
-          const attachments = [obj];
+          const attachments = [
+            {
+              "title": `New Match!`,
+              "text": `:tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
+              "fallback": "The features of this app are not supported by your device",
+              "color": format.COLOUR
+            }
+          ];
+          attachments.push(obj);
           const value = {
             "userId": userId,
             "userName": userName,
@@ -872,7 +880,6 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 
           // DM matched user
           SLACK.api("chat.postMessage", {
-            "text": `Hi, ${matchName}!  :tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
             "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
             "channel": matchId,
             "username": BOT_NAME
@@ -897,23 +904,12 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
   var text = (data.type === "team") ? "their" : "your";
 
   SLACK.api("chat.postMessage", {
-    "text": `Hi, ${data.userName}!  ${data.matchName} has accepted your request to join ${text} team :tada:.`,
     "attachments": JSON.stringify([
       {
-      "text": ` Go and send <@${data.matchId}|${data.matchUserName}> a direct message!`,
-      "fallback": "The features of this app are not supported by your device",
-      "callback_id": "contact",
-      "color": format.COLOUR,
-      "attachment_type": "default",
-      "actions": [
-        {
-          "name": "contact",
-          "text": "Message them!",
-          "type": "button",
-          "style": "primary",
-          "value": data.matchId
-        }
-      ]
+        "title": `Team Request Accepted`,
+        "text": `${data.matchName} has accepted your request to join ${text} team :tada:\n Go and send <@${data.matchId}|${data.matchUserName}> a direct message!`,
+        "fallback": "The features of this app are not supported by your device",
+        "color": format.COLOUR
     }]),  // convert to string in order for API to properly parse it
     "channel": data.userId,
     "username": BOT_NAME
@@ -944,20 +940,19 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
   setTimeout(() => SLACK.api("chat.postMessage", {
     "attachments": JSON.stringify([
       {
-      "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
-      "fallback": "The features of this app are not supported by your device",
-      "callback_id": "remove",
-      "color": format.COLOUR,
-      "attachment_type": "default",
-      "actions": [
-        {
-          "name": "remove",
-          "text": "Remove me!",
-          "type": "button",
-          "style": "danger",
-          "value": "remove"
-        }
-      ]
+        "fallback": "The features of this app are not supported by your device",
+        "callback_id": "remove",
+        "color": format.COLOUR,
+        "attachment_type": "default",
+        "actions": [
+          {
+            "name": "remove",
+            "text": "Remove me!",
+            "type": "button",
+            "style": "danger",
+            "value": "remove"
+          }
+        ]
     }]),  // convert to string in order for API to properly parse it
     "channel": data.userId,
     "username": BOT_NAME
@@ -971,7 +966,16 @@ function declineTeamRequest(matchUserName, data, responseUrl, callback) {
   var text = (data.type === "team") ? "their" : "your";
 
   SLACK.api("chat.postMessage", {
-    "text": `Hi, ${data.userName}, ${data.matchName} has declined your request to join ${text} team.  Don't give up! Search for more matches using ` + "`/teambot search`!",
+    "attachments": JSON.stringify([
+      {
+        "title": `Team Request Declined`,
+        "text": `${data.matchName} has declined your request to join ${text} team.\n  Don't give up! Search for more matches using ` + "`/teambot search`!",
+        "fallback": "The features of this app are not supported by your device",
+        "callback_id": "contact",
+        "color": format.COLOUR,
+        "attachment_type": "default"
+      }
+    ]);
     "channel": data.userId,
     "username": BOT_NAME
   }, (err, response) => {

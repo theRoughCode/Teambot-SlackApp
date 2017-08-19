@@ -77,7 +77,7 @@ function formatMatches(sortedMatches, type, callback) {
 
       // None of the matches, remove user
       matches.push({
-        "text": `I'm not ready to form a team just yet!  Remove me for now!`,
+        "text": `I'm not ready to form a team just yet!  Please remove me!`,
         "fallback": "Required plain-text summary of the attachment.",
         "color": COLOUR,
         "callback_id": "discover",
@@ -136,7 +136,7 @@ function formatInfo(data, callback) { //TODO
       {
         "fallback": "Required plain-text summary of the attachment.",
         "color": COLOUR,
-        "pretext": "Here are your preferences!",
+        "title": "Here are your preferences!",
         "fields": [
             {
                 "title": "Looking For",
