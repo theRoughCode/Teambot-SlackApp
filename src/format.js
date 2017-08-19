@@ -218,7 +218,7 @@ function displayButtons(data, callback) {
   }
 
   // Set skills
-  if (data.skills) {
+  if (data.skills) 
     actions.push({
       "name": "skills",
       "text": "Change skills",
