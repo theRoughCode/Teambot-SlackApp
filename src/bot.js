@@ -346,7 +346,7 @@ function updateLastMsg(userId, newTs, newURL, callback) {
       }
       // delete current msg
       else {
-        sendMsgToUrl({ "text": "This message has timed out.  To start a new conversation, use `/teambot`"}, res.responseUrl);
+        sendMsgToUrl({ "text": "This message has timed out.  To start a new conversation, use `/teambot`"}, newURL);
         return callback(false);
       }
     } else if (newTs) db.updateLastMsg(userId, newTs, newURL, () => callback(true));
