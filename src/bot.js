@@ -55,19 +55,11 @@ function welcome(body, callback) {
   // delete prev message
   updateLastMsg(userId, null, null, () => {});
 
-  getFirstName(userId, (success, userName) => {
-    if (success) {
-      db.hasUser(userId, (res, data) => {
-        // user exists in db
-        if (res) {
-          sendMsgToUrl({ "text": `Welcome back ${userName}!`}, responseUrl);
-          display(userId, responseUrl, () => {});
-        }
-        // user does not exist
-        else return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
-      });
-    }
-    else return sendMsgToChannel(userId, BOT_CHANNEL_NAME, userName);
+  db.hasUser(userId, (res, data) => {
+    // user exists in db
+    if (res) return display(userId, responseUrl, () => {});
+    // user does not exist
+    else return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
   });
 }
 
