@@ -96,7 +96,7 @@ function parseCommands(msg, callback) {
   // search for matches
   else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);
   // add addtional info
-  else if (text[0] === "info") addInfo(msg.user_id, msg.response_url, text.splice(0, 1).join(" "), callback);
+  else if (text[0] === "info") addInfo(msg.user_id, msg.response_url, text.shift().join(" "), callback);
   else callback("Incorrect command.  Try `/teambot help` for a list of commands");
 }
 
@@ -941,13 +941,12 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 
 // Add additional info
 function addInfo(userId, responseUrl, info, callback) {
+  if(!info.length) callback({ "text": "Incorrect command!  Please fill in the additional information you want to display!  (i.e. `/teambot info I Love Hack the North!`)"});
   callback(null);
-
-  console.log(info);
 
   db.updateInfo(userId, info, success => {
     if(!success) return format.displayErrorMsg(`Failed to update additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
-    else return sendMsgToUrl(":thumbsup: Your description has been updated!");
+    else return sendMsgToUrl(":thumbsup: Your description has been updated!", responseUrl);
   })
 }
 
