@@ -339,8 +339,8 @@ function updateLastMsg(userId, newTs, newURL, callback) {
     // has last msg
     if (res) {
       // delete last msg
+      console.log(newTs + " > " + res.ts);
       if (!newTs || newTs > res.ts) {
-        console.log(newTs + " > " + res.ts);
         sendMsgToUrl({ "text": "test" }, res.response_url);
         if (newTs) db.updateLastMsg(userId, newTs, newURL, () => {});
         return callback(true);
