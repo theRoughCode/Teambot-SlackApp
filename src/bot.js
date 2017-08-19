@@ -82,8 +82,6 @@ function welcomeUserToChannel(userId, channel, callback) {
 // parse commands
 function parseCommands(msg, callback) {
   var text = msg.text.toLowerCase().split(" ");
-  console.log(text);
-  console.log(text.shift());
 
   // welcome message or display personal info
   if (!(text[0].replace(" ","").length) || text[0] === "start") welcome(msg, callback);
@@ -98,7 +96,10 @@ function parseCommands(msg, callback) {
   // search for matches
   else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);
   // add addtional info
-  else if (text[0] === "info") addInfo(msg.user_id, msg.response_url, text.shift().join(" "), callback);
+  else if (text[0] === "info") {
+    text.shift();
+    addInfo(msg.user_id, msg.response_url, text.join(" "), callback);
+  }
   else callback("Incorrect command.  Try `/teambot help` for a list of commands");
 }
 
