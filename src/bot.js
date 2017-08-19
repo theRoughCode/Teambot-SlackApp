@@ -111,6 +111,7 @@ function parseIMsg(msg, callback) {
     setRoles(msg, actions[0].value, callback);
   } else if (callbackID === 'skills' || callbackID === 'skillsLvl') {
     callback(null);
+    console.log(actions);
     if (callbackID === 'skills') updateSkillLevels(msg, actions[0].name, actions[0].selected_options[0].value, displaySkills);
     else updateSkillLevels(msg, actions[0].name, actions[0].value, displaySkillChoice);
   } else if (callbackID === 'discover') { // turn on discoverability
@@ -285,7 +286,7 @@ function createSkills(msg, callback) {
 // display skills
 function displaySkills(skillArr, callback) {
   if (!skillArr.length) return callback({ "text": "You don't have any skills to display.  To add skills, use `/teambot skills skill1, skill2, ...` (i.e. `/teambot skills Node.js, Python`)" });
-  console.log(skillArr);
+
   format.formatSkills(skillArr, obj => callback(obj));
 }
 
