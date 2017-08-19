@@ -67,7 +67,7 @@ function welcome(body, callback) {
         else return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
       });
     }
-    else return sendMsgToChannel(BOT_CHANNEL_NAME, userName);
+    else return sendMsgToChannel(userId, BOT_CHANNEL_NAME, userName);
   });
 }
 
@@ -77,8 +77,8 @@ function welcomeUserToChannel(userId, channel, callback) {
 
   if (channel === BOT_CHANNEL_ID)
     getFirstName(userId, (success, res) => {
-      if (success) return sendMsgToChannel(BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/teambot` or `/teambot start` to begin searching for a team or `/teambot help` for a list of commands!");
-      else return sendMsgToChannel(BOT_CHANNEL_NAME, res);
+      if (success) return sendMsgToChannel(userId, BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/teambot` or `/teambot start` to begin searching for a team or `/teambot help` for a list of commands!");
+      else return sendMsgToChannel(userId, BOT_CHANNEL_NAME, res);
     });
 }
 
@@ -357,7 +357,10 @@ function updateLastMsg(userId, newTs, newURL, callback) {
 // Get channel id of channel
 function getChannelId(channelName, callback) {
   SLACK.api("channels.list", (err, response) => {
-    if (!response.ok) return format.displayErrorMsg(`Failed to retrieve list of channels from Slack API.\nError: ${response.error}`, msg => sendMsgToChannel(BOT_CHANNEL_NAME, msg));
+    if (!response.ok) {
+      console.error(`Failed to retrieve list of channels from Slack API.\nError: ${response.error}`);
+      callback(null);
+    }
 
     for (var i = 0; i < response.channels.length; i++) {
       if (response.channels[i].name === channelName) return callback(response.channels[i].id);
@@ -375,11 +378,11 @@ function sendMsgToUrl(msg, url = webhookUri) {
 }
 
 // send message to channel
-function sendMsgToChannel(channel, msg) {
-  SLACK.api("chat.postMessage", {
+function sendMsgToChannel(userId, channel, msg) {
+  SLACK.api("chat.postEphemeral", {
     "text": msg,
     "channel": `#${channel}`,
-    "username": BOT_NAME
+    "user": userId
   }, (err, response) => {
     if (!response.ok) console.error(`Failed to send message to #${channel}.\nError: ${response.error}`);
   });
