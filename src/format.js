@@ -168,6 +168,23 @@ function formatInfo(data, callback) { //TODO
 function displayButtons(data, callback) {
   var actions = [];
 
+  var action_userType = {
+    "name": "user_type",
+    "text": "",
+    "type": "button",
+    "value": ""
+  };
+
+  // Switch user type
+  if(data.user_type === "team") {
+    action_userType["text"] = "Find members instead";
+    action_userType["value"] = "member";
+  } else if (data.user_type === "member") {
+    action_userType["text"] = "Find a team instead";
+    action_userType["value"] = "team";
+  }
+  actions.push(action_userType);
+
   // Set roles
   if (!data.roles) {
     actions.push({
@@ -183,46 +200,45 @@ function displayButtons(data, callback) {
       "type": "button",
       "value": "roles"
     });
+    // Toggle visibility
+    if (!data.visible)
+      actions.push({  // TODO: replace with search button
+        "name": "discover",
+        "text": "Discover me!",
+        "type": "button",
+        "value": (data.user_type === "team") ? "team" : "member"
+      });
+    else
+      actions.push({
+        "name": "undiscover",
+        "text": "Hide me!",
+        "type": "button",
+        "value": (data.user_type === "team") ? "team" : "member"
+      });
   }
-  // Toggle visibility
-  else if (!data.visible)
-    actions.push({
-      "name": "discover",
-      "text": "Discover me!",
-      "type": "button",
-      "value": (data.user_type === "team") ? "team" : "member"
-    });
-  else {
-    actions.push({
-      "name": "undiscover",
-      "text": "Hide me!",
-      "type": "button",
-      "value": (data.user_type === "team") ? "team" : "member"
-    });
-    var action_userType = {
-      "name": "user_type",
-      "text": "",
-      "type": "button",
-      "value": ""
-    };
 
-    // Switch user type
-    if(data.user_type === "team") {
-      action_userType["text"] = "Find members instead";
-      action_userType["value"] = "member";
-    } else if (data.user_type === "member") {
-      action_userType["text"] = "Find a team instead";
-      action_userType["value"] = "team";
-    }
-    actions.push(action_userType);
-  }
+  // Set skills
+  if (data.skills) {
+    actions.push({
+      "name": "skills",
+      "text": "Change skills",
+      "type": "button",
+      "value": "change"
+    });
+
 
   // Remove User
   actions.push({
     "name": "remove",
     "text": "Remove me",
     "type": "button",
-    "value": "remove"
+    "value": "remove",
+    "confirm": {
+      "title": "Are you sure?",
+      "text": `If you click "Yes", your preferences and information stored will be deleted!`,
+      "ok_text": "Yes",
+      "dismiss_text": "No"
+    }
   });
 
   callback({

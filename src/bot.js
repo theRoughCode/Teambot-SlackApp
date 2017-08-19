@@ -115,12 +115,15 @@ function parseIMsg(msg, callback) {
   } else if (callbackID === 'skills' || callbackID === 'skillsLvl') {
     callback(null);
 
+    // change existing skills
     if (callbackID === 'skills') {
       const value = (actions[0].selected_options) ? actions[0].selected_options[0].value : actions[0].value;
 
       updateSkillLevels(msg, actions[0].name, value, displaySkills);
 
-    } else updateSkillLevels(msg, actions[0].name, actions[0].value, displaySkillChoice);
+    }
+    // set new skills
+    else updateSkillLevels(msg, actions[0].name, actions[0].value, displaySkillChoice);
 
   } else if (callbackID === 'discover') { // turn on discoverability
     if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
@@ -143,6 +146,9 @@ function parseIMsg(msg, callback) {
     // set roles
     else if (actions[0].name === "roles") {
       setRoles(msg, null, callback);
+    }
+    else if (actions[0].name === "skills") {
+      updateSkillLevels(msg, null, null, displaySkills);
     }
     // turn on visibility
     else if (actions[0].name === "discover") {
@@ -743,16 +749,17 @@ function updateSkillLevels(msg, skill, level, callback) {
   db.getSkills(userId, (res, skills) => {
     if (!res) return console.error(`Could not retrieve skills for ${userId}: Database error`);
 
-    for (var i = skills.length - 1; i >= 0; i--) {
-      if(skills[i].skill === skill) {
-        if (level === "-1") skills.splice(i, 1);  // remove skill
-        else skills[i]["level"] = level;
+    if (!skill) return callback(skills, msg => sendMsgToUrl(msg, responseUrl));
+    else {
+      for (var i = skills.length - 1; i >= 0; i--) {
+        if(skills[i].skill === skill) {
+          if (level === "-1") skills.splice(i, 1);  // remove skill
+          else skills[i]["level"] = level;
 
-        db.updateSkills(userId, skills, success => {
-          return callback(skills, msg => sendMsgToUrl(msg, responseUrl));
-
-          // TODO
-        });
+          db.updateSkills(userId, skills, success => {
+            return callback(skills, msg => sendMsgToUrl(msg, responseUrl));
+          });
+        }
       }
     }
   })
