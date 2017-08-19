@@ -81,7 +81,9 @@ function welcomeUserToChannel(userId, channel, callback) {
 
 // parse commands
 function parseCommands(msg, callback) {
-  const text = msg.text.toLowerCase().split(" ");
+  var text = msg.text.toLowerCase().split(" ");
+  console.log(text);
+  console.log(text.shift());
 
   // welcome message or display personal info
   if (!(text[0].replace(" ","").length) || text[0] === "start") welcome(msg, callback);
