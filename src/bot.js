@@ -943,6 +943,8 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 function addInfo(userId, responseUrl, info, callback) {
   callback(null);
 
+  console.log(info);
+
   db.updateInfo(userId, info, success => {
     if(!success) return format.displayErrorMsg(`Failed to update additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
     else return sendMsgToUrl(":thumbsup: Your description has been updated!");
