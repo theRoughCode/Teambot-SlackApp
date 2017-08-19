@@ -111,7 +111,7 @@ function parseIMsg(msg, callback) {
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
   } else if (callbackID === 'roles') {
-    setRoles(msg, actions[0].value, callback);
+    setRoles(msg, actions[0].value, (actions[0].name === "add"), callback);
   } else if (callbackID === 'skills' || callbackID === 'skillsLvl') {
     callback(null);
 
@@ -145,7 +145,7 @@ function parseIMsg(msg, callback) {
     }
     // set roles
     else if (actions[0].name === "roles") {
-      setRoles(msg, null, callback);
+      setRoles(msg, null, true, callback);
     }
     else if (actions[0].name === "skills") {
       updateSkillLevels(msg, null, null, displaySkills);
@@ -461,21 +461,30 @@ function selectRoles(roles, callback, defaultButton = null) {
   async.map(ROLES, (role, next) => {
     if (roles.includes(role.role))
       return next(null, {
-        "text": `:white_check_mark: Added ${role.role} to your roles!`,
+        "text": `${role.emote} ${role.role}  :white_check_mark:`,
         "fallback": "The features of this app are not supported by your device",
-        "color": "#3AA3E3",
-        "attachment_type": "default"
+        "callback_id": "roles",
+        "color": format.COLOUR,
+        "attachment_type": "default",
+        "actions": [
+          {
+            "name": "remove",
+            "text": "Remove role",
+            "type": "button",
+            "value": `${role.role}`
+          }
+        ]
       });
     else
       return next(null, {
         "text": `${role.emote} ${role.role}`,
         "fallback": "The features of this app are not supported by your device",
         "callback_id": "roles",
-        "color": "#3AA3E3",
+        "color": format.COLOUR,
         "attachment_type": "default",
         "actions": [
           {
-            "name": "roles",
+            "name": "add",
             "text": "Add to roles",
             "type": "button",
             "value": `${role.role}`
@@ -603,7 +612,7 @@ function editUserType(msg, type, callback) {
   });
 }
 
-function setRoles(msg, role, callback) {
+function setRoles(msg, role, add, callback) {
   const responseUrl = msg.response_url;
 
   callback(null);
@@ -625,7 +634,13 @@ function setRoles(msg, role, callback) {
 
     } else {
       if (!roles) roles = [];
-      if(role) roles.push(role);  // add role to list
+      if(role) {
+        if (add) roles.push(role);  // add role to list
+        else {
+          var index = roles.indexOf(role);
+          if (index > -1) roles.splice(index, 1);  // remove role from list
+        }
+      }
 
       selectRoles(roles, attachments => {
         db.updateRoles(msg.user.id, roles, success => {
