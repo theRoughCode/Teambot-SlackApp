@@ -106,7 +106,7 @@ function getField(userId, field, callback) {
     if (snapshot.val())
       callback(true, snapshot.val());
     else
-      callback(true, []);
+      callback(true, null);
   }, error => {
     console.error(error);
     callback(false, null);

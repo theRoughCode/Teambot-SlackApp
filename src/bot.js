@@ -238,7 +238,7 @@ function createSkills(msg, callback) {
   if (!text) return db.getSkills(msg.user_id, (success, skillArr) => {
     callback(null);
 
-    if (!success) skillArr = [];
+    if (!skills) skillArr = [];
     displaySkills(skillArr, msg => sendMsgToUrl(msg, responseUrl));
   });
 
@@ -268,7 +268,7 @@ function createSkills(msg, callback) {
 
     // add new skills to old skills, if not, set old skill level to null
     db.getSkills(msg.user_id, (success, skillArr) => {
-      if (!success) skillArr = [];
+      if (!skills) skillArr = [];
       async.forEachOf(skills, (skill, index, next) => {
         if (index === skills.indexOf(skill)) {
           if (!skillArr.length) {
@@ -333,7 +333,7 @@ function deleteLastMsg(userId, newTs, newChannelId, callback) {
   db.getLastMsg(userId, (success, res) => {
     console.log(success);
     console.log(res);
-    if (success) {
+    if (res) {
       SLACK.api("chat.update", {
         "channel": res.channel_id,
         "ts": res.ts
@@ -787,6 +787,8 @@ function updateSkillLevels(msg, skill, level, callback) {
 
   db.getSkills(userId, (res, skills) => {
     if (!res) return console.error(`Could not retrieve skills for ${userId}: Database error`);
+
+    if(!skills) skills = [];
 
     if (!skill) return callback(skills, msg => sendMsgToUrl(msg, responseUrl));
     else {
