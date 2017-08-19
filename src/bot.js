@@ -365,11 +365,17 @@ function getChannelId(channelName, callback) {
 }
 
 // send message to webhook
-function sendMsgToUrl(msg, url = webhookUri) {
+function sendMsgToUrl(msg, url) {
   var slack = new Slack();
-  slack.setWebhook(url);
 
-  slack.webhook(msg, function(err, response) {});
+  if (!url) {
+    url = webhookUri;
+    slack.setWebhook(url);
+    format.displayErrorMsg({ "text": `Could not sent "${msg}": URL undefined.` }, msg => slack.webhook(msg, function(err, response) {}));
+  } else {
+    slack.setWebhook(url);
+    slack.webhook(msg, function(err, response) {});
+  }
 }
 
 // send message to channel
@@ -709,9 +715,8 @@ function search(userId, responseUrl, callback) {
   callback(null);
 
   db.getUserInfo(userId, (res, userData) => {
-    console.log(userData);
     if (!res) return format.displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
-    else if (!userData.user_type || !userData.roles) return sendMsgToUrl("We don't have enough information on you to perform a search!  Use `/teambot start` instead!");
+    else if (!userData.user_type || !userData.roles) return sendMsgToUrl("We don't have enough information on you to perform a search!  Use `/teambot start` instead!", responseUrl);
     else findMatch(userData, msg => sendMsgToUrl(msg, responseUrl));
   });
 }
