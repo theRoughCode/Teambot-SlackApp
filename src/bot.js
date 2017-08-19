@@ -340,7 +340,7 @@ function updateLastMsg(userId, newTs, newURL, callback) {
         if (newTs) return db.updateLastMsg(userId, newTs, newURL, callback);
       }
       else sendMsgToUrl({ "text": "This message has timed out.  To start a new conversation, use `/teambot`"});
-    } else if (newTes) db.updateLastMsg(userId, newTs, newURL, callback);
+    } else if (newTs) db.updateLastMsg(userId, newTs, newURL, callback);
   });
 }
 
