@@ -52,8 +52,6 @@ function welcome(body, callback) {
   const responseUrl = body.response_url;
   callback(null);
 
-  console.log(body);
-
   getFirstName(userId, (success, userName) => {
     if (success) {
       db.hasUser(userId, (res, data) => {
@@ -107,6 +105,11 @@ function parseIMsg(msg, callback) {
   msg = JSON.parse(msg.payload);
   const callbackID = msg.callback_id;
   const actions = msg.actions;
+
+  // delete previous unfinished message to prevent altering info
+  deleteLastMsg(msg.user.id, msg.message_ts, msg.channel.id, success => {
+    if (!success) console.error(`ERROR: Failed to delete last message for ${msg.user.id}`);
+  })
 
   if (callbackID === 'user_type') {
     setUserType(msg, actions[0].value, callback);
