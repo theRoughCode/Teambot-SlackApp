@@ -341,7 +341,7 @@ function updateLastMsg(userId, newTs, newURL, callback) {
       // delete last msg
       if (newTs === res.ts) return callback(true);
       else if (!newTs || newTs > res.ts) {
-        sendMsgToUrl({ "text": "" }, res.response_url);
+        sendMsgToUrl({ "text": ":smile:" }, res.response_url);
         if (newTs) db.updateLastMsg(userId, newTs, newURL, () => {});
         return callback(true);
       }
