@@ -375,7 +375,7 @@ function displaySkillChoice(skills, callback) {
 
   const skillArr = [];
   // if array of objects
-  if (skills.length && (typeof skills[0] === 'string' || skills[0] instanceof String)) {
+  if (skills.length && typeof skills[0] !== 'string') {
     async.forEachOf(skills, (value, index, next) => {
       if (!value.level) skillArr.push(value.skill);
       next();
