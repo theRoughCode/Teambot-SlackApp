@@ -109,6 +109,8 @@ function parseIMsg(msg, callback) {
   const callbackID = msg.callback_id;
   const actions = msg.actions;
 
+  console.log(msg.message_ts);
+
   // delete previous unfinished message to prevent altering info
   updateLastMsg(msg.user.id, msg.message_ts, msg.channel.id, () => {})
 
