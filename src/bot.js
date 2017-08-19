@@ -246,6 +246,7 @@ function createSkills(msg, callback) {
   displaySkillChoice(skills, res => {
     sendMsgToUrl(res, responseUrl);
 
+    // add new skills to old skills, if not, set old skill level to null
     db.getSkills(msg.user_id, (success, skillArr) => {
       if (!success) skillArr = [];
       async.forEachOf(skills, (skill, index, next) => {
@@ -340,6 +341,7 @@ function sendMsgToChannel(channel, msg) {
 
 // display skills
 function displaySkillChoice(skills, callback) {
+  console.log(skills);
   var helper = function(skills) {
     if(!skills.length) return callback({
       text: ":thumbsup: Excellent! Your skill levels are all set!"
@@ -371,13 +373,14 @@ function displaySkillChoice(skills, callback) {
     });
   }
 
+  const skillArr = [];
   // if array of objects
   if (skills.length && (typeof skills[0] === 'string' || skills[0] instanceof String)) {
-    const skillArr = [];
     async.forEachOf(skills, (value, index, next) => {
       if (!value.level) skillArr.push(value.skill);
       next();
     }, err => {
+      console.log(skillArr);
       if (err) return format.displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => callback({ "text": msg }));
       else helper(skillArr);
     });
