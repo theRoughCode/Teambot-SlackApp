@@ -126,7 +126,7 @@ function parseIMsg(msg, callback) {
 
       } else if (callbackID === 'discover') { // turn on discoverability
         if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
-        else callback("All the best team-hunting! :smile:");
+        else callback("All the best team-hunting! :smile:\nUse `/teambot search` to begin your search again!");
       } else if (callbackID === "request") {  // contact user
         notifyMatchedUser(msg.user.id, actions[0].value, actions[0].name, msg.response_url, callback);
       } else if (callbackID === "respond") {
@@ -150,11 +150,11 @@ function parseIMsg(msg, callback) {
           callback(null);
           updateSkillLevels(msg, null, null, displaySkills);
         }
-        // turn on visibility
-        else if (actions[0].name === "discover") {
-          setDiscoverable(msg, true, actions[0].value, callback);
+        // find matches
+        else if (actions[0].name === "search") {
+          search(msg.user.id, msg.response_url, callback);
         }
-        // remove user
+        // turn off visibility
         else if (actions[0].name === "undiscover") {
           setDiscoverable(msg, false, actions[0].value, callback);
         }

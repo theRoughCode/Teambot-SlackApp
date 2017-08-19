@@ -196,11 +196,12 @@ function displayButtons(data, callback) {
   } else {
     // Toggle visibility
     if (!data.visible)
-      actions.push({  // TODO: replace with search button
-        "name": "discover",
-        "text": "Discover me!",
+      actions.push({
+        "name": "search",
+        "text": "Begin search",
+        "style": "primary",
         "type": "button",
-        "value": (data.user_type === "team") ? "team" : "member"
+        "value": "search"
       });
     else
       actions.push({
