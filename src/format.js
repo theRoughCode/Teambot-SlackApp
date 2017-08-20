@@ -120,7 +120,7 @@ function formatUser(userId, userName, roles, skills, info, callback) {
         "short": true
       },
       {
-        "title": `Additional Info`,
+        "title": `Additional Info (Limit: 200 characters)`,
         "value": formInfo,
         "short": false
       }
@@ -167,7 +167,7 @@ function formatInfo(data, callback) {
                 "short": true
             },
             {
-              "title": `Additional Info`,
+              "title": `Additional Info (Limit: 200 characters)`,
               "value": info,
               "short": false
             }
