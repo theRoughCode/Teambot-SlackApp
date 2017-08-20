@@ -619,11 +619,6 @@ function editUserType(msg, type, callback) {
 
   callback(null);
 
-  // prevents roles from writing over this msg
-  //sendMsgToChannel(userId, msg.channel.name, {
-  //  text: `:pencil: You are now looking for ${str}.`
-  //});
-
   db.updateType(userId, type, success => {
     if(success) {
       var isTeam = (type !== "team");
@@ -632,10 +627,10 @@ function editUserType(msg, type, callback) {
         if(success) {
           db.updateMember(userId, success => {
             if(success) {
-              sendMsgToUrl({
-                text: `:pencil: You are now looking for ${str}.`,
-                replace_original: true
-              }, responseUrl);
+              // prevents roles from writing over this msg
+              sendMsgToChannel(userId, msg.channel.name, {
+                text: `:pencil: You are now looking for ${str}.`
+              });
               setRoles(msg, null, true, () => {});
             } else {
               format.displayErrorMsg("Failed to update member", msg => {
