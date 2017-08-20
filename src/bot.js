@@ -372,7 +372,7 @@ function getChannelId(channelName, callback) {
 // send message to webhook
 function sendMsgToUrl(msg, url) {
   console.log(msg);
-  console.log(msg instanceof String);
+  console.log(typeof msg === "string");
   if (msg instanceof String) return console.error(`Could not sent "${msg}": Improper msg type (should be object not string).`);
   else if (!url) return console.error(`Could not sent "${msg}": URL undefined.`);
   else {
