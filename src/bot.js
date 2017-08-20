@@ -949,7 +949,7 @@ function addInfo(userId, responseUrl, info, callback) {
 
   db.updateInfo(userId, info, success => {
     if(!success) return format.displayErrorMsg(`Failed to update additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
-    else return sendMsgToUrl({ "msg": ":thumbsup: Your description has been updated!" }, responseUrl);
+    else return sendMsgToUrl({ "text": ":thumbsup: Your description has been updated!" }, responseUrl);
   })
 }
 
