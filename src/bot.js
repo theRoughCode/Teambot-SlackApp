@@ -838,7 +838,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
       if(success) {
         var text = (category === "team") ? "your skills" : "the skills you're looking for"
         callback({
-          "text": ":clap: Yay!  You are now discoverable to others and will be notified if they would like to team up!\n*Next Steps*\n - `/teambot skills`: List down " + `${text}` + " (e.g. `/teambot skills Node.js, Python, Java`)\n - `/teambot info`: Personalize your description with additional information, such as _project ideas_, _passions_, and _portfolio links_!  (e.g. `/teambot info I Love Hack the North!`)"
+          "text": ":clap: Yay!  You are now discoverable to others and will be notified if they would like to team up!\n*Next Steps*\n - `/teambot skills`: List down " + `${text}` + " (e.g. `/teambot skills Node.js, Python, Java`)\n - `/teambot info`: Personalize your description with additional information, such as _project ideas_, _passions_, and _portfolio links_!  (e.g. `/teambot info I Love Hack the North!`)  *Limit: 200 characters*"
         });
       }
       else {
@@ -948,7 +948,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 
 // Add additional info
 function addInfo(userId, responseUrl, info, callback) {
-  if(!info.length) return callback({ "text": "Incorrect command!  Please fill in the additional information you want to display!  (i.e. `/teambot info I Love Hack the North!`)"});
+  if(!info.length) return callback({ "text": "Incorrect command!  Please fill in the additional information you want to display!  (i.e. `/teambot info I Love Hack the North!`)  *Limit: 200 characters*" });
   callback(null);
 
   db.updateInfo(userId, info, success => {

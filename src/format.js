@@ -10,7 +10,7 @@ function displayErrorMsg(errorMsg, callback) {
 
 // list commands
 function helpMsg(callback) {
-  callback({ text: "List of commands:\n  `/teambot` or `/teambot start` to edit your team profile!\n  `/teambot info` to update your description and let others know more about you and what you want to work on!\n `/teambot list (members/teams)` to display the list of discoverable users\n  `/teambot remove` to remove your information from the database" });
+  callback({ text: "List of commands:\n  `/teambot` or `/teambot start` to edit your team profile!\n  `/teambot info` to update your description and let others know more about you and what you want to work on (*Limit: 200 characters*)!\n `/teambot list (members/teams)` to display the list of discoverable users\n  `/teambot remove` to remove your information from the database" });
 }
 
 // Welcome new users
