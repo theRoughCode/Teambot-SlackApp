@@ -297,7 +297,9 @@ function createSkills(msg, callback) {
           }
         }
       }, err => {
-        if (err) return format.displayErrorMsg(err, msg => sendMsgToUrl({ text: msg }, skillArrponseUrl));
+        console.log(skillArr);
+        if (err) return format.displayErrorMsg(err, msg => sendMsgToUrl({ text: msg }, responseUrl));
+
 
         db.updateSkills(msg.user_id, skillArr, success => {
           if (!success) format.displayErrorMsg(`Failed to update skills for ${msg.user_id}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
