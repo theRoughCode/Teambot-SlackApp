@@ -794,7 +794,7 @@ function findMatch(userData, callback) {
         if (err || !matches.length) return callback(noMatchMsg);
         else match.sortMatches(matches, sorted => {
           return format.formatMatches(matches, type, formatted => callback({
-           "text": `:tada: We found some matches! :tada:\nHere they are:`,
+           "text": `:tada: We found some matches! :tada:\nHere they are, starting with your best match:`,
            attachments: formatted
          }));
         });
