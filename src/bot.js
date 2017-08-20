@@ -835,7 +835,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
     db.updateVisibility(msg.user.id, true, success => {
       if(success) {
         var text = (category === "team") ? "all relevant skills" : "the skills you're looking for"
-        callback(`:clap: Yay!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can list down ${text} (i.e. languages/frameworks/tools) using the ` + "`/teambot skills` command!\ne.g. `/teambot skills Node.js, Python, Java`");
+        callback(`:clap: Yay!  You are now discoverable to others and will be notified if they would like to team up!\nTo allow others to have more information, you can:\n - list down ${text} (i.e. languages/frameworks/tools) using the ` + "`/teambot skills` command!\ne.g. `/teambot skills Node.js, Python, Java`\n - personalize your description to add additional information (i.e. Project ideas, passions, portfolio links) with `/teambot info`");
       }
       else {
         return format.displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
