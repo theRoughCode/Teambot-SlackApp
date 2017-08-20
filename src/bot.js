@@ -624,7 +624,8 @@ function editUserType(msg, type, callback) {
       db.updateTeam(userId, success => {
         if(success) {
           callback(null);
-          sendMsgToChannel(userId, msg.channel.id, {
+          // prevents roles from writing over this msg
+          sendMsgToChannel(userId, msg.channel.name, {
             text: `:pencil: You are now looking for ${str}.`
           });
           setRoles(msg, null, true, () => {});
