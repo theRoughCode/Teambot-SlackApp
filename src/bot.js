@@ -486,7 +486,7 @@ function convertToUserID(userName, callback){
   SLACK.api("users.list", function(err, response) {
     if (!response.ok) displayErrorMsg(`Failed to convert username of ${userName} to id: Database error\nError:${response.error}`, msg => callback(false, { text: msg }));
     for (var i = 0; i < response.members.length; i++) {
-      if(response.members[i].id === userId || response.members[i].name === userId){
+      if(response.members[i].id === userName || response.members[i].name === userName){
         return callback(true, response.members[i].id);
       }
       if (i === response.members.length - 1) displayErrorMsg("Failed to convert username to id: User could not be found", msg => callback(false, { text: msg }));
