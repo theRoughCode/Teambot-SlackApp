@@ -241,6 +241,13 @@ function displayButtons(data, callback) {
       "value": "change"
     });
 
+  // Remove Additional Info
+  if(data.info) actions.push({
+    "name": "info",
+    "text": "Remove additional info",
+    "type": "button",
+    "value": "info"
+  });
 
   // Remove User
   actions.push({

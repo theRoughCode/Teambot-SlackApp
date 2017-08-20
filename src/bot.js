@@ -163,6 +163,10 @@ function parseIMsg(msg, callback) {
         else if (actions[0].name === "undiscover") {
           setDiscoverable(msg, false, actions[0].value, callback);
         }
+        // remove additional info
+        else if (actions[0].name === "info") {
+          removeInfo(msg.user.id, callback);
+        }
         // reset user info
         else if (actions[0].name === "remove") {
           removeUser(msg.user.id, msg.response_url, callback);
@@ -956,6 +960,16 @@ function addInfo(userId, responseUrl, info, callback) {
     if(!success) return format.displayErrorMsg(`Failed to update additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
     else return sendMsgToUrl({ "text": ":thumbsup: Your description has been updated!" }, responseUrl);
   })
+}
+
+// Remove additional info
+function removeInfo(userId, callback) {
+  callback(null);
+
+  db.updateInfo(userId, null, success => {
+    if(!success) return format.displayErrorMsg(`Failed to delete additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    else return sendMsgToUrl({ "text": ":thumbsup: Your description has been removed!" }, responseUrl);
+  });
 }
 
 /*
