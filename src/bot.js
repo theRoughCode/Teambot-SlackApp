@@ -948,7 +948,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 
 // Add additional info
 function addInfo(userId, responseUrl, info, callback) {
-  if(!info.length) return callback({ "text": "Incorrect command!  Please fill in the additional information you want to display!  (i.e. `/teambot info I Love Hack the North!`)  *Limit: 200 characters*" });
+  if(!info.length) return callback({ "text": "Incorrect command!  Please fill in the additional information you want to display!  (i.e. `/teambot info I Love Hack the North!` )  *Limit: 200 characters*" });
   callback(null);
 
   db.updateInfo(userId, info, success => {
