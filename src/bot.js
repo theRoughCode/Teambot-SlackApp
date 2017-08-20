@@ -397,13 +397,13 @@ function sendMsgToUrl(msg, url) {
 }
 
 // send message to channel
-function sendMsgToChannel(userId, channel, msg) {
+function sendMsgToChannel(userId, channelName, msg) {
   SLACK.api("chat.postEphemeral", {
     "text": msg,
-    "channel": `#${channel}`,
+    "channel": `#${channelName}`,
     "user": userId
   }, (err, response) => {
-    if (!response.ok) console.error(`Failed to send message to #${channel}.\nError: ${response.error}`);
+    if (!response.ok) console.error(`Failed to send message to #${channelName}.\nError: ${response.error}`);
   });
 }
 
@@ -631,7 +631,7 @@ function editUserType(msg, type, callback) {
               sendMsgToChannel(userId, msg.channel.name, {
                 text: `:pencil: You are now looking for ${str}.`
               });
-              setRoles(msg, null, true, () => {});
+              //setRoles(msg, null, true, () => {});
             } else {
               format.displayErrorMsg("Failed to update member", msg => {
                 return sendMsgToUrl({
