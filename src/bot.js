@@ -172,7 +172,8 @@ function parseIMsg(msg, callback) {
                 "text": " - `/teambot info remove` : remove your additional info\n - `/teambot info` : change your additional info (i.e. `/teambot info I Love Hack the North!` )  *Limit: 200 characters*",
                 "fallback": "The features of this app are not supported by your device",
                 "color": format.COLOUR,
-                "attachment_type": "default"
+                "attachment_type": "default",
+                "mrkdwn_in": ["text"]
               }
             ]
           });
