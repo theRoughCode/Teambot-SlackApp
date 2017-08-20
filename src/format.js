@@ -10,7 +10,7 @@ function helpMsg(callback) {
         "title": "List of commands:",
         "text": " - `/teambot` or `/teambot start` to view your team formation dashboard and edit your team profile!\n - `/teambot info` to update your description and let others know more about you and what you want to work on! (*Limit: 200 characters*)\n - `/teambot list (members/teams)` to display the list of discoverable users\n - `/teambot remove` to remove your information from the database",
         "fallback": "The features of this app are not supported by your device",
-        "color": format.COLOUR,
+        "color": COLOUR,
         "attachment_type": "default",
         "mrkdwn_in": ["text"]
       }
