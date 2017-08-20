@@ -371,6 +371,8 @@ function getChannelId(channelName, callback) {
 
 // send message to webhook
 function sendMsgToUrl(msg, url) {
+  console.log(msg);
+  console.log(msg instanceof String);
   if (msg instanceof String) return console.error(`Could not sent "${msg}": Improper msg type (should be object not string).`);
   else if (!url) return console.error(`Could not sent "${msg}": URL undefined.`);
   else {
@@ -944,7 +946,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 
 // Add additional info
 function addInfo(userId, responseUrl, info, callback) {
-  if(!info.length) callback({ "text": "Incorrect command!  Please fill in the additional information you want to display!  (i.e. `/teambot info I Love Hack the North!`)"});
+  if(!info.length) return callback({ "text": "Incorrect command!  Please fill in the additional information you want to display!  (i.e. `/teambot info I Love Hack the North!`)"});
   callback(null);
 
   db.updateInfo(userId, info, success => {
