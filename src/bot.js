@@ -865,6 +865,11 @@ function setDiscoverable(msg, discoverable, category, callback) {
             }
           ]
         });
+
+        // delete last msg records
+        db.updateLastMsg(msg.user.id, null, null, success => {
+          if (!success) console.error(`Could not delete last msg for ${msg.user.id}`);
+        });
       }
       else {
         return format.displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
