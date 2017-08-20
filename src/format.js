@@ -334,7 +334,6 @@ function formatSkills(skillArr, callback) {
 module.exports = {
   COLOUR,
   MAX_SKILL_LVL,
-  displayErrorMsg,
   helpMsg,
   welcomeNewUser,
   formatMatches,
