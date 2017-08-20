@@ -2,12 +2,6 @@ const async = require('async');
 const COLOUR = "#3AA3E3";
 const MAX_SKILL_LVL = 4;
 
-// display error message
-function displayErrorMsg(errorMsg, callback) {
-  callback("Oops, something went wrong! :thinking_face:\nPlease contact an organizer! :telephone_receiver:");
-  console.error(`ERROR: ${errorMsg}`);
-}
-
 // list commands
 function helpMsg(callback) {
   callback({ text: "List of commands:\n  `/teambot` or `/teambot start` to edit your team profile!\n  `/teambot info` to update your description and let others know more about you and what you want to work on! (*Limit: 200 characters*)\n `/teambot list (members/teams)` to display the list of discoverable users\n  `/teambot remove` to remove your information from the database" });

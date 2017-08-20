@@ -11,11 +11,18 @@ const SLACK = new Slack(token);
 
 const BOT_CHANNEL_NAME = "bots";
 const BOT_NAME = "Teambot";
-var BOT_CHANNEL_ID;
+const RAPH_NAME = "raphael";
+var BOT_CHANNEL_ID, RAPH_ID;
 
 // get bot channel id (can be null if not found)
 getChannelId(BOT_CHANNEL_NAME, id => {
   BOT_CHANNEL_ID = id;
+  if (!id) console.error(`#${BOT_CHANNEL_NAME} is not a valid channel name`);
+});
+
+// get raph dm id
+getChannelId(RAPH_NAME, id => {
+  RAPH_ID = id;
   if (!id) console.error(`#${BOT_CHANNEL_NAME} is not a valid channel name`);
 });
 
@@ -198,7 +205,7 @@ function parseEvent(msg, callback) {
 // Lists teams or members
 function list(type, responseUrl, callback) {
   var output = function (type, res, data) {
-    if(!res) return format.displayErrorMsg(`Could not retrieve list of ${type}s`, msg => callback({ text: msg }));
+    if(!res) return displayErrorMsg(`Could not retrieve list of ${type}s`, msg => callback({ text: msg }));
     else if (!data) return callback(`No ${type}s found. :disappointed:`);
 
     const attachments = [];
@@ -213,12 +220,12 @@ function list(type, responseUrl, callback) {
           if(userName) format.formatUser(userId, userName, info.roles, info.skills, info.info, obj => attachments.push(obj));
           innerCallback();
         } else {
-          return format.displayErrorMsg(`Could not get ${userId}'s info`, msg => sendMsgToUrl({ text: msg }, responseUrl));
+          return displayErrorMsg(`Could not get ${userId}'s info`, msg => sendMsgToUrl({ text: msg }, responseUrl));
         }
       });
     }, function (err) {
       if (err) {
-        return format.displayErrorMsg(`Could not get list of ${type}s.\n${err.message}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
+        return displayErrorMsg(`Could not get list of ${type}s.\n${err.message}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
       } else {
         return sendMsgToUrl({
          "text": `List of ${type}s:`,
@@ -245,7 +252,7 @@ function display(userId, responseUrl, callback) {
       // format display
       format.formatInfo(info, attachments => sendMsgToUrl({ "attachments" : attachments }, responseUrl));
 
-    } else format.displayErrorMsg(`Could not get info of ${userId}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
+    } else displayErrorMsg(`Could not get info of ${userId}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
   })
 }
 
@@ -312,11 +319,11 @@ function createSkills(msg, callback) {
           }
         }
       }, err => {
-        if (err) return format.displayErrorMsg(err, msg => sendMsgToUrl({ text: msg }, responseUrl));
+        if (err) return displayErrorMsg(err, msg => sendMsgToUrl({ text: msg }, responseUrl));
 
 
         db.updateSkills(msg.user_id, skillArr, success => {
-          if (!success) format.displayErrorMsg(`Failed to update skills for ${msg.user_id}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
+          if (!success) displayErrorMsg(`Failed to update skills for ${msg.user_id}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
         });
       });
     });
@@ -340,7 +347,7 @@ function removeUser(userId, responseUrl, callback) {
         if (success) sendMsgToUrl({
           "text": ":thumbsup: You have successfully been removed from the database!  Type `/teambot start` to begin your search again!  Happy hacking! :robot_face:"
         }, responseUrl);
-        else format.displayErrorMsg(`Could not reset ${userId}`, msg => sendMsgToUrl({ "text": msg }));
+        else displayErrorMsg(`Could not reset ${userId}`, msg => sendMsgToUrl({ "text": msg }));
       })
     }
     else sendMsgToUrl({ "text": "You are not in our database!" }, responseUrl);
@@ -348,6 +355,22 @@ function removeUser(userId, responseUrl, callback) {
 }
 
 /* HELPERS */
+
+// display error message
+function displayErrorMsg(errorMsg, callback) {
+  callback("Oops, something went wrong! :thinking_face:\nPlease contact an organizer! :telephone_receiver:");
+  var errorMsg = `ERROR: ${errorMsg}`;
+  console.error(errorMsg);
+
+  // DM Raphael
+  SLACK.api("chat.postMessage", {
+    "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
+    "channel": RAPH_ID,
+    "username": BOT_NAME
+  }, (err, response) => {
+    if (!response.ok) return console.error(`Failed to contact Raph.\nERROR: ${response.error}`);
+  });
+}
 
 // Delete previous message and update with new one
 function updateLastMsg(userId, newTs, newURL, callback) {
@@ -447,7 +470,7 @@ function displaySkillChoice(skills, callback) {
       if (!value.level) skillArr.push(value.skill);
       next();
     }, err => {
-      if (err) return format.displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => callback({ "text": msg }));
+      if (err) return displayErrorMsg(`Could not update skills for ${userId}: Database error`, msg => callback({ "text": msg }));
       else helper(skillArr);
     });
   } else helper(skills);
@@ -457,12 +480,12 @@ function displaySkillChoice(skills, callback) {
 function convertToUserID(userName, callback){
   // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
   SLACK.api("users.list", function(err, response) {
-    if (!response.ok) format.displayErrorMsg(`Failed to convert username of ${userName} to id: Database error\nError:${response.error}`, msg => callback(false, { text: msg }));
+    if (!response.ok) displayErrorMsg(`Failed to convert username of ${userName} to id: Database error\nError:${response.error}`, msg => callback(false, { text: msg }));
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userId || response.members[i].name === userId){
         return callback(true, response.members[i].id);
       }
-      if (i === response.members.length - 1) format.displayErrorMsg("Failed to convert username to id: User could not be found", msg => callback(false, { text: msg }));
+      if (i === response.members.length - 1) displayErrorMsg("Failed to convert username to id: User could not be found", msg => callback(false, { text: msg }));
     }
   });
 }
@@ -471,12 +494,12 @@ function convertToUserID(userName, callback){
 function convertToUserName(userId, callback){
   // Send either a U123456 UserID or bob UserName and it will return the bob value all the time
   SLACK.api("users.list", function(err, response) {
-    if (!response.ok) format.displayErrorMsg(`Failed to convert id of ${userId} to username: Database error\nError: ${response.error}`, msg => callback({ text: msg }));
+    if (!response.ok) displayErrorMsg(`Failed to convert id of ${userId} to username: Database error\nError: ${response.error}`, msg => callback({ text: msg }));
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userId || response.members[i].name === userId){
         return callback(response.members[i].name);
       }
-      if (i === response.members.length) format.displayErrorMsg("Failed to convert username to id: User could not be found", msg => callback({ text: msg }));
+      if (i === response.members.length) displayErrorMsg("Failed to convert username to id: User could not be found", msg => callback({ text: msg }));
     }
   });
 }
@@ -486,7 +509,7 @@ function getFirstName(userId, callback) {
   SLACK.api("users.info", {
     "user": userId
   }, function(err, response) {
-    if (!response.ok) return format.displayErrorMsg(`Failed to get info of ${userId}: API error\nError: ${err}`, msg => callback(msg));
+    if (!response.ok) return displayErrorMsg(`Failed to get info of ${userId}: API error\nError: ${err}`, msg => callback(msg));
     else return callback(true, response.user.profile.first_name);
   });
 }
@@ -607,7 +630,7 @@ function setUserType(msg, type, callback) {
 
   addUser(userId, userName, { userType: type }, success => {
     if (!success) {
-      format.displayErrorMsg(`Failed to add ${msg.user_name}`, msg => sendMsgToUrl(msg, responseUrl));
+      displayErrorMsg(`Failed to add ${msg.user_name}`, msg => sendMsgToUrl(msg, responseUrl));
     }
   });
 }
@@ -632,7 +655,7 @@ function editUserType(msg, type, callback) {
               sendMsgToChannel(userId, msg.channel.name, `:pencil: You are now looking for ${str}.`);
               setTimeout(() => setRoles(msg, null, true, () => {}), 1500);
             } else {
-              format.displayErrorMsg("Failed to update member", msg => {
+              displayErrorMsg("Failed to update member", msg => {
                 return sendMsgToUrl({
                   text: msg,
                   replace_original: true
@@ -641,7 +664,7 @@ function editUserType(msg, type, callback) {
             }
           }, isTeam);
         } else {
-          format.displayErrorMsg("Failed to update team", msg => {
+          displayErrorMsg("Failed to update team", msg => {
             return sendMsgToUrl({
               text: msg,
               replace_original: true
@@ -651,7 +674,7 @@ function editUserType(msg, type, callback) {
       }, !isTeam);
     }
     else {
-      format.displayErrorMsg(`Failed to update user type of ${msg.user_name}`, msg => {
+      displayErrorMsg(`Failed to update user type of ${msg.user_name}`, msg => {
         return callback({
           text: msg,
           replace_original: true
@@ -667,7 +690,7 @@ function setRoles(msg, role, add, callback) {
   callback(null);
 
   db.getUserInfo(msg.user.id, (res, userData) => {
-    if (!res) return format.displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
+    if (!res) return displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
 
     var roles = userData.roles;
 
@@ -701,7 +724,7 @@ function setRoles(msg, role, add, callback) {
             }, responseUrl);
           }
           else {
-            format.displayErrorMsg(`ERROR: Could not update roles for ${msg.user.name}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
+            displayErrorMsg(`ERROR: Could not update roles for ${msg.user.name}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
           }
         });
       },
@@ -731,7 +754,7 @@ function search(userId, responseUrl, callback) {
   callback(null);
 
   db.getUserInfo(userId, (res, userData) => {
-    if (!res) return format.displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
+    if (!res) return displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
     else if (!userData.user_type || !userData.roles) return sendMsgToUrl({ "text": "We don't have enough information on you to perform a search!  Use `/teambot start` instead!" }, responseUrl);
     else findMatch(userData, msg => sendMsgToUrl(msg, responseUrl));
   });
@@ -870,16 +893,16 @@ function setDiscoverable(msg, discoverable, category, callback) {
         });
       }
       else {
-        return format.displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
+        return displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
       }
     });
     if (category === "team") { // member looking for teams
       db.updateMember(msg.user.id, success => {
-        if (!success) return format.displayErrorMsg(`Could not add ${msg.user.name} into Member database`, callback);
+        if (!success) return displayErrorMsg(`Could not add ${msg.user.name} into Member database`, callback);
       });
     } else if (category === "member") {  // team looking for members
       db.updateTeam(msg.user.id,  success => {
-        if (!success) return format.displayErrorMsg(`Could not add ${msg.user.name} into Team database`, callback);
+        if (!success) return displayErrorMsg(`Could not add ${msg.user.name} into Team database`, callback);
       });
     }
   } else {
@@ -888,7 +911,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
         callback(`:thumbsup: Other ${category}s will no longer be able to discover you!`);
       }
       else {
-        return format.displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
+        return displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
       }
     });
     db.undiscoverUser(msg.user.id, success => {
@@ -911,7 +934,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
       else callback(null);
 
       db.getUserInfo(userId, (success, info) => {
-        if (!success) return format.displayErrorMsg(`Failed to retrieve info for ${userId}`, msg => sendMsgToUrl(msg, responseUrl));
+        if (!success) return displayErrorMsg(`Failed to retrieve info for ${userId}`, msg => sendMsgToUrl(msg, responseUrl));
 
         format.formatUser(userId, info.username, info.roles, info.skills, info.info, obj => {
           const attachments = [
@@ -965,7 +988,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
             "channel": matchId,
             "username": BOT_NAME
           }, (err, response) => {
-            if (!response.ok) return format.displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+            if (!response.ok) return displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
             else return sendMsgToUrl({ "text": `Your request has been sent to ${matchName}!  *slackbot* will send you a message when ${matchName} replies! :smile:` }, responseUrl);
           });
         });
@@ -982,7 +1005,7 @@ function addInfo(userId, responseUrl, info, callback) {
   callback(null);
 
   db.updateInfo(userId, info, success => {
-    if(!success) return format.displayErrorMsg(`Failed to update additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    if(!success) return displayErrorMsg(`Failed to update additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
     else return sendMsgToUrl({ "text": ":thumbsup: Your description has been updated!" }, responseUrl);
   })
 }
@@ -992,7 +1015,7 @@ function removeInfo(userId, responseUrl, callback) {
   callback(null);
 
   db.updateInfo(userId, null, success => {
-    if(!success) return format.displayErrorMsg(`Failed to delete additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    if(!success) return displayErrorMsg(`Failed to delete additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
     else return sendMsgToUrl({ "text": ":thumbsup: Your description has been removed!" }, responseUrl);
   });
 }
@@ -1018,7 +1041,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     "channel": data.userId,
     "username": BOT_NAME
   }, (err, response) => {
-    if (!response.ok) return format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    if (!response.ok) return displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
     else sendMsgToUrl({
       "text": `${data.userName} has been notified!  All the best and happy hacking! :robot_face:`,
       "attachments": JSON.stringify([
@@ -1061,7 +1084,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     "channel": data.userId,
     "username": BOT_NAME
   }, (err, response) => {
-    if (!response.ok) format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    if (!response.ok) displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
   }), 2000);
 }
 
@@ -1083,7 +1106,7 @@ function declineTeamRequest(matchUserName, data, responseUrl, callback) {
     "channel": data.userId,
     "username": BOT_NAME
   }, (err, response) => {
-    if (!response.ok) return format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    if (!response.ok) return displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
     else return sendMsgToUrl({ "text": `You have declined ${data.userName}'s request!` }, responseUrl);
   });
 }
@@ -1093,14 +1116,14 @@ function contactUser(matchId, responseUrl, callback) {
   callback(null);
 
   getDMChannel(matchId, (err, channelId) => {
-    if (err) return format.displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    if (err) return displayErrorMsg(`Failed to find IM id\nError: ${err}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
 
     SLACK.api("chat.postMessage", {
       "text": `Congratulations on forming your team!  All the best and happy hacking! :robot_face:`,
       "channel": channelId,
       "username": BOT_NAME
     }, (err, response) => {
-      if (!response.ok) return format.displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+      if (!response.ok) return displayErrorMsg(`${matchUserName} failed to send message to ${data.userName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
       else return sendMsgToUrl({ "text": `A new conversation between the two of you has been initiated!  Go ahead, it's time to form a life-long friendship! :hugging_face:` }, responseUrl);
     });
   });
