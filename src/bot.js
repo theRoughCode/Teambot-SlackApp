@@ -623,10 +623,10 @@ function editUserType(msg, type, callback) {
       var str = !isTeam ? "a team" : "members";
       db.updateTeam(userId, success => {
         if(success) {
-          callback({
-            text: `:pencil: You are now looking for ${str}.`,
-            replace_original: true
-          });
+          callback(null);
+          sendMsgToUrl({
+            text: `:pencil: You are now looking for ${str}.`
+          }, responseUrl);
           setRoles(msg, null, true, () => {});
         } else {
           format.displayErrorMsg("Failed to update team", msg => {
