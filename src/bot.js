@@ -811,6 +811,7 @@ function updateSkillLevels(msg, skill, level, callback) {
 
   db.getSkills(userId, (res, skills) => {
     if (!res) return console.error(`Could not retrieve skills for ${userId}: Database error`);
+    console.log(skills);
 
     if(!skills) skills = [];
 
@@ -836,7 +837,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
       if(success) {
         var text = (category === "team") ? "your skills" : "the skills you're looking for"
         callback({
-          "text": ":clap: Yay!  You are now discoverable to others and will be notified if they would like to team up!\n*Next Steps*\n - `/teambot skills`: List down " + `${text}` + " (e.g. `/teambot skills Node.js, Python, Java`)\n - `/teambot info`: Personalize your description with additional information, such as _project ideas_, _passions_, _portfolio links_!  (e.g. `/teambot info I Love Hack the North!`)"
+          "text": ":clap: Yay!  You are now discoverable to others and will be notified if they would like to team up!\n*Next Steps*\n - `/teambot skills`: List down " + `${text}` + " (e.g. `/teambot skills Node.js, Python, Java`)\n - `/teambot info`: Personalize your description with additional information, such as _project ideas_, _passions_, and _portfolio links_!  (e.g. `/teambot info I Love Hack the North!`)"
         });
       }
       else {
