@@ -62,6 +62,7 @@ function welcome(body, callback) {
   const userId = body.user_id;
   const responseUrl = body.response_url;
   callback(null);
+  displayErrorMsg("test", msg => {});
 
   // delete prev message
   updateLastMsg(userId, null, null, () => {});
