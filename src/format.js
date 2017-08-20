@@ -223,13 +223,22 @@ function displayButtons(data, callback) {
         "value": "search"
       });
     // Turn off visibility
-    else
+    else {
       actions.push({
         "name": "undiscover",
         "text": "Hide me!",
         "type": "button",
         "value": (data.user_type === "team") ? "team" : "member"
       });
+      actions.push({
+        "name": "search",
+        "text": "Search again!",
+        "style": "primary",
+        "type": "button",
+        "value": "search"
+      });
+    }
+
   }
 
   // Set skills
