@@ -244,7 +244,7 @@ function displayButtons(data, callback) {
   // Remove Additional Info
   if(data.info) actions.push({
     "name": "info",
-    "text": "Remove additional info",
+    "text": "Update info",
     "type": "button",
     "value": "info"
   });

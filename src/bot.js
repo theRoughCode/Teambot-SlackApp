@@ -165,7 +165,7 @@ function parseIMsg(msg, callback) {
         }
         // remove additional info
         else if (actions[0].name === "info") {
-          removeInfo(msg.user.id, callback);
+          callback("`/teambot info remove` to remove your additional info\n `/teambot info` to change your additional info (i.e. `/teambot info I Love Hack the North!`)  *Limit: 200 characters*");
         }
         // reset user info
         else if (actions[0].name === "remove") {
@@ -954,6 +954,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 function addInfo(userId, responseUrl, info, callback) {
   if(!info.length) return callback({ "text": "Incorrect command!  Please fill in the additional information you want to display!  (i.e. `/teambot info I Love Hack the North!` )  *Limit: 200 characters*" });
   else if (info.length > 200) return callback({ "text": "Exceeded 200 character limit!  Please try again!" });
+  else if (info.toLowerCase() === "remove") return removeInfo(userId, responseUrl, callback);
   callback(null);
 
   db.updateInfo(userId, info, success => {
@@ -963,7 +964,7 @@ function addInfo(userId, responseUrl, info, callback) {
 }
 
 // Remove additional info
-function removeInfo(userId, callback) {
+function removeInfo(userId, responseUrl, callback) {
   callback(null);
 
   db.updateInfo(userId, null, success => {
