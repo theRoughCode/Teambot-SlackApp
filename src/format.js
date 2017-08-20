@@ -268,7 +268,7 @@ function displayButtons(data, callback) {
 
   callback([
     {
-      "text": "Edit information:",
+      "title": "Edit information:",
       "fallback": "The features of this app are not supported by your device",
       "callback_id": "edit",
       "color": COLOUR,
@@ -276,7 +276,7 @@ function displayButtons(data, callback) {
       "actions": actions1
     },
     {
-      "text": "Other actions:",
+      "title": "Other actions:",
       "fallback": "The features of this app are not supported by your device",
       "callback_id": "edit",
       "color": COLOUR,
