@@ -624,9 +624,9 @@ function editUserType(msg, type, callback) {
       db.updateTeam(userId, success => {
         if(success) {
           callback(null);
-          sendMsgToUrl({
+          sendMsgToChannel(userId, msg.channel.id, {
             text: `:pencil: You are now looking for ${str}.`
-          }, responseUrl);
+          });
           setRoles(msg, null, true, () => {});
         } else {
           format.displayErrorMsg("Failed to update team", msg => {
