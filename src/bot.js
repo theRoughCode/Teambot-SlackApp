@@ -21,10 +21,14 @@ getChannelId(BOT_CHANNEL_NAME, id => {
 });
 
 // get raph dm id
-getChannelId(RAPH_NAME, id => {
-  RAPH_ID = id;
-  if (!id) console.error(`#${BOT_CHANNEL_NAME} is not a valid channel name`);
+convertToUserID(RAPH_NAME, (success, id) => {
+  if (!success) return console.error(`Could not find id for ${RAPH_NAME}`);
+  getDMChannel(id, (err, channelId) => {
+    if (err) return console.error(`Failed to get channel id for ${RAPH_NAME}`);
+    else RAPH_ID = id;
+  });
 });
+
 
 const ROLES = [
   {
