@@ -632,7 +632,7 @@ function editUserType(msg, type, callback) {
               /*sendMsgToChannel(userId, msg.channel.name, {
                 text: `:pencil: You are now looking for ${str}.`
               });*/
-              //setRoles(msg, null, true, () => {});
+              setRoles(msg, null, true, () => {});
             } else {
               format.displayErrorMsg("Failed to update member", msg => {
                 return sendMsgToUrl({
