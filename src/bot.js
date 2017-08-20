@@ -369,7 +369,7 @@ function displayErrorMsg(errorMsg, callback) {
 
   // DM Raphael
   SLACK.api("chat.postMessage", {
-    "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
+    "text": errorMsg,
     "channel": RAPH_ID,
     "username": BOT_NAME
   }, (err, response) => {
