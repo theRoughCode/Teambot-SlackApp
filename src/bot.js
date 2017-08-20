@@ -9,9 +9,9 @@ webhookUri = process.env.WEBHOOK;
 token = process.env.API_TOKEN;
 const SLACK = new Slack(token);
 
-const BOT_CHANNEL_NAME = "bots";
-const BOT_NAME = "Teambot";
-const RAPH_NAME = "raphael";
+const BOT_CHANNEL_NAME = process.env.BOT_CHANNEL_NAME;
+const BOT_NAME = process.env.BOT_NAME;
+const RAPH_NAME = process.env.RAPH_NAME;
 var BOT_CHANNEL_ID, RAPH_ID;
 
 // get bot channel id (can be null if not found)
