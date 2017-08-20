@@ -97,8 +97,10 @@ function parseCommands(msg, callback) {
   else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);
   // add addtional info
   else if (text[0] === "info") {
-    text.shift();
-    addInfo(msg.user_id, msg.response_url, text.join(" "), callback);
+    text = msg.text.substring(text.indexOf("info") + "info".length + 1);
+    console.log(msg.text);
+    console.log(text);
+    addInfo(msg.user_id, text, callback);
   }
   else callback("Incorrect command.  Try `/teambot help` for a list of commands");
 }
