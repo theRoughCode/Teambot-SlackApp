@@ -949,8 +949,8 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
 // Add additional info
 function addInfo(userId, responseUrl, info, callback) {
   if(!info.length) return callback({ "text": "Incorrect command!  Please fill in the additional information you want to display!  (i.e. `/teambot info I Love Hack the North!` )  *Limit: 200 characters*" });
-  callback(null);
   else if (info.length > 200) return callback({ "text": "Exceeded 200 character limit!  Please try again!" });
+  callback(null);
 
   db.updateInfo(userId, info, success => {
     if(!success) return format.displayErrorMsg(`Failed to update additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
