@@ -165,7 +165,7 @@ function parseIMsg(msg, callback) {
         }
         // remove additional info
         else if (actions[0].name === "info") {
-          callback("`/teambot info remove` to remove your additional info\n `/teambot info` to change your additional info (i.e. `/teambot info I Love Hack the North!`)  *Limit: 200 characters*");
+          callback("`/teambot info remove` to remove your additional info\n `/teambot info` to change your additional info (i.e. `/teambot info I Love Hack the North!` )  *Limit: 200 characters*");
         }
         // reset user info
         else if (actions[0].name === "remove") {
