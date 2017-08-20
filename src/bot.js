@@ -273,7 +273,7 @@ function createSkills(msg, callback) {
 
     // add new skills to old skills, if not, set old skill level to null
     db.getSkills(msg.user_id, (success, skillArr) => {
-      if (!skills) skillArr = [];
+      if (!skillArr) skillArr = [];
       async.forEachOf(skills, (skill, index, next) => {
         if (index === skills.indexOf(skill)) {
           if (!skillArr.length) {
@@ -297,7 +297,6 @@ function createSkills(msg, callback) {
           }
         }
       }, err => {
-        console.log(skillArr);
         if (err) return format.displayErrorMsg(err, msg => sendMsgToUrl({ text: msg }, responseUrl));
 
 
