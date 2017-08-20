@@ -171,7 +171,7 @@ function formatInfo(data, callback) {
               "short": false
             }
         ]
-      }, buttons
+      }, ...buttons
     ]);
   });
 }
@@ -179,7 +179,7 @@ function formatInfo(data, callback) {
 // Welcome returning user
 function displayButtons(data, callback) {
   var actions1 = [];
-  var action2 = [];
+  var actions2 = [];
 
   var action_userType = {
     "name": "user_type",
