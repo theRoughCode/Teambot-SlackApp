@@ -617,42 +617,44 @@ function editUserType(msg, type, callback) {
   const userName = msg.user.name;
   const userId = msg.user.id;
 
+  callback(null);
+
+  // prevents roles from writing over this msg
+  //sendMsgToChannel(userId, msg.channel.name, {
+  //  text: `:pencil: You are now looking for ${str}.`
+  //});
+
   db.updateType(userId, type, success => {
     if(success) {
       var isTeam = (type !== "team");
       var str = !isTeam ? "a team" : "members";
       db.updateTeam(userId, success => {
         if(success) {
-          callback(null);
-          // prevents roles from writing over this msg
-          sendMsgToChannel(userId, msg.channel.name, {
-            text: `:pencil: You are now looking for ${str}.`
-          });
-          setRoles(msg, null, true, () => {});
+          db.updateMember(userId, success => {
+            if(success) {
+              sendMsgToUrl({
+                text: `:pencil: You are now looking for ${str}.`,
+                replace_original: true
+              }, responseUrl);
+              setRoles(msg, null, true, () => {});
+            } else {
+              format.displayErrorMsg("Failed to update member", msg => {
+                return sendMsgToUrl({
+                  text: msg,
+                  replace_original: true
+                }, responseUrl);
+              });
+            }
+          }, isTeam);
         } else {
           format.displayErrorMsg("Failed to update team", msg => {
-            return callback({
+            return sendMsgToUrl({
               text: msg,
               replace_original: true
-            });
+            }, responseUrl);
           });
         }
       }, !isTeam);
-      db.updateMember(userId, success => {
-        if(success) {
-          callback({
-            text: `:pencil: You are now looking for ${str}.`,
-            replace_original: true
-          });
-        } else {
-          format.displayErrorMsg("Failed to update member", msg => {
-            return callback({
-              text: msg,
-              replace_original: true
-            });
-          });
-        }
-      }, isTeam);
     }
     else {
       format.displayErrorMsg(`Failed to update user type of ${msg.user_name}`, msg => {
