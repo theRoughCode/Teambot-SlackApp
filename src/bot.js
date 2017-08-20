@@ -628,9 +628,10 @@ function editUserType(msg, type, callback) {
           db.updateMember(userId, success => {
             if(success) {
               // prevents roles from writing over this msg
-              sendMsgToChannel(userId, msg.channel.name, {
+              sendMsgToUrl({ text: `:pencil: You are now looking for ${str}.` }, responseUrl);
+              /*sendMsgToChannel(userId, msg.channel.name, {
                 text: `:pencil: You are now looking for ${str}.`
-              });
+              });*/
               //setRoles(msg, null, true, () => {});
             } else {
               format.displayErrorMsg("Failed to update member", msg => {
