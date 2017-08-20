@@ -627,6 +627,7 @@ function editUserType(msg, type, callback) {
             text: `:pencil: You are now looking for ${str}.`,
             replace_original: true
           });
+          setRoles(msg, null, true, () => {});
         } else {
           format.displayErrorMsg("Failed to update team", msg => {
             return callback({
