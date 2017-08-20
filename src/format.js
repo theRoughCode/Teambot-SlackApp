@@ -144,6 +144,7 @@ function formatInfo(data, callback) {
         "fallback": "Required plain-text summary of the attachment.",
         "color": COLOUR,
         "pretext": "Here are your preferences!",
+        "mrkdwn_in": ["fields"],
         "fields": [
             {
                 "title": "Looking For",
