@@ -178,7 +178,8 @@ function formatInfo(data, callback) {
 
 // Welcome returning user
 function displayButtons(data, callback) {
-  var actions = [];
+  var actions1 = [];
+  var action2 = [];
 
   var action_userType = {
     "name": "user_type",
@@ -195,55 +196,38 @@ function displayButtons(data, callback) {
     action_userType["text"] = "Find a team instead";
     action_userType["value"] = "team";
   }
-  actions.push(action_userType);
+  actions1.push(action_userType);
 
   // Set roles
   if (!data.roles) {
-    actions.push({
+    actions1.push({
       "name": "roles",
       "text": "Pick roles",
       "type": "button",
       "value": "roles"
     });
   } else {
-    actions.push({
+    actions1.push({
       "name": "roles",
       "text": "Change roles",
       "type": "button",
       "value": "roles"
     });
 
-    // Begin search
-    if (!data.visible)
-      actions.push({
-        "name": "search",
-        "text": "Begin search",
-        "style": "primary",
-        "type": "button",
-        "value": "search"
-      });
     // Turn off visibility
-    else {
-      actions.push({
+    if (data.visible)
+      actions1.push({
         "name": "undiscover",
         "text": "Hide me!",
         "type": "button",
         "value": (data.user_type === "team") ? "team" : "member"
       });
-      actions.push({
-        "name": "search",
-        "text": "Search again!",
-        "style": "primary",
-        "type": "button",
-        "value": "search"
-      });
-    }
 
   }
 
   // Set skills
   if (data.skills)
-    actions.push({
+    actions1.push({
       "name": "skills",
       "text": "Change skills",
       "type": "button",
@@ -251,15 +235,24 @@ function displayButtons(data, callback) {
     });
 
   // Remove Additional Info
-  if(data.info) actions.push({
+  if(data.info) actions1.push({
     "name": "info",
     "text": "Update info",
     "type": "button",
     "value": "info"
   });
 
+  // Search for match
+  actions2.push({
+    "name": "search",
+    "text": "Begin search",
+    "style": "primary",
+    "type": "button",
+    "value": "search"
+  });
+
   // Remove User
-  actions.push({
+  actions2.push({
     "name": "remove",
     "text": "Remove me",
     "type": "button",
@@ -273,14 +266,24 @@ function displayButtons(data, callback) {
     }
   });
 
-  callback({
-    "text": "Select an action:",
-    "fallback": "The features of this app are not supported by your device",
-    "callback_id": "edit",
-    "color": COLOUR,
-    "attachment_type": "default",
-    "actions": actions
-  });
+  callback([
+    {
+      "text": "Edit information:",
+      "fallback": "The features of this app are not supported by your device",
+      "callback_id": "edit",
+      "color": COLOUR,
+      "attachment_type": "default",
+      "actions": actions1
+    },
+    {
+      "text": "Other actions:",
+      "fallback": "The features of this app are not supported by your device",
+      "callback_id": "edit",
+      "color": COLOUR,
+      "attachment_type": "default",
+      "actions": actions2
+    }
+  ]);
 }
 
 function formatSkillLvl(skill, actions, callback) {
