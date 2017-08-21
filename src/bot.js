@@ -285,12 +285,13 @@ function createSkills(msg, callback) {
   });
 
   var skills = text.split(',');
+  skills.forEach((elem, index, array) => array[index].trim());  // remove trailing whitespaces
 
   // Remove duplicates
   var tempObj = {};
   for (var i = 0; i < skills.length; i++) {
     // store index of elements (case-insensitive)
-    const skill = skills[i].toLowerCase().trim();
+    const skill = skills[i].toLowerCase();
     if (!tempObj[skill]) tempObj[skill] = [i];
     else tempObj[skill].push(i);
   }
