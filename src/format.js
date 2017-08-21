@@ -53,18 +53,19 @@ function welcomeNewUser(userName, callback) {
 function formatMatches(sortedMatches, type, callback) {
   async.map(sortedMatches, (match, next) => {
     formatUser(match.user_id, match.user_name, match.roles, match.skills, match.info, obj => {
-      var text;
-      if (match.requested) text = "Request sent! :white_check_mark:";
-      else if (type === "team") text = "Request to join";
-      else text = "Invite as member";
+      if (match.requested) {
+        obj.fields.push({ "text": "Request sent! :white_check_mark:" });
+      } else {
+        var text = (type === "team") ? "Request to join" : "Invite as member";
+        obj["callback_id"] = "request";
+        obj["actions"] = [{
+          "name": type,
+          "text": text,
+          "type": "button",
+          "value": match.user_id
+        }];
+      }
 
-      obj["callback_id"] = "request";
-      obj["actions"] = [{
-        "name": type,
-        "text": text,
-        "type": "button",
-        "value": match.user_id
-      }];
       next(null, obj);
     });
   }, (err, matches) => {
