@@ -70,7 +70,7 @@ function parseCommands(msg, callback) {
   // edit skills
   else if (text[0] === "skills") createSkills(msg, callback);
   // remove user
-  else if (text[0] === "remove") setDiscoverable(msg, false, actions[0].value, callback);
+  else if (text[0] === "remove") setDiscoverable(msg, false, null, callback);
   else if (text[0] === "reset") resetUser(msg.user_id, msg.response_url, callback);  // TODO
   // search for matches
   else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);

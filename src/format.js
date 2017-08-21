@@ -269,13 +269,13 @@ function displayButtons(data, callback) {
   // Remove User
   actions2.push({
     "name": "delete",
-    "text": "Delete data",
+    "text": "Reset profile",
     "type": "button",
     "style": "danger",
     "value": "delete",
     "confirm": {
       "title": "Are you sure?",
-      "text": `If you click "Yes", your preferences and information stored will be deleted!`,
+      "text": `If you click "Yes", your current preferences will be reset!`,
       "ok_text": "Yes",
       "dismiss_text": "No"
     }
