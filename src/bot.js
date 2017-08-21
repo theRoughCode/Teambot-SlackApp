@@ -280,7 +280,7 @@ function createSkills(msg, callback) {
   if (!text.replace(/\s/g,'').length) return db.getSkills(msg.user_id, (success, skillArr) => {
     callback(null);
 
-    if (!skills) skillArr = [];
+    if (!skillArr) skillArr = [];
     displaySkills(skillArr, msg => sendMsgToUrl(msg, responseUrl));
   });
 
@@ -888,7 +888,6 @@ function updateSkillLevels(msg, skill, level, callback) {
 
   db.getSkills(userId, (res, skills) => {
     if (!res) return console.error(`Could not retrieve skills for ${userId}: Database error`);
-    console.log(skills);
 
     if(!skills) skills = [];
 
