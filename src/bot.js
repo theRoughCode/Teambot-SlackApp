@@ -274,9 +274,10 @@ function display(userId, responseUrl, callback) {
 function createSkills(msg, callback) {
   const responseUrl = msg.response_url;
 
-  var text = msg.text.substring("skills".length).replace(/\s/g,'');
+  var text = msg.text.substring("skills".length);
 
-  if (!text) return db.getSkills(msg.user_id, (success, skillArr) => {
+  // if no text
+  if (!text.replace(/\s/g,'').length) return db.getSkills(msg.user_id, (success, skillArr) => {
     callback(null);
 
     if (!skills) skillArr = [];
@@ -1071,7 +1072,7 @@ function removeInfo(userId, responseUrl, callback) {
 }
 
 /*
-{
+data = {
   userId, userName, matchId, matchName, type
 }
 */
@@ -1084,7 +1085,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     "attachments": JSON.stringify([
       {
         "title": `Team Request Accepted`,
-        "text": `${data.matchName} has accepted your request to join ${text} team :tada:\n Go and send <@${data.matchId}|${data.matchUserName}> a direct message!`,
+        "text": `${data.matchName} has accepted your request to join ${text} team :tada:\n Go and send <@${data.matchId}|${matchUserName}> a direct message!`,
         "fallback": "The features of this app are not supported by your device",
         "color": format.COLOUR
     }]),  // convert to string in order for API to properly parse it
@@ -1196,11 +1197,7 @@ function addUser(userId, userName, { roles = [], skills = [],
 }
 
 module.exports = {
-  welcome,
   parseCommands,
   parseIMsg,
-  parseEvent,
-  list,
-  display,
-  createSkills
+  parseEvent
 }

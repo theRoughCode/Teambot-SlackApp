@@ -5,13 +5,6 @@ const bodyParser = require('body-parser');
 routes.use(bodyParser.json());  // support JSON-encoded bodies
 routes.use(bodyParser.urlencoded({ extended: true }));  // support URL-encoded bodies
 
-// send custom msg
-routes.get('/msg/:msg', function(req, res) {
-  bot.sendMsg(req.params.msg);
-  res.status(200);
-  res.send();
-});
-
 // slash commands
 routes.post('/slash', function(req, res) {
   /* token, team_id, team_domain, channel_id
