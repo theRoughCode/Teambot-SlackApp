@@ -285,10 +285,7 @@ function createSkills(msg, callback) {
   });
 
   var skills = text.split(',');
-  skills.forEach((elem, index, array) => {
-    array[index] = elem.trim();
-    console.log(array[index]);
-  });  // remove trailing whitespaces
+  skills.forEach((elem, index, array) => array[index] = elem.trim());  // remove trailing whitespaces
 
   // Remove duplicates
   var tempObj = {};
