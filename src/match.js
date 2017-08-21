@@ -1,5 +1,7 @@
 const async = require('async');
 
+const MAX_MATCHES_DISPLAYED = 1;
+
 // Gives a score on quality of match
 function rateUser(userData, matchData, callback) {
   const userRoles = userData.roles || [];
@@ -40,6 +42,7 @@ function sortMatches(matches, callback) {
 
 
 module.exports = {
+  MAX_MATCHES_DISPLAYED,
   rateUser,
   sortMatches
 }

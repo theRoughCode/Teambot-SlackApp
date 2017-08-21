@@ -812,6 +812,7 @@ function findMatch(userData, callback) {
       }, err => {
         if (err || !matches.length) return callback(noMatchMsg);
         else match.sortMatches(matches, sorted => {
+          if (sorted.length > match.MAX_MATCHES_DISPLAYED) sorted = sorted.slice(0, match.MAX_MATCHES_DISPLAYED);
           return format.formatMatches(sorted, type, formatted => callback({
            "text": `:tada: We found some matches! :tada:\nHere are your top 5 matches:`,
            attachments: formatted
