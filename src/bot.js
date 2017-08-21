@@ -569,10 +569,10 @@ function selectRoles(roles, callback) {
         ]
       });
   }, (err, results) => {
-    results.unshift(
+    results.push(
       // Default Button
       {
-        "text": ":thumbsup: That's all",
+        "text": ":thumbsup: That's all!  Begin the search!",
         "fallback": "The features of this app are not supported by your device",
         "callback_id": "roles",
         "color": "#3AA3E3",
