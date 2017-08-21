@@ -438,7 +438,7 @@ function sendMsgToChannel(userId, channelName, msg) {
 function displaySkillChoice(skills, callback) {
   var helper = function(skills) {
     if(!skills.length) return callback({
-      text: ":thumbsup: Excellent! Your skill levels are all set!"
+      text: ":thumbsup: Excellent! Your skill levels are all set!  Use `/teambot` to check out your updated profile!"
     });
 
     async.map(skills, (skill, next1) => {
