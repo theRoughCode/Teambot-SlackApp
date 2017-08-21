@@ -853,6 +853,7 @@ function findMatch(userId, userData, callback) {
 // Display Matches
 function displayMatches(userId, type, responseUrl, callback) {
   callback(null);
+  console.log(responseUrl);
 
   db.getMatches(userId, (success, matches) => {
     if (!success) return format.displayErrorMsg(`Failed to retrieve matches for ${userId}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
