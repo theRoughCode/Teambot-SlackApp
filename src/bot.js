@@ -972,7 +972,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
     var userId = msg.user_id || msg.user.id;
     db.updateVisibility(userId, false, success => {
       if(success) {
-        callback(`:thumbsup: Other ${category}s will no longer be able to discover you!  Use ` + "`/teambot` to change your preferences anytime!");
+        callback(`:thumbsup: Other hackers will no longer be able to discover you!  Use ` + "`/teambot` to change your preferences anytime!");
       }
       else {
         return displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
