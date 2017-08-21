@@ -534,7 +534,7 @@ function getDMChannel(userId, callback) {
 }
 
 // Role selection
-function selectRoles(roles, callback, defaultButton = null) {
+function selectRoles(roles, callback) {
   async.map(ROLES, (role, next) => {
     if (roles.includes(role.role))
       return next(null, {
@@ -569,7 +569,25 @@ function selectRoles(roles, callback, defaultButton = null) {
         ]
       });
   }, (err, results) => {
-    if(defaultButton) results.push(defaultButton);
+    results.unshift(
+      // Default Button
+      {
+        "text": ":thumbsup: That's all",
+        "fallback": "The features of this app are not supported by your device",
+        "callback_id": "roles",
+        "color": "#3AA3E3",
+        "attachment_type": "default",
+        "actions": [
+          {
+            "name": "done",
+            "text": "Begin search",
+            "type": "button",
+            "style": "primary",
+            "value": "done"
+          }
+        ]
+      }
+    );
     return callback(results);
   });
 }
@@ -615,21 +633,6 @@ function setUserType(msg, type, callback) {
         attachments: attachments
       });
     }
-  }, {
-    "text": ":thumbsup: That's all!",
-    "fallback": "The features of this app are not supported by your device",
-    "callback_id": "roles",
-    "color": "#3AA3E3",
-    "attachment_type": "default",
-    "actions": [
-        {
-            "name": "done",
-            "text": "Begin search",
-            "type": "button",
-            "style": "primary",
-            "value": "done"
-        }
-      ]
   });
 
   addUser(userId, userName, { userType: type }, success => {
@@ -736,23 +739,6 @@ function setRoles(msg, role, add, callback) {
             displayErrorMsg(`ERROR: Could not update roles for ${msg.user.name}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
           }
         });
-      },
-      // Default Button
-      {
-        "text": ":thumbsup: That's all",
-        "fallback": "The features of this app are not supported by your device",
-        "callback_id": "roles",
-        "color": "#3AA3E3",
-        "attachment_type": "default",
-        "actions": [
-          {
-            "name": "done",
-            "text": "Begin search",
-            "type": "button",
-            "style": "primary",
-            "value": "done"
-          }
-        ]
       });
     }
   });
