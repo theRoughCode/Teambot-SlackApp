@@ -726,7 +726,7 @@ function setRoles(msg, role, add, callback) {
 
       var text = (userData.user_type === 'team') ? "you're willing to fill on a team" : "you want to be filled on your team";
 
-      var errorText = (role === "done") ? `Please select a role that ${errorText}!` : null;
+      var errorText = (role === "done") ? `Please select a role that ${text}!` : null;
 
       selectRoles(roles, attachments => {
         db.updateRoles(msg.user.id, roles, success => {
