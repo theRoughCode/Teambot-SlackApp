@@ -212,6 +212,15 @@ function displayButtons(data, callback) {
   }
   actions1.push(action_userType);
 
+  // Search for match
+  actions2.push({
+    "name": "search",
+    "text": "Begin search",
+    "style": "primary",
+    "type": "button",
+    "value": "search"
+  });
+
   // Set roles
   if (!data.roles) {
     actions1.push({
@@ -230,10 +239,11 @@ function displayButtons(data, callback) {
 
     // Turn off visibility
     if (data.visible)
-      actions1.push({
+      actions2.push({
         "name": "undiscover",
-        "text": "Hide me!",
+        "text": "Remove me!",
         "type": "button",
+        "style": "danger",
         "value": (data.user_type === "team") ? "team" : "member"
       });
 
@@ -256,22 +266,13 @@ function displayButtons(data, callback) {
     "value": "info"
   });
 
-  // Search for match
-  actions2.push({
-    "name": "search",
-    "text": "Begin search",
-    "style": "primary",
-    "type": "button",
-    "value": "search"
-  });
-
   // Remove User
   actions2.push({
-    "name": "remove",
-    "text": "Remove me",
+    "name": "delete",
+    "text": "Delete data",
     "type": "button",
     "style": "danger",
-    "value": "remove",
+    "value": "delete",
     "confirm": {
       "title": "Are you sure?",
       "text": `If you click "Yes", your preferences and information stored will be deleted!`,

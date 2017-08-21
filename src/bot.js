@@ -70,7 +70,8 @@ function parseCommands(msg, callback) {
   // edit skills
   else if (text[0] === "skills") createSkills(msg, callback);
   // remove user
-  else if (text[0] === "remove") removeUser(msg.user_id, msg.response_url, callback);
+  else if (text[0] === "remove") setDiscoverable(msg, false, actions[0].value, callback);
+  else if (text[0] === "reset") resetUser(msg.user_id, msg.response_url, callback);  // TODO
   // search for matches
   else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);
   // add addtional info
@@ -123,7 +124,7 @@ function parseIMsg(msg, callback) {
         else declineTeamRequest(msg.user.name, data, msg.response_url, callback);
       }
       else if (callbackID === "remove") {
-        removeUser(msg.user.id, msg.response_url, callback);
+        setDiscoverable(msg, false, actions[0].value, callback);
       }
       // form new conversation between matched users
       else if (callbackID === "contact") {
@@ -167,8 +168,8 @@ function parseIMsg(msg, callback) {
           });
         }
         // reset user info
-        else if (actions[0].name === "remove") {
-          removeUser(msg.user.id, msg.response_url, callback);
+        else if (actions[0].name === "delete") {
+          resetUser(msg.user.id, msg.response_url, callback);
         }
       }
     } else callback(null);
@@ -376,14 +377,14 @@ function displaySkills(skillArr, callback) {
 }
 
 // reset user info
-function removeUser(userId, responseUrl, callback) {
+function resetUser(userId, responseUrl, callback) {
   callback(null);
 
   db.hasUser(userId, (res, data) => {
     if (res) {
       db.deleteUser(userId, success => {
         if (success) sendMsgToUrl({
-          "text": ":thumbsup: You have successfully been removed from the database!  Type `/teambot start` to begin your search again!  Happy hacking! :robot_face:"
+          "text": ":thumbsup: Your preferences have been reset!  Type `/teambot` to create your new profile!  Happy hacking! :robot_face:"
         }, responseUrl);
         else displayErrorMsg(`Could not reset ${userId}`, msg => sendMsgToUrl({ "text": msg }));
       })
@@ -970,7 +971,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
   } else {
     db.updateVisibility(msg.user.id, false, success => {
       if(success) {
-        callback(`:thumbsup: Other ${category}s will no longer be able to discover you!  Use ` + "`/teambot` to check out your updated profile!");
+        callback(`:thumbsup: Other ${category}s will no longer be able to discover you!  Use ` + "`/teambot` to change your preferences anytime!");
       }
       else {
         return displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
@@ -1140,6 +1141,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
   setTimeout(() => SLACK.api("chat.postMessage", {
     "attachments": JSON.stringify([
       {
+        "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
         "fallback": "The features of this app are not supported by your device",
         "callback_id": "remove",
         "color": format.COLOUR,
