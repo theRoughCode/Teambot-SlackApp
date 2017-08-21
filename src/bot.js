@@ -285,7 +285,10 @@ function createSkills(msg, callback) {
   });
 
   var skills = text.split(',');
-  skills.forEach((elem, index, array) => array[index].trim());  // remove trailing whitespaces
+  skills.forEach((elem, index, array) => {
+    array[index] = elem.trim();
+    console.log(array[index]);
+  });  // remove trailing whitespaces
 
   // Remove duplicates
   var tempObj = {};
@@ -450,7 +453,7 @@ function sendMsgToChannel(userId, channelName, msg) {
 function displaySkillChoice(skills, callback) {
   var helper = function(skills) {
     if(!skills.length) return callback({
-      text: ":thumbsup: Your skill levels are all set!  Use `/teambot` to check out your updated profile!"
+      text: ":thumbsup: Your skill levels are all set!  Use `/teambot skills` to check out your updated skills!"
     });
 
     async.map(skills, (skill, next1) => {
