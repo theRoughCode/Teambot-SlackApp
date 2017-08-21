@@ -68,7 +68,7 @@ function welcome(body, callback) {
 
   db.hasUser(userId, (res, data) => {
     // user exists in db
-    if (res) return display(userId, responseUrl, () => {});
+    if (res && data.user_type) return display(userId, responseUrl, () => {});
     // user does not exist
     else {
       getFirstName(userId, (success, userName) => {
