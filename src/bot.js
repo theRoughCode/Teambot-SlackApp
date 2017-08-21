@@ -181,6 +181,8 @@ function parseEvent(msg, callback) {
     verifyURL(msg.challenge, callback);
   else if (msg.event.type === "member_joined_channel")
     welcomeUserToChannel(msg.event.user, msg.event.channel, msg.event.event_ts, callback);
+  else if (msg.event.type === "member_left_channel")
+    userLeftChannel(msg.event.user, msg.event.channel, callback);
 }
 
 // welcome message
@@ -216,7 +218,7 @@ function welcomeUserToChannel(userId, channel, ts, callback) {
         getFirstName(userId, (success, res) => {
           if (success) {
             db.addWelcomeTimeStamp(userId, ts, () => {});
-            
+
             return sendMsgToChannel(userId, BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/teambot` or `/teambot start` to begin searching for a team or `/teambot help` for a list of commands!");
           }
           else return sendMsgToChannel(userId, BOT_CHANNEL_NAME, res);
