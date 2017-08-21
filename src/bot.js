@@ -812,8 +812,8 @@ function findMatch(userData, callback) {
       }, err => {
         if (err || !matches.length) return callback(noMatchMsg);
         else match.sortMatches(matches, sorted => {
-          return format.formatMatches(matches, type, formatted => callback({
-           "text": `:tada: We found some matches! :tada:\nHere they are, starting with your best match:`,
+          return format.formatMatches(sorted, type, formatted => callback({
+           "text": `:tada: We found some matches! :tada:\nHere are your top 5 matches:`,
            attachments: formatted
          }));
         });
