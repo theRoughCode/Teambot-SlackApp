@@ -804,7 +804,8 @@ function findMatch(userId, userData, callback) {
               "roles": matchData.roles,
               "skills": matchData.skills || null,
               "info": matchData.info || null,
-              "ts": ts
+              "ts": ts,
+              "requested": false
             });
             next();
           });
@@ -812,7 +813,6 @@ function findMatch(userId, userData, callback) {
       }, err => {
         if (err || !matches.length) return callback(noMatchMsg);
         else match.sortMatches(matches, sorted => {
-          console.log(sorted);
           db.updateMatches(userId, sorted, success => {
             if (!success) return format.displayErrorMsg(`Failed to update matches for ${userData.username}`, msg => callback({ "text": msg }));
             else {
@@ -833,26 +833,6 @@ function findMatch(userId, userData, callback) {
     else return callback(noMatchMsg);
   }
 
-  // Display Matches
-  function displayMatches(userId, responseUrl, callback) {
-    callback(null);
-
-    db.getMatches(userId, (success, matches) => {
-      if (!success) return format.displayErrorMsg(`Failed to retrieve matches for ${userId}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
-      else {
-        var text = "matches, starting with your best match:";
-        if (matches.length > match.MAX_MATCHES_DISPLAYED) {
-          matches = matches.slice(0, match.MAX_MATCHES_DISPLAYED);
-          text = `top ${match.MAX_MATCHES_DISPLAYED} matches, starting with your best match:`
-        }
-        return format.formatMatches(matches, type, formatted => callback({
-         "text": `:tada: We found some matches! :tada:\nHere are your ${text}`,
-         attachments: formatted
-       }));
-      }
-    });
-  }
-
   // Perform matchmaking
   if (type === "team") db.getTeams((res, data) => {
     if(!res) {
@@ -867,6 +847,26 @@ function findMatch(userId, userData, callback) {
       return callback(null);
     }
     else handleMatches(data);
+  });
+}
+
+// Display Matches
+function displayMatches(userId, responseUrl, callback) {
+  callback(null);
+
+  db.getMatches(userId, (success, matches) => {
+    if (!success) return format.displayErrorMsg(`Failed to retrieve matches for ${userId}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    else {
+      var text = "matches, starting with your best match:";
+      if (matches.length > match.MAX_MATCHES_DISPLAYED) {
+        matches = matches.slice(0, match.MAX_MATCHES_DISPLAYED);
+        text = `top ${match.MAX_MATCHES_DISPLAYED} matches, starting with your best match:`
+      }
+      return format.formatMatches(matches, type, formatted => callback({
+       "text": `:tada: We found some matches! :tada:\nHere are your ${text}`,
+       attachments: formatted
+     }));
+    }
   });
 }
 

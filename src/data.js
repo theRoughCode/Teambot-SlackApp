@@ -26,7 +26,7 @@ function updateUser(userId, data, callback) {
     visible -- true if user is visible for search
     info -- additional info
     matches -- list of matches
-      [{ "user_id","user_name","rating","roles","skills","info","ts" }]
+      [{ "user_id","user_name","rating","roles","skills","info","ts","requested" }]
   */
   userRef.child(userId).set(data).then(() => {
     callback(true);
