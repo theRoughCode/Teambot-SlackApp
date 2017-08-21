@@ -438,7 +438,7 @@ function sendMsgToChannel(userId, channelName, msg) {
 function displaySkillChoice(skills, callback) {
   var helper = function(skills) {
     if(!skills.length) return callback({
-      text: ":thumbsup: Excellent! Your skill levels are all set!  Use `/teambot` to check out your updated profile!"
+      text: ":thumbsup: Your skill levels are all set!  Use `/teambot` to check out your updated profile!"
     });
 
     async.map(skills, (skill, next1) => {
@@ -911,7 +911,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
   } else {
     db.updateVisibility(msg.user.id, false, success => {
       if(success) {
-        callback(`:thumbsup: Other ${category}s will no longer be able to discover you!`);
+        callback(`:thumbsup: Other ${category}s will no longer be able to discover you!  Use ` + "`/teambot` to check out your updated profile!");
       }
       else {
         return displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);

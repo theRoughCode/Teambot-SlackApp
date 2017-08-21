@@ -67,7 +67,7 @@ function formatMatches(sortedMatches, type, callback) {
     else {
       // None of the matches, add to database
       matches.push({
-        "text": `I would like to keep searching.  Make me discoverable by other ${type}s!`,
+        "text": `I would like to keep searching.  Put me up to be discoverable and allow other ${type}s to match with me!`,
         "fallback": "Required plain-text summary of the attachment.",
         "color": COLOUR,
         "callback_id": "discover",
@@ -84,7 +84,7 @@ function formatMatches(sortedMatches, type, callback) {
 
       // None of the matches, remove user
       matches.push({
-        "text": `I'm not ready to form a team just yet!`,
+        "text": `I'm not ready to form a team just yet.  Don't allow other ${type}s to find and match with me!`,
         "fallback": "Required plain-text summary of the attachment.",
         "color": COLOUR,
         "callback_id": "discover",
