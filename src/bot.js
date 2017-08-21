@@ -702,7 +702,7 @@ function setRoles(msg, role, add, callback) {
     if (role === 'done') { // no more role
       if (!roles || !roles.length) {
         var text = (userData.user_type === 'team') ? "you're willing to fill on a team" : "you want to be filled on your team";
-        return sendMsgToChannel(msg.user.id, msg.channel.id, `Please select a role that ${text}!`);
+        return sendMsgToChannel(msg.user.id, msg.channel.name, `Please select a role that ${text}!`);
       } else {
         sendMsgToUrl({
           text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
