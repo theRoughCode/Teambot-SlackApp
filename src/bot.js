@@ -232,7 +232,7 @@ function welcomeUserToChannel(userId, channel, ts, callback) {
 function userLeftChannel(userId, channel, callback) {
   callback(null);
 
-  //if (channel === BOT_CHANNEL_ID) db.addWelcomeTimeStamp(userId, null, () => {});
+  if (channel === BOT_CHANNEL_ID) db.addWelcomeTimeStamp(userId, null, () => {});
 }
 
 // Lists teams or members
