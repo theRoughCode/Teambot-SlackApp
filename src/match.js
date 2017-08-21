@@ -1,6 +1,6 @@
 const async = require('async');
 
-const MAX_MATCHES_DISPLAYED = 1;
+const MAX_MATCHES_DISPLAYED = 5;
 
 // Gives a score on quality of match
 function rateUser(userData, matchData, callback) {
