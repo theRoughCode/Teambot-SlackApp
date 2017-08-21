@@ -711,7 +711,7 @@ function setRoles(msg, role, add, callback) {
         replace_original: true
       }, responseUrl);
 
-      findMatch(userData, msg => sendMsgToUrl(msg, responseUrl));
+      findMatch(msg.user.id, userData, msg => sendMsgToUrl(msg, responseUrl));
 
     } else {
       if (!roles) roles = [];
@@ -754,7 +754,7 @@ function search(userId, responseUrl, callback) {
   db.getUserInfo(userId, (res, userData) => {
     if (!res) return displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
     else if (!userData.user_type || !userData.roles) return sendMsgToUrl({ "text": "We don't have enough information on you to perform a search!  Use `/teambot start` instead!" }, responseUrl);
-    else findMatch(userData, msg => sendMsgToUrl(msg, responseUrl));
+    else findMatch(userId, userData, msg => sendMsgToUrl(msg, responseUrl));
   });
 }
 
@@ -762,7 +762,7 @@ function search(userId, responseUrl, callback) {
 /*
 [{ "user_id","user_name","rating","roles","skills","ts" }]
 */
-function findMatch(userData, callback) {
+function findMatch(userId, userData, callback) {
   const type = userData.user_type;
   const noMatchMsg = {
     text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
@@ -812,19 +812,44 @@ function findMatch(userData, callback) {
       }, err => {
         if (err || !matches.length) return callback(noMatchMsg);
         else match.sortMatches(matches, sorted => {
-          var text = "matches, starting with your best match:";
-          if (sorted.length > match.MAX_MATCHES_DISPLAYED) {
-            sorted = sorted.slice(0, match.MAX_MATCHES_DISPLAYED);
-            text = `top ${match.MAX_MATCHES_DISPLAYED} matches, starting with your best match:`
-          }
-          return format.formatMatches(sorted, type, formatted => callback({
-           "text": `:tada: We found some matches! :tada:\nHere are your ${text}`,
-           attachments: formatted
-         }));
+          db.updateMatches(userId, sorted, success => {
+            if (!success) return format.displayErrorMsg(`Failed to update matches for ${userData.username}`, msg => callback({ "text": msg }));
+            else {
+              var text = "matches, starting with your best match:";
+              if (sorted.length > match.MAX_MATCHES_DISPLAYED) {
+                sorted = sorted.slice(0, match.MAX_MATCHES_DISPLAYED);
+                text = `top ${match.MAX_MATCHES_DISPLAYED} matches, starting with your best match:`
+              }
+              return format.formatMatches(sorted, type, formatted => callback({
+               "text": `:tada: We found some matches! :tada:\nHere are your ${text}`,
+               attachments: formatted
+             }));
+            }
+          });
         });
       });
     }
     else return callback(noMatchMsg);
+  }
+
+  // Display Matches
+  function displayMatches(userId, responseUrl, callback) {
+    callback(null);
+
+    db.getMatches(userId, (success, matches) => {
+      if (!success) return format.displayErrorMsg(`Failed to retrieve matches for ${userId}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+      else {
+        var text = "matches, starting with your best match:";
+        if (matches.length > match.MAX_MATCHES_DISPLAYED) {
+          matches = matches.slice(0, match.MAX_MATCHES_DISPLAYED);
+          text = `top ${match.MAX_MATCHES_DISPLAYED} matches, starting with your best match:`
+        }
+        return format.formatMatches(matches, type, formatted => callback({
+         "text": `:tada: We found some matches! :tada:\nHere are your ${text}`,
+         attachments: formatted
+       }));
+      }
+    });
   }
 
   // Perform matchmaking
@@ -992,7 +1017,8 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
             "username": BOT_NAME
           }, (err, response) => {
             if (!response.ok) return displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
-            else return sendMsgToUrl({ "text": `Your request has been sent to ${matchName}!  We will send you a message when ${matchName} replies, so be on the lookout for it! :smile:` }, responseUrl);
+            else return displayMatches(userId, responseUrl, () => {});
+            //return sendMsgToUrl({ "text": `Your request has been sent to ${matchName}!  We will send you a message when ${matchName} replies, so be on the lookout for it! :smile:` }, responseUrl);
           });
         });
       });
