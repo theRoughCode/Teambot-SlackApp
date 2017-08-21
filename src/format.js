@@ -1,5 +1,6 @@
 const async = require('async');
 const COLOUR = "#3AA3E3";
+const ERROR_COLOUR = "#ff5959";
 const MAX_SKILL_LVL = 4;
 
 // list commands
@@ -344,6 +345,7 @@ function formatSkills(skillArr, callback) {
 
 module.exports = {
   COLOUR,
+  ERROR_COLOUR,
   MAX_SKILL_LVL,
   helpMsg,
   welcomeNewUser,

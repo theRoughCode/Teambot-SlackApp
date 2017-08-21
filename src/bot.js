@@ -534,7 +534,7 @@ function getDMChannel(userId, callback) {
 }
 
 // Role selection
-function selectRoles(roles, callback) {
+function selectRoles(roles, callback, error = false) {
   async.map(ROLES, (role, next) => {
     if (roles.includes(role.role))
       return next(null, {
@@ -569,13 +569,15 @@ function selectRoles(roles, callback) {
         ]
       });
   }, (err, results) => {
+    var text = (userData.user_type === 'team') ? "you're willing to fill on a team" : "you want to be filled on your team";
+
     results.push(
       // Default Button
       {
-        "text": ":thumbsup: That's all!  Begin the search!",
+        "text": `:thumbsup: That's all!  Begin the search!\n*Please select a role that ${text}!*`,
         "fallback": "The features of this app are not supported by your device",
         "callback_id": "roles",
-        "color": "#3AA3E3",
+        "color": (error) ? format.ERROR_COLOUR : format.COLOUR,
         "attachment_type": "default",
         "actions": [
           {
@@ -702,18 +704,13 @@ function setRoles(msg, role, add, callback) {
     var roles = userData.roles;
 
     // errors is handled by parseRoles(null)
-    if (role === 'done') { // no more role
-      if (!roles || !roles.length) {
-        var text = (userData.user_type === 'team') ? "you're willing to fill on a team" : "you want to be filled on your team";
-        return sendMsgToChannel(msg.user.id, msg.channel.name, `Please select a role that ${text}!`);
-      } else {
-        sendMsgToUrl({
-          text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
-          replace_original: true
-        }, responseUrl);
+    if (role === 'done' && roles && roles.length) { // no more roles
+      sendMsgToUrl({
+        text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
+        replace_original: true
+      }, responseUrl);
 
-        findMatch(userData, msg => sendMsgToUrl(msg, responseUrl));
-      }
+      findMatch(userData, msg => sendMsgToUrl(msg, responseUrl));
 
     } else {
       if (!roles) roles = [];
@@ -739,7 +736,7 @@ function setRoles(msg, role, add, callback) {
             displayErrorMsg(`ERROR: Could not update roles for ${msg.user.name}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
           }
         });
-      });
+      }, (role === "done"));
     }
   });
 }
