@@ -812,6 +812,7 @@ function findMatch(userId, userData, callback) {
       }, err => {
         if (err || !matches.length) return callback(noMatchMsg);
         else match.sortMatches(matches, sorted => {
+          console.log(sorted);
           db.updateMatches(userId, sorted, success => {
             if (!success) return format.displayErrorMsg(`Failed to update matches for ${userData.username}`, msg => callback({ "text": msg }));
             else {
