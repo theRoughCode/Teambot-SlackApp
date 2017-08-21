@@ -13,6 +13,8 @@ const db = admin.database();
 const userRef = db.ref('users');
 const teamRef = db.ref(`teams/${HACKATHON}`);
 const memRef = db.ref(`members/${HACKATHON}`);
+const tempRef = db.ref('tempData');
+const welcomeRef = tempRef.child('welcome_ts');
 
 // Update user
 function updateUser(userId, data, callback) {
@@ -67,9 +69,6 @@ function updateField(userId, field, data, callback) {
   }, error => {
     console.error(error);
     callback(false);
-  }, error => {
-    console.error(error);
-    callback(false);
   });
 }
 
@@ -109,6 +108,19 @@ function updateInfo(userId, info, callback) {
 // Update matches
 function updateMatches(userId, matches, callback) {
   updateField(userId, "matches", matches, callback);
+}
+
+// Add welcome timestamp
+/*
+{ userId: ts }
+*/
+function addWelcomeTimeStamp(userId, ts, callback) {
+  welcomeRef.child(`${userId}`).set(ts).then(() => {
+    callback(true);
+  }, error => {
+    console.error(error);
+    callback(false);
+  });
 }
 
 // Get field
@@ -176,6 +188,14 @@ function getMatches(userId, callback) {
   getField(userId, "matches", callback);
 }
 
+// Get welcome timestamps
+function getWelcomeTimeStamp(userId, callback) {
+  welcomeRef.child(`${userId}`).once('value').then(snapshot => callback(snapshot.val()), error => {
+    console.error(error);
+    callback(null);
+  });
+}
+
 // Returns true if user is in database
 function hasUser(userId, callback) {
   userRef.once('value').then(snapshot => {
@@ -238,6 +258,7 @@ module.exports = {
   updateLastMsg,
   updateInfo,
   updateMatches,
+  addWelcomeTimeStamp,
   getUserInfo,
   getRoles,
   getSkills,
@@ -246,6 +267,7 @@ module.exports = {
   getLastMsg,
   getInfo,
   getMatches,
+  getWelcomeTimeStamp,
   hasUser,
   getTeams,
   getMembers,

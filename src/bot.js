@@ -57,39 +57,6 @@ const ROLES = [
   }
 ];
 
-// welcome message
-function welcome(body, callback) {
-  const userId = body.user_id;
-  const responseUrl = body.response_url;
-  callback(null);
-
-  // delete prev message
-  updateLastMsg(userId, null, null, () => {});
-
-  db.hasUser(userId, (res, data) => {
-    // user exists in db
-    if (res && data.user_type) return display(userId, responseUrl, () => {});
-    // user does not exist
-    else {
-      getFirstName(userId, (success, userName) => {
-        if (success) return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
-        else return format.welcomeNewUser(data.username, msg => sendMsgToUrl(msg, responseUrl));
-      });
-    }
-  });
-}
-
-// welcome user to channel
-function welcomeUserToChannel(userId, channel, callback) {
-  callback(null);
-
-  if (channel === BOT_CHANNEL_ID)
-    getFirstName(userId, (success, res) => {
-      if (success) return sendMsgToChannel(userId, BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/teambot` or `/teambot start` to begin searching for a team or `/teambot help` for a list of commands!");
-      else return sendMsgToChannel(userId, BOT_CHANNEL_NAME, res);
-    });
-}
-
 // parse commands
 function parseCommands(msg, callback) {
   var text = msg.text.toLowerCase().split(" ");
@@ -213,7 +180,57 @@ function parseEvent(msg, callback) {
   if (msg.type === "url_verification")
     verifyURL(msg.challenge, callback);
   else if (msg.event.type === "member_joined_channel")
-    welcomeUserToChannel(msg.event.user, msg.event.channel, callback);
+    welcomeUserToChannel(msg.event.user, msg.event.channel, msg.event.event_ts, callback);
+}
+
+// welcome message
+function welcome(body, callback) {
+  const userId = body.user_id;
+  const responseUrl = body.response_url;
+  callback(null);
+
+  // delete prev message
+  updateLastMsg(userId, null, null, () => {});
+
+  db.hasUser(userId, (res, data) => {
+    // user exists in db
+    if (res && data.user_type) return display(userId, responseUrl, () => {});
+    // user does not exist
+    else {
+      getFirstName(userId, (success, userName) => {
+        if (success) return format.welcomeNewUser(userName, msg => sendMsgToUrl(msg, responseUrl));
+        else return format.welcomeNewUser(data.username, msg => sendMsgToUrl(msg, responseUrl));
+      });
+    }
+  });
+}
+
+// welcome user to channel
+function welcomeUserToChannel(userId, channel, ts, callback) {
+  callback(null);
+
+  if (channel === BOT_CHANNEL_ID) {
+    // ensure no duplicate welcome msgs
+    db.getWelcomeTimeStamp(userId, obj => {
+      if(!obj) {
+        getFirstName(userId, (success, res) => {
+          if (success) {
+            db.addWelcomeTimeStamp(userId, ts, () => {});
+            
+            return sendMsgToChannel(userId, BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/teambot` or `/teambot start` to begin searching for a team or `/teambot help` for a list of commands!");
+          }
+          else return sendMsgToChannel(userId, BOT_CHANNEL_NAME, res);
+        });
+      } else console.error("Welcome msg sent already!");
+    });
+  }
+}
+
+// User left channel
+function userLeftChannel(userId, channel, callback) {
+  callback(null);
+
+  if (channel === BOT_CHANNEL_ID) db.addWelcomeTimeStamp(userId, null, () => {});
 }
 
 // Lists teams or members
