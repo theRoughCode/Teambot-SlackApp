@@ -65,7 +65,6 @@ function formatMatches(sortedMatches, type, callback) {
         "type": "button",
         "value": match.user_id
       }];
-      console.log(obj);
       next(null, obj);
     });
   }, (err, matches) => {
