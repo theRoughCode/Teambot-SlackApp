@@ -802,8 +802,8 @@ function findMatch(userId, userData, callback) {
               "user_name": matchData.username,
               "rating": rating,
               "roles": matchData.roles,
-              "skills": matchData.skills,
-              "info": matchData.info,
+              "skills": matchData.skills || null,
+              "info": matchData.info || null,
               "ts": ts
             });
             next();
