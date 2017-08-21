@@ -1,5 +1,6 @@
 const async = require('async');
 const COLOUR = "#3AA3E3";
+const DISPLAY_COLOUR = "#74c8fc";
 const ERROR_COLOUR = "#ff5959";
 const MAX_SKILL_LVL = 4;
 
@@ -112,7 +113,7 @@ function formatUser(userId, userName, roles, skills, info, callback) {
 
   callback({
     "fallback": "Required plain-text summary of the attachment.",
-    "color": COLOUR,
+    "color": DISPLAY_COLOUR,
     "title": `<@${userId}|${userName}>`,
     "fields": [
       {
@@ -148,7 +149,7 @@ function formatInfo(data, callback) {
     callback([
       {
         "fallback": "Required plain-text summary of the attachment.",
-        "color": COLOUR,
+        "color": DISPLAY_COLOUR,
         "pretext": "Here are your preferences!",
         "mrkdwn_in": ["fields"],
         "fields": [
@@ -345,6 +346,7 @@ function formatSkills(skillArr, callback) {
 
 module.exports = {
   COLOUR,
+  DISPLAY_COLOUR,
   ERROR_COLOUR,
   MAX_SKILL_LVL,
   helpMsg,
