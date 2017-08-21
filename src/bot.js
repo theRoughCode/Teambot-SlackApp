@@ -274,7 +274,7 @@ function display(userId, responseUrl, callback) {
 function createSkills(msg, callback) {
   const responseUrl = msg.response_url;
 
-  var text = msg.text.substring("skills".length);
+  var text = msg.text.substring("skills".length).trim();
 
   // if no text
   if (!text.replace(/\s/g,'').length) return db.getSkills(msg.user_id, (success, skillArr) => {
@@ -290,7 +290,7 @@ function createSkills(msg, callback) {
   var tempObj = {};
   for (var i = 0; i < skills.length; i++) {
     // store index of elements (case-insensitive)
-    const skill = skills[i].toLowerCase();
+    const skill = skills[i].toLowerCase().trim();
     if (!tempObj[skill]) tempObj[skill] = [i];
     else tempObj[skill].push(i);
   }
