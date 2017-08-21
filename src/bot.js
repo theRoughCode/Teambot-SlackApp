@@ -140,20 +140,30 @@ function parseIMsg(msg, callback) {
         // set new skills
         else updateSkillLevels(msg, actions[0].name, actions[0].value, displaySkillChoice);
 
-      } else if (callbackID === 'discover') { // turn on discoverability
+      }
+      // turn on discoverability
+      else if (callbackID === 'discover') {
         if (actions[0].name === "yes") setDiscoverable(msg, true, actions[0].value, callback);
         else callback("All the best team-hunting! :smile:\nUse `/teambot search` to begin your search again!");
-      } else if (callbackID === "request") {  // contact user
+      }
+      // contact user
+      else if (callbackID === "request") {
         notifyMatchedUser(msg.user.id, actions[0].value, actions[0].name, msg.response_url, callback);
-      } else if (callbackID === "respond") {
+      }
+      else if (callbackID === "respond") {
         var data = JSON.parse(actions[0].value);
         if (actions[0].name === "accept") acceptTeamRequest(msg.user.name, data, msg.response_url, callback);
         else declineTeamRequest(msg.user.name, data, msg.response_url, callback);
-      } else if (callbackID === "remove") {
+      }
+      else if (callbackID === "remove") {
         removeUser(msg.user.id, msg.response_url, callback);
-      } else if (callbackID === "contact") {  // form new conversation between matched users
+      }
+      // form new conversation between matched users
+      else if (callbackID === "contact") {
         contactUser(actions[0].value, msg.response_url, callback);
-      } else if (callbackID === 'edit') {  // edit existing data
+      }
+      // edit existing data
+      else if (callbackID === 'edit') {
         // change user type
         if (actions[0].name === 'user_type') {
           editUserType(msg, actions[0].value, callback);
@@ -814,7 +824,7 @@ function findMatch(userId, userData, callback) {
         if (err || !matches.length) return callback(noMatchMsg);
         else match.sortMatches(matches, sorted => {
           db.updateMatches(userId, sorted, success => {
-            if (!success) return format.displayErrorMsg(`Failed to update matches for ${userData.username}`, msg => callback({ "text": msg }));
+            if (!success) return displayErrorMsg(`Failed to update matches for ${userData.username}`, msg => callback({ "text": msg }));
             else {
               var text = "matches, starting with your best match:";
               if (sorted.length > match.MAX_MATCHES_DISPLAYED) {
@@ -853,10 +863,9 @@ function findMatch(userId, userData, callback) {
 // Display Matches
 function displayMatches(userId, type, responseUrl, callback) {
   callback(null);
-  console.log(responseUrl);
 
   db.getMatches(userId, (success, matches) => {
-    if (!success) return format.displayErrorMsg(`Failed to retrieve matches for ${userId}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+    if (!success) return displayErrorMsg(`Failed to retrieve matches for ${userId}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
     else {
       var text = "matches, starting with your best match:";
       if (matches.length > match.MAX_MATCHES_DISPLAYED) {
@@ -966,61 +975,71 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
       db.getUserInfo(userId, (success, info) => {
         if (!success) return displayErrorMsg(`Failed to retrieve info for ${userId}`, msg => sendMsgToUrl(msg, responseUrl));
 
-        format.formatUser(userId, info.username, info.roles, info.skills, info.info, obj => {
-          const attachments = [
-            {
-              "title": `New Match!`,
-              "text": `:tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
-              "fallback": "The features of this app are not supported by your device",
-              "color": format.COLOUR
-            }
-          ];
-          attachments.push(obj);
-          const value = {
-            "userId": userId,
-            "userName": userName,
-            "matchId": matchId,
-            "matchName": matchName,
-            "type": type
-          }
-          attachments.push({
-            "text": (type === "team") ? "Would you to to accept them into your team?" : "Would you like to join their team?",
-            "fallback": "The features of this app are not supported by your device",
-            "callback_id": "respond",
-            "color": format.COLOUR,
-            "attachment_type": "default",
-            "actions": [
-              {
-                "name": "accept",
-                "text": "Yes",
-                "type": "button",
-                "style": "primary",
-                "value": JSON.stringify(value)
-              },
-              {
-                "name": "decline",
-                "text": "No",
-                "type": "button",
-                "style": "danger",
-                "value": JSON.stringify(value),
-                "confirm": {
-                  "title": "Are you sure?",
-                  "ok_text": "Yes",
-                  "dismiss_text": "No"
-                }
-              }
-            ]
-          });
+        var matches = info.matches;
+        // Update requested field to prevent spamming
+        for (var i = 0; i < matches.length; i++) {
+          if (matches[i].user_id === matchId) matches[i].requested = true;
+        }
 
-          // DM matched user
-          SLACK.api("chat.postMessage", {
-            "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
-            "channel": matchId,
-            "username": BOT_NAME
-          }, (err, response) => {
-            if (!response.ok) return displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
-            else return displayMatches(userId, type, responseUrl, () => {});
-            //return sendMsgToUrl({ "text": `Your request has been sent to ${matchName}!  We will send you a message when ${matchName} replies, so be on the lookout for it! :smile:` }, responseUrl);
+        db.updateMatches(userId, matches, success => {
+          if (!success) return displayErrorMsg(`Failed to update matches for ${userId}`);
+
+          format.formatUser(userId, info.username, info.roles, info.skills, info.info, obj => {
+            const attachments = [
+              {
+                "title": `New Match!`,
+                "text": `:tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
+                "fallback": "The features of this app are not supported by your device",
+                "color": format.COLOUR
+              }
+            ];
+            attachments.push(obj);
+            const value = {
+              "userId": userId,
+              "userName": userName,
+              "matchId": matchId,
+              "matchName": matchName,
+              "type": type
+            }
+            attachments.push({
+              "text": (type === "team") ? "Would you to to accept them into your team?" : "Would you like to join their team?",
+              "fallback": "The features of this app are not supported by your device",
+              "callback_id": "respond",
+              "color": format.COLOUR,
+              "attachment_type": "default",
+              "actions": [
+                {
+                  "name": "accept",
+                  "text": "Yes",
+                  "type": "button",
+                  "style": "primary",
+                  "value": JSON.stringify(value)
+                },
+                {
+                  "name": "decline",
+                  "text": "No",
+                  "type": "button",
+                  "style": "danger",
+                  "value": JSON.stringify(value),
+                  "confirm": {
+                    "title": "Are you sure?",
+                    "ok_text": "Yes",
+                    "dismiss_text": "No"
+                  }
+                }
+              ]
+            });
+
+            // DM matched user
+            SLACK.api("chat.postMessage", {
+              "attachments": JSON.stringify(attachments),  // convert to string in order for API to properly parse it
+              "channel": matchId,
+              "username": BOT_NAME
+            }, (err, response) => {
+              if (!response.ok) return displayErrorMsg(`Failed to send message to ${matchName}.\nError: ${response.error}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
+              else return displayMatches(userId, type, responseUrl, () => {});
+              //return sendMsgToUrl({ "text": `Your request has been sent to ${matchName}!  We will send you a message when ${matchName} replies, so be on the lookout for it! :smile:` }, responseUrl);
+            });
           });
         });
       });
