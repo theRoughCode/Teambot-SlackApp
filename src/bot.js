@@ -534,7 +534,7 @@ function getDMChannel(userId, callback) {
 }
 
 // Role selection
-function selectRoles(roles, callback, error = false) {
+function selectRoles(roles, callback, errorText = null) {
   async.map(ROLES, (role, next) => {
     if (roles.includes(role.role))
       return next(null, {
@@ -569,15 +569,15 @@ function selectRoles(roles, callback, error = false) {
         ]
       });
   }, (err, results) => {
-    var text = (userData.user_type === 'team') ? "you're willing to fill on a team" : "you want to be filled on your team";
+    var text = (errorText) ? `\n*${errorText}*` : "";
 
     results.push(
       // Default Button
       {
-        "text": `:thumbsup: That's all!  Begin the search!\n*Please select a role that ${text}!*`,
+        "text": `:thumbsup: That's all!  Begin the search!${text}`,
         "fallback": "The features of this app are not supported by your device",
         "callback_id": "roles",
-        "color": (error) ? format.ERROR_COLOUR : format.COLOUR,
+        "color": (errorText) ? format.ERROR_COLOUR : format.COLOUR,
         "attachment_type": "default",
         "actions": [
           {
@@ -722,6 +722,11 @@ function setRoles(msg, role, add, callback) {
         }
       }
 
+
+      var text = (userData.user_type === 'team') ? "you're willing to fill on a team" : "you want to be filled on your team";
+
+      var errorText = (role === "done") ? `\n*Please select a role that ${errorText}!*` : null;
+
       selectRoles(roles, attachments => {
         db.updateRoles(msg.user.id, roles, success => {
           if (success) {
@@ -736,7 +741,7 @@ function setRoles(msg, role, add, callback) {
             displayErrorMsg(`ERROR: Could not update roles for ${msg.user.name}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
           }
         });
-      }, (role === "done"));
+      }, errorText);
     }
   });
 }
