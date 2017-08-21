@@ -969,7 +969,8 @@ function setDiscoverable(msg, discoverable, category, callback) {
       });
     }
   } else {
-    db.updateVisibility(msg.user.id, false, success => {
+    var userId = msg.user.id || msg.user_id;
+    db.updateVisibility(userId, false, success => {
       if(success) {
         callback(`:thumbsup: Other ${category}s will no longer be able to discover you!  Use ` + "`/teambot` to change your preferences anytime!");
       }
@@ -977,7 +978,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
         return displayErrorMsg(`Could not update visibility of ${msg.user.name}`, callback);
       }
     });
-    db.undiscoverUser(msg.user.id, success => {
+    db.undiscoverUser(userId, success => {
       if (!success) console.error(`ERROR: Failed to remove ${msg.user.name} from ${category} database`);
     });
   }
