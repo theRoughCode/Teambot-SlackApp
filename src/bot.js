@@ -700,12 +700,17 @@ function setRoles(msg, role, add, callback) {
 
     // errors is handled by parseRoles(null)
     if (role === 'done') { // no more role
-      sendMsgToUrl({
-        text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
-        replace_original: true
-      }, responseUrl);
+      if (!roles.length) {
+        var text = (userData.user_type === 'team') ? "you're willing to fill on a team" : "you want to be filled on your team";
+        return sendMsgToChannel(msg.user.id, msg.channel.id, `Please select a role that ${text}!`);
+      } else {
+        sendMsgToUrl({
+          text: "You are looking to fill: " + roles.join(", ") + "\n:mag_right: Commencing search...",
+          replace_original: true
+        }, responseUrl);
 
-      findMatch(userData, msg => sendMsgToUrl(msg, responseUrl));
+        findMatch(userData, msg => sendMsgToUrl(msg, responseUrl));
+      }
 
     } else {
       if (!roles) roles = [];
