@@ -60,6 +60,7 @@ const ROLES = [
 // parse commands
 function parseCommands(msg, callback) {
   var text = msg.text.toLowerCase().split(" ");
+  console.log(msg);
 
   // welcome message or display personal info
   if (!(text[0].replace(" ","").length) || text[0] === "start") welcome(msg, callback);
@@ -71,9 +72,8 @@ function parseCommands(msg, callback) {
   else if (text[0] === "skills") createSkills(msg, callback);
   // remove user
   else if (text[0] === "remove") setDiscoverable(msg, false, null, callback);
-  else if (text[0] === "reset") resetUser(msg.user_id, msg.response_url, callback);  // TODO
   // search for matches
-  else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);
+  else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);  //TODO
   // add addtional info
   else if (text[0] === "info") {
     text = msg.text.substring(text.indexOf("info") + "info".length + 1);
