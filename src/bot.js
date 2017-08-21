@@ -194,6 +194,9 @@ function welcome(body, callback) {
   // delete prev message
   updateLastMsg(userId, null, null, () => {});
 
+  // remove record of welcome msg timestamp from database
+  db.setWelcomeTimeStamp(userId, null, () => {});
+
   db.hasUser(userId, (res, data) => {
     // user exists in db
     if (res && data.user_type) return display(userId, responseUrl, () => {});
@@ -217,7 +220,7 @@ function welcomeUserToChannel(userId, channel, ts, callback) {
       if(!lastTs || lastTs !== ts) {
         getFirstName(userId, (success, res) => {
           if (success) {
-            db.addWelcomeTimeStamp(userId, ts, () => {});
+            db.setWelcomeTimeStamp(userId, ts, () => {});
 
             return sendMsgToChannel(userId, BOT_CHANNEL_NAME, `:wave: Welcome ${res} to #${BOT_CHANNEL_NAME}!\nI'm ${BOT_NAME}, here to help you find a team for ${db.HACKATHON}!\n` + "Type `/teambot` or `/teambot start` to begin searching for a team or `/teambot help` for a list of commands!");
           }
@@ -232,7 +235,7 @@ function welcomeUserToChannel(userId, channel, ts, callback) {
 function userLeftChannel(userId, channel, callback) {
   callback(null);
 
-  if (channel === BOT_CHANNEL_ID) db.addWelcomeTimeStamp(userId, null, () => {});
+  if (channel === BOT_CHANNEL_ID) db.setWelcomeTimeStamp(userId, null, () => {});
 }
 
 // Lists teams or members

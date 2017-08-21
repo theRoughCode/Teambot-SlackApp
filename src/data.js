@@ -111,7 +111,7 @@ function updateMatches(userId, matches, callback) {
 }
 
 // Add welcome timestamp
-function addWelcomeTimeStamp(userId, ts, callback) {
+function setWelcomeTimeStamp(userId, ts, callback) {
   welcomeRef.child(`${userId}`).set(ts).then(() => {
     callback(true);
   }, error => {
@@ -255,7 +255,7 @@ module.exports = {
   updateLastMsg,
   updateInfo,
   updateMatches,
-  addWelcomeTimeStamp,
+  setWelcomeTimeStamp,
   getUserInfo,
   getRoles,
   getSkills,
