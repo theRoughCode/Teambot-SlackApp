@@ -812,9 +812,13 @@ function findMatch(userData, callback) {
       }, err => {
         if (err || !matches.length) return callback(noMatchMsg);
         else match.sortMatches(matches, sorted => {
-          if (sorted.length > match.MAX_MATCHES_DISPLAYED) sorted = sorted.slice(0, match.MAX_MATCHES_DISPLAYED);
+          var text = "matches, starting with your best match:";
+          if (sorted.length > match.MAX_MATCHES_DISPLAYED) {
+            sorted = sorted.slice(0, match.MAX_MATCHES_DISPLAYED);
+            text = `top ${match.MAX_MATCHES_DISPLAYED} matches, starting with your best match:`
+          }
           return format.formatMatches(sorted, type, formatted => callback({
-           "text": `:tada: We found some matches! :tada:\nHere are your top 5 matches:`,
+           "text": `:tada: We found some matches! :tada:\nHere are your ${text}`,
            attachments: formatted
          }));
         });
