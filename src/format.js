@@ -53,6 +53,7 @@ function welcomeNewUser(userName, callback) {
 function formatMatches(sortedMatches, type, callback) {
   async.map(sortedMatches, (match, next) => {
     formatUser(match.user_id, match.user_name, match.roles, match.skills, match.info, obj => {
+      console.log(type);
       var text;
       if (match.requested) text = "Request sent! :white_check_mark:";
       else if (type === "team") text = "Request to join";
