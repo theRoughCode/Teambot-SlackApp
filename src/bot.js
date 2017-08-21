@@ -213,8 +213,8 @@ function welcomeUserToChannel(userId, channel, ts, callback) {
 
   if (channel === BOT_CHANNEL_ID) {
     // ensure no duplicate welcome msgs
-    db.getWelcomeTimeStamp(userId, obj => {
-      if(!obj) {
+    db.getWelcomeTimeStamp(userId, lastTs => {
+      if(!lastTs || lastTs !== ts) {
         getFirstName(userId, (success, res) => {
           if (success) {
             db.addWelcomeTimeStamp(userId, ts, () => {});
@@ -232,7 +232,7 @@ function welcomeUserToChannel(userId, channel, ts, callback) {
 function userLeftChannel(userId, channel, callback) {
   callback(null);
 
-  if (channel === BOT_CHANNEL_ID) db.addWelcomeTimeStamp(userId, null, () => {});
+  //if (channel === BOT_CHANNEL_ID) db.addWelcomeTimeStamp(userId, null, () => {});
 }
 
 // Lists teams or members

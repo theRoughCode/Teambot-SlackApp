@@ -111,9 +111,6 @@ function updateMatches(userId, matches, callback) {
 }
 
 // Add welcome timestamp
-/*
-{ userId: ts }
-*/
 function addWelcomeTimeStamp(userId, ts, callback) {
   welcomeRef.child(`${userId}`).set(ts).then(() => {
     callback(true);
