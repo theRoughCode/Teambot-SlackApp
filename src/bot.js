@@ -587,7 +587,8 @@ function selectRoles(roles, callback, errorText = null) {
             "style": "primary",
             "value": "done"
           }
-        ]
+        ],
+        "mrkdwn_in": ["text"]
       }
     );
     return callback(results);
