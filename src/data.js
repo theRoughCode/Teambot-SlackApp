@@ -7,7 +7,7 @@ admin.initializeApp({
   databaseURL: "https://teambot-68704.firebaseio.com"
 });
 
-const HACKATHON = "Hack the North";
+const HACKATHON = process.env.DB_NAME;
 const auth = admin.auth();
 const db = admin.database();
 const userRef = db.ref('users');
