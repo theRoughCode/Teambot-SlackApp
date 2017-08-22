@@ -669,7 +669,7 @@ function setUserType(msg, type, callback) {
     }
   });
 
-  addUser(userId, userName, { userType: type }, success => {
+  addUser(userId, userName, type, success => {
     if (!success) {
       displayErrorMsg(`Failed to add ${msg.user_name}`, msg => sendMsgToUrl(msg, responseUrl));
     }
@@ -1158,16 +1158,13 @@ function contactUser(matchId, responseUrl, callback) {
 
 /* Interact with data.js */
 
-function addUser(userId, userName, { roles = [], skills = [],
-  userType = null, visible = false } = {}, callback) {
+function addUser(userId, userName, userType, callback) {
   if (userName === undefined) callback(false);
   db.updateUser(userId, {
     "username": userName,
     "hackathon": db.HACKATHON,
-    "roles": roles,
-    "skills": skills,
     "user_type": userType,
-    "visible": visible
+    "visible": false
   }, success => callback(success));
 }
 
