@@ -297,40 +297,56 @@ function formatSkillLvl(skill, actions, callback) {
 
 // format for display of skills
 function formatSkills(skillArr, callback) {
+  var attachments = skillArr.map(skill => {
+
+    var actions = [
+      {
+        "name": skill.skill,
+        "text": "Change level...",
+        "type": "select",
+        "options": [... Array(MAX_SKILL_LVL).keys()].map(lvl => {
+          return {
+            "text": ":star:".repeat(lvl + 1),
+            "value": lvl + 1
+          }
+        })
+      },
+      {
+        "name": skill.skill,
+        "text": "Remove skill",
+        "type": "button",
+        "style": "danger",
+        "value": "-1"
+      }
+    ];
+
+    return {
+      "text": (skill.level) ? `${skill.skill} (Level: ${skill.level})` : `${skill.skill}`,
+      "fallback": "The features of this app are not supported by your device",
+      "callback_id": "skills",
+      "color": COLOUR,
+      "attachment_type": "default",
+      "actions": actions
+    };
+  });
+
+  attachments.push({
+    "fallback": "The features of this app are not supported by your device",
+    "callback_id": "dashboard",
+    "color": DISPLAY_COLOUR,
+    "attachment_type": "default",
+    "actions": [{
+      "name": "dashboard",
+      "text": "Back to dashboard",
+      "type": "button",
+      "style": "primary",
+      "value": "dashboard"
+    }]
+  });
+
   callback({
     text: `Here are your skills (Level: out of ${MAX_SKILL_LVL}):`,
-    attachments: skillArr.map(skill => {
-
-      var actions = [
-        {
-          "name": skill.skill,
-          "text": "Change level...",
-          "type": "select",
-          "options": [... Array(MAX_SKILL_LVL).keys()].map(lvl => {
-            return {
-              "text": ":star:".repeat(lvl + 1),
-              "value": lvl + 1
-            }
-          })
-        },
-        {
-          "name": skill.skill,
-          "text": "Remove skill",
-          "type": "button",
-          "style": "danger",
-          "value": "-1"
-        }
-      ];
-
-      return {
-        "text": (skill.level) ? `${skill.skill} (Level: ${skill.level})` : `${skill.skill}`,
-        "fallback": "The features of this app are not supported by your device",
-        "callback_id": "skills",
-        "color": COLOUR,
-        "attachment_type": "default",
-        "actions": actions
-      };
-    })
+    attachments:
   });
 }
 

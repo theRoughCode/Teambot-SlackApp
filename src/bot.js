@@ -129,6 +129,10 @@ function parseIMsg(msg, callback) {
       else if (callbackID === "contact") {
         contactUser(actions[0].value, msg.response_url, callback);
       }
+      // view dashboard
+      else if (callbackID === "dashboard") {
+        display(msg.user.id, msg.response_url, callback);
+      }
       // edit existing data
       else if (callbackID === 'edit') {
         // set roles
@@ -571,7 +575,7 @@ function selectRoles(roles, callback, errorText = null) {
         "text": `${role.emote} ${role.role}  :white_check_mark:`,
         "fallback": "The features of this app are not supported by your device",
         "callback_id": "roles",
-        "color": format.COLOUR,
+        "color": format.DISPLAY_COLOUR,
         "attachment_type": "default",
         "actions": [
           {
@@ -587,7 +591,7 @@ function selectRoles(roles, callback, errorText = null) {
         "text": `${role.emote} ${role.role}`,
         "fallback": "The features of this app are not supported by your device",
         "callback_id": "roles",
-        "color": format.COLOUR,
+        "color": format.DISPLAY_COLOUR,
         "attachment_type": "default",
         "actions": [
           {
