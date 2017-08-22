@@ -518,7 +518,7 @@ function displaySkillChoice(skills, callback) {
 function convertToUserID(userName, callback){
   // Send either a U123456 UserID or bob UserName and it will return the U123456 value all the time
   SLACK.api("users.list", function(err, response) {
-    if (!response.ok) displayErrorMsg(`Failed to convert username of ${userName} to id: Database error\nError:${response.error}`, msg => callback(false, { text: msg }));
+    if (!response.ok) return displayErrorMsg(`Failed to convert username of ${userName} to id: Database error\nError:${response.error}`, msg => callback(false, { text: msg }));
     for (var i = 0; i < response.members.length; i++) {
       if(response.members[i].id === userName || response.members[i].name === userName){
         return callback(true, response.members[i].id);
