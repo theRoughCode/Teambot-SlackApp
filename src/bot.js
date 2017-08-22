@@ -1159,13 +1159,24 @@ function contactUser(matchId, responseUrl, callback) {
 /* Interact with data.js */
 
 function addUser(userId, userName, userType, callback) {
-  if (userName === undefined) callback(false);
-  db.updateUser(userId, {
-    "username": userName,
-    "hackathon": db.HACKATHON,
-    "user_type": userType,
-    "visible": false
-  }, success => callback(success));
+  if (userName === undefined) return callback(false);
+
+  db.getUserInfo(userId, (success, data) => {
+    if (success) {
+      data["username"] = userName;
+      data["hackathon"] = db.HACKATHON;
+      data["user_type"] = userType;
+      data["visible"] = false;
+      db.updateUser(userId, data, success => callback(success));
+    } else {
+      db.updateUser(userId, {
+        "username": userName,
+        "hackathon": db.HACKATHON,
+        "user_type": userType,
+        "visible": false
+      }, success => callback(success));
+    }
+  });
 }
 
 module.exports = {
