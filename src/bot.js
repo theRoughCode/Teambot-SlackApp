@@ -62,7 +62,7 @@ function parseCommands(msg, callback) {
   var text = msg.text.toLowerCase().split(" ");
 
   // welcome message or display personal info
-  if (!(text[0].replace(" ","").length) || text[0] === "start") welcome(msg, callback);
+  if (!(text[0].replace(" ","").length) || text[0] === "start") welcome(msg.user_id, msg.response_url, callback);
   // list commands
   else if (text[0] === "help" || text[0] === "commands") format.helpMsg(callback);
   // display listed teams or members
@@ -72,7 +72,7 @@ function parseCommands(msg, callback) {
   // remove user
   else if (text[0] === "remove") setDiscoverable(msg, false, null, callback);
   // search for matches
-  else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);  //TODO
+  else if (text[0] === "search") search(msg.user_id, msg.response_url, callback);
   // add addtional info
   else if (text[0] === "info") {
     text = msg.text.substring(text.indexOf("info") + "info".length + 1);
@@ -131,7 +131,7 @@ function parseIMsg(msg, callback) {
       }
       // view dashboard
       else if (callbackID === "dashboard") {
-        display(msg.user.id, msg.response_url, callback);
+        welcome(msg.user.id, msg.response_url, callback);
       }
       // edit existing data
       else if (callbackID === 'edit') {
@@ -186,9 +186,7 @@ function parseEvent(msg, callback) {
 }
 
 // welcome message
-function welcome(body, callback) {
-  const userId = body.user_id;
-  const responseUrl = body.response_url;
+function welcome(userId, responseUrl, callback) {
   callback(null);
 
   // delete prev message
@@ -298,10 +296,10 @@ function createSkills(msg, callback) {
 
   var text = msg.text.substring("skills".length).trim();
 
+  callback(null);
+
   // if no text
   if (!text.replace(/\s/g,'').length) return db.getSkills(msg.user_id, (success, skillArr) => {
-    callback(null);
-
     if (!skillArr) skillArr = [];
     displaySkills(skillArr, msg => sendMsgToUrl(msg, responseUrl));
   });
@@ -327,7 +325,6 @@ function createSkills(msg, callback) {
     }
   }
 
-  callback(null);
   displaySkillChoice(skills, res => {
     sendMsgToUrl(res, responseUrl);
 

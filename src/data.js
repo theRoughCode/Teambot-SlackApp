@@ -191,7 +191,7 @@ function getWelcomeTimeStamp(userId, callback) {
 // Returns true if user is in database
 function hasUser(userId, callback) {
   userRef.once('value').then(snapshot => {
-    if (userId !== undefined && snapshot.val() && snapshot.hasChild(userId))
+    if (userId !== undefined && snapshot.val()) && snapshot.hasChild(userId))
       callback(true, snapshot.val()[userId]);
     else
       callback(false, null);
