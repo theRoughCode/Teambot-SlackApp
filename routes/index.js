@@ -47,7 +47,6 @@ routes.post('/events', function(req, res) {
     "reaction","item_user","event_ts"},
   "type","authed_users":[],"event_id","event_time"}
   */
-  console.log(req.body);
   res.status(200);
   bot.parseEvent(req.body, msg => res.send(msg));
 })
