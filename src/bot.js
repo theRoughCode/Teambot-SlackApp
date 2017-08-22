@@ -696,7 +696,7 @@ function setRoles(msg, role, add, callback) {
         replace_original: true
       }, responseUrl);
 
-      findMatch(msg.user.id, userData, msg => sendMsgToUrl(msg, responseUrl));
+      setTimeout(() => findMatch(msg.user.id, userData, msg => sendMsgToUrl(msg, responseUrl)), 1500);
 
     } else {
       if (!roles) roles = [];
