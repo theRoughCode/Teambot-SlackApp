@@ -161,7 +161,7 @@ function formatInfo(data, callback) {
         "fields": [
             {
                 "title": "Looking For",
-                "value": userType,
+                "value": (userType.toLowerCase() === "team") ? "A team to join" : "Members for my team",
                 "short": true
             },
             {
