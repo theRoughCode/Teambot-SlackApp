@@ -82,11 +82,6 @@ function updateSkills(userId, skills, callback) {
   updateField(userId, "skills", skills, callback);
 }
 
-// Update user type
-function updateType(userId, user_type, callback) {
-  updateField(userId, "user_type", user_type, callback);
-}
-
 // Update visibility
 function updateVisibility(userId, visible, callback) {
   updateField(userId, "visible", visible, callback);
@@ -250,7 +245,6 @@ module.exports = {
   updateMember,
   updateRoles,
   updateSkills,
-  updateType,
   updateVisibility,
   updateLastMsg,
   updateInfo,

@@ -131,12 +131,8 @@ function parseIMsg(msg, callback) {
       }
       // edit existing data
       else if (callbackID === 'edit') {
-        // change user type
-        if (actions[0].name === 'user_type') {
-          editUserType(msg, actions[0].value, callback);
-        }
         // set roles
-        else if (actions[0].name === "roles") {
+        if (actions[0].name === "roles") {
           setRoles(msg, null, true, callback);
         }
         else if (actions[0].name === "skills") {
@@ -675,55 +671,6 @@ function setUserType(msg, type, callback) {
   addUser(userId, userName, { userType: type }, success => {
     if (!success) {
       displayErrorMsg(`Failed to add ${msg.user_name}`, msg => sendMsgToUrl(msg, responseUrl));
-    }
-  });
-}
-
-function editUserType(msg, type, callback) {
-  const responseUrl = msg.response_url;
-  const userName = msg.user.name;
-  const userId = msg.user.id;
-
-  callback(null);
-
-  db.updateType(userId, type, success => {
-    if(success) {
-      var isTeam = (type !== "team");
-      var str = !isTeam ? "a team" : "members";
-      db.updateTeam(userId, success => {
-        if(success) {
-          db.updateMember(userId, success => {
-            if(success) {
-              // prevents roles from writing over this msg
-            //  sendMsgToUrl({ text: `:pencil: You are now looking for ${str}.` }, responseUrl);
-              sendMsgToChannel(userId, msg.channel.name, `:pencil: You are now looking for ${str}.`);
-              setTimeout(() => setRoles(msg, null, true, () => {}), 1500);
-            } else {
-              displayErrorMsg("Failed to update member", msg => {
-                return sendMsgToUrl({
-                  text: msg,
-                  replace_original: true
-                }, responseUrl);
-              });
-            }
-          }, isTeam);
-        } else {
-          displayErrorMsg("Failed to update team", msg => {
-            return sendMsgToUrl({
-              text: msg,
-              replace_original: true
-            }, responseUrl);
-          });
-        }
-      }, !isTeam);
-    }
-    else {
-      displayErrorMsg(`Failed to update user type of ${msg.user_name}`, msg => {
-        return callback({
-          text: msg,
-          replace_original: true
-        });
-      });
     }
   });
 }

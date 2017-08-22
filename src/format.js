@@ -195,23 +195,6 @@ function displayButtons(data, callback) {
   var actions1 = [];
   var actions2 = [];
 
-  var action_userType = {
-    "name": "user_type",
-    "text": "",
-    "type": "button",
-    "value": ""
-  };
-
-  // Switch user type
-  if(data.user_type === "team") {
-    action_userType["text"] = "Find members instead";
-    action_userType["value"] = "member";
-  } else if (data.user_type === "member") {
-    action_userType["text"] = "Find a team instead";
-    action_userType["value"] = "team";
-  }
-  actions1.push(action_userType);
-
   // Search for match
   actions2.push({
     "name": "search",
