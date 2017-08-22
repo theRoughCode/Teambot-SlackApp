@@ -11,7 +11,7 @@ function helpMsg(callback) {
       {
         "title": "List of commands:",
         "text": " - `/teambot` or `/teambot start` to view your team formation dashboard and edit your team profile!\n - `/teambot skills` to update/view your skills\n - `/teambot info` to update your description and let others know more about you and what you want to work on! (*Limit: 200 characters*)\n - `/teambot list (members/teams)` to display the list of discoverable users\n - `/teambot search` to perform a search\n - `/teambot remove` to remove yourself and prevent others from discovering you",
-        "fallback": "The features of this app are not supported by your device",
+        "fallback": "List of commands:",
         "color": COLOUR,
         "attachment_type": "default",
         "mrkdwn_in": ["text"]
@@ -27,7 +27,7 @@ function welcomeNewUser(userName, callback) {
     attachments: [
       {
         "text": "I want to:",
-        "fallback": "The features of this app are not supported by your device",
+        "fallback": "I want to:",
         "callback_id": "user_type",
         "color": COLOUR,
         "attachment_type": "default",
@@ -72,9 +72,11 @@ function formatMatches(sortedMatches, type, callback) {
     if (err) return displayErrorMsg("Could not sort matches", msg => callback({ "text": msg }));
     else {
       // None of the matches, add to database
+      var text1 = `I have no more team requests to send and would like to keep searching.  Put me up to be discoverable and allow other ${type}s to match with me!`;
+
       matches.push({
-        "text": `I have no more team requests to send and would like to keep searching.  Put me up to be discoverable and allow other ${type}s to match with me!`,
-        "fallback": "Required plain-text summary of the attachment.",
+        "text": text1,
+        "fallback": text1,
         "color": COLOUR,
         "callback_id": "discover",
         "actions": [
@@ -89,9 +91,10 @@ function formatMatches(sortedMatches, type, callback) {
       });
 
       // None of the matches, remove user
+      var text2 = `I have no more team requests to send, but I'm done searching for more teams right now.  Don't allow other ${type}s to find and match with me!`;
       matches.push({
-        "text": `I have no more team requests to send, but I'm done searching for more teams right now.  Don't allow other ${type}s to find and match with me!`,
-        "fallback": "Required plain-text summary of the attachment.",
+        "text": text2,
+        "fallback": text2,
         "color": COLOUR,
         "callback_id": "discover",
         "actions": [
@@ -118,7 +121,6 @@ function formatUser(userId, userName, roles, skills, info, callback) {
   const formInfo = info || "N/A";
 
   callback({
-    "fallback": "Required plain-text summary of the attachment.",
     "color": DISPLAY_COLOUR,
     "title": `<@${userId}|${userName}>`,
     "fields": [
@@ -154,7 +156,6 @@ function formatInfo(data, callback) {
   displayButtons(data, buttons => {
     callback([
       {
-        "fallback": "Required plain-text summary of the attachment.",
         "color": DISPLAY_COLOUR,
         "pretext": "Here are your preferences!",
         "mrkdwn_in": ["fields"],
@@ -267,7 +268,7 @@ function displayButtons(data, callback) {
   callback([
     {
       "title": "Edit information:",
-      "fallback": "The features of this app are not supported by your device",
+      "fallback": "Edit information:",
       "callback_id": "edit",
       "color": COLOUR,
       "attachment_type": "default",
@@ -275,7 +276,7 @@ function displayButtons(data, callback) {
     },
     {
       "title": "Other actions:",
-      "fallback": "The features of this app are not supported by your device",
+      "fallback": "Other actions:",
       "callback_id": "edit",
       "color": COLOUR,
       "attachment_type": "default",
@@ -286,7 +287,6 @@ function displayButtons(data, callback) {
 
 function formatSkillLvl(skill, actions, callback) {
   callback({
-    "fallback": "The features of this app are not supported by your device",
     "callback_id": "skillsLvl",
     "color": COLOUR,
     "attachment_type": "default",
@@ -320,9 +320,11 @@ function formatSkills(skillArr, callback) {
       }
     ];
 
+    var text = (skill.level) ? `${skill.skill} (Level: ${skill.level})` : `${skill.skill}`;
+
     return {
-      "text": (skill.level) ? `${skill.skill} (Level: ${skill.level})` : `${skill.skill}`,
-      "fallback": "The features of this app are not supported by your device",
+      "text": text,
+      "fallback": text,
       "callback_id": "skills",
       "color": DISPLAY_COLOUR,
       "attachment_type": "default",
@@ -331,7 +333,6 @@ function formatSkills(skillArr, callback) {
   });
 
   attachments.push({
-    "fallback": "The features of this app are not supported by your device",
     "callback_id": "dashboard",
     "color": COLOUR,
     "attachment_type": "default",

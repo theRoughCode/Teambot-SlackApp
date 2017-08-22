@@ -158,7 +158,7 @@ function parseIMsg(msg, callback) {
               {
                 "title": "Commands to update info:",
                 "text": " - `/teambot info remove` : remove your additional info\n - `/teambot info` : change your additional info (i.e. `/teambot info I Love Hack the North!` )  *Limit: 200 characters*",
-                "fallback": "The features of this app are not supported by your device",
+                "fallback": "Commands to update info:",
                 "color": format.COLOUR,
                 "attachment_type": "default",
                 "mrkdwn_in": ["text"]
@@ -573,7 +573,7 @@ function selectRoles(roles, callback, errorText = null) {
     if (roles.includes(role.role))
       return next(null, {
         "text": `${role.emote} ${role.role}  :white_check_mark:`,
-        "fallback": "The features of this app are not supported by your device",
+        "fallback": `${role.role}`,
         "callback_id": "roles",
         "color": format.DISPLAY_COLOUR,
         "attachment_type": "default",
@@ -589,7 +589,7 @@ function selectRoles(roles, callback, errorText = null) {
     else
       return next(null, {
         "text": `${role.emote} ${role.role}`,
-        "fallback": "The features of this app are not supported by your device",
+        "fallback": `${role.role}`,
         "callback_id": "roles",
         "color": format.DISPLAY_COLOUR,
         "attachment_type": "default",
@@ -609,7 +609,7 @@ function selectRoles(roles, callback, errorText = null) {
       // Default Button
       {
         "text": `:thumbsup: That's all!  Begin the search!${text}`,
-        "fallback": "The features of this app are not supported by your device",
+        "fallback": `That's all!  Begin the search!`,
         "callback_id": "roles",
         "color": (errorText) ? format.ERROR_COLOUR : format.COLOUR,
         "attachment_type": "default",
@@ -753,7 +753,6 @@ function findMatch(userId, userData, callback) {
     text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
     attachments: [
         {
-            "fallback": "The features of this app are not supported by your device",
             "callback_id": "discover",
             "color": format.COLOUR,
             "attachment_type": "default",
@@ -892,7 +891,7 @@ function setDiscoverable(msg, discoverable, category, callback) {
             {
               "title": "Next Steps:",
               "text": "1. `/teambot skills` : List down " + `${text}` + " (e.g. `/teambot skills Node.js, Python, Java`)\n2. `/teambot info` : Personalize your description with additional information, such as _project ideas_, _passions_, and _portfolio links_!  (e.g. `/teambot info I Love Hack the North!` )  *Limit: 200 characters*",
-              "fallback": "The features of this app are not supported by your device",
+              "fallback": "Next Steps:",
               "color": format.COLOUR,
               "attachment_type": "default",
               "mrkdwn_in": ["text"]
@@ -964,7 +963,7 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
               {
                 "title": `New Match!`,
                 "text": `:tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
-                "fallback": "The features of this app are not supported by your device",
+                "fallback": `:tada: You've got a match! :tada:   ${userName} would like to ${text}!\n Here's more about them:`,
                 "color": format.COLOUR
               }
             ];
@@ -976,9 +975,12 @@ function notifyMatchedUser(userId, matchId, type, responseUrl, callback) {
               "matchName": matchName,
               "type": type
             }
+
+            var text = (type === "team") ? "Would you to to accept them into your team?" : "Would you like to join their team?";
+
             attachments.push({
-              "text": (type === "team") ? "Would you to to accept them into your team?" : "Would you like to join their team?",
-              "fallback": "The features of this app are not supported by your device",
+              "text": text,
+              "fallback": text,
               "callback_id": "respond",
               "color": format.COLOUR,
               "attachment_type": "default",
@@ -1060,7 +1062,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
       {
         "title": `Team Request Accepted`,
         "text": `${data.matchName} has accepted your request to join ${text} team :tada:\n Go and send <@${data.matchId}|${matchUserName}> a direct message!`,
-        "fallback": "The features of this app are not supported by your device",
+        "fallback": `${data.matchName} has accepted your request to join ${text} team!`,
         "color": format.COLOUR
     }]),  // convert to string in order for API to properly parse it
     "channel": data.userId,
@@ -1072,7 +1074,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
       "attachments": JSON.stringify([
         {
           "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
-          "fallback": "The features of this app are not supported by your device",
+          "fallback": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
           "callback_id": "remove",
           "color": format.COLOUR,
           "attachment_type": "default",
@@ -1093,7 +1095,7 @@ function acceptTeamRequest(matchUserName, data, responseUrl, callback) {
     "attachments": JSON.stringify([
       {
         "text": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
-        "fallback": "The features of this app are not supported by your device",
+        "fallback": `If you're done forming a team, you can remove yourself from ${BOT_NAME}!`,
         "callback_id": "remove",
         "color": format.COLOUR,
         "attachment_type": "default",
@@ -1123,7 +1125,7 @@ function declineTeamRequest(matchUserName, data, responseUrl, callback) {
       {
         "title": `Team Request Declined`,
         "text": `${data.matchName} has declined your request to join ${text} team.\n  Don't give up! Search for more matches using ` + "`/teambot search`!",
-        "fallback": "The features of this app are not supported by your device",
+        "fallback": `${data.matchName} has declined your request to join ${text} team.`,
         "callback_id": "contact",
         "color": format.COLOUR,
         "attachment_type": "default"
