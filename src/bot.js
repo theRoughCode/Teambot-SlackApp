@@ -753,6 +753,7 @@ function findMatch(userId, userData, callback) {
     text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
     attachments: [
         {
+            "fallback": `Would you like to be discoverable by other ${type}s?`,
             "callback_id": "discover",
             "color": format.COLOUR,
             "attachment_type": "default",

@@ -121,6 +121,7 @@ function formatUser(userId, userName, roles, skills, info, callback) {
   const formInfo = info || "N/A";
 
   callback({
+    "fallback": `${userName}`,
     "color": DISPLAY_COLOUR,
     "title": `<@${userId}|${userName}>`,
     "fields": [
@@ -156,6 +157,7 @@ function formatInfo(data, callback) {
   displayButtons(data, buttons => {
     callback([
       {
+        "fallback": "Here are your preferences!",
         "color": DISPLAY_COLOUR,
         "pretext": "Here are your preferences!",
         "mrkdwn_in": ["fields"],
@@ -287,6 +289,7 @@ function displayButtons(data, callback) {
 
 function formatSkillLvl(skill, actions, callback) {
   callback({
+    "fallback": skill,
     "callback_id": "skillsLvl",
     "color": COLOUR,
     "attachment_type": "default",
@@ -333,6 +336,7 @@ function formatSkills(skillArr, callback) {
   });
 
   attachments.push({
+    "fallback": "Back to dashboard",
     "callback_id": "dashboard",
     "color": COLOUR,
     "attachment_type": "default",
