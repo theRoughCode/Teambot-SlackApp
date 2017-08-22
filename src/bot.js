@@ -1031,7 +1031,7 @@ function addInfo(userId, responseUrl, info, callback) {
 
   db.updateInfo(userId, info, success => {
     if(!success) return displayErrorMsg(`Failed to update additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
-    else return sendMsgToUrl({ "text": ":thumbsup: Your description has been updated!" }, responseUrl);
+    else return sendMsgToUrl({ "text": ":thumbsup: Your description has been updated!  Check out your updated profile with `/teambot` !" }, responseUrl);
   })
 }
 
@@ -1041,7 +1041,7 @@ function removeInfo(userId, responseUrl, callback) {
 
   db.updateInfo(userId, null, success => {
     if(!success) return displayErrorMsg(`Failed to delete additional info for ${userId}.\nInfo: ${info}`, msg => sendMsgToUrl({ "text": msg }, responseUrl));
-    else return sendMsgToUrl({ "text": ":thumbsup: Your description has been removed!" }, responseUrl);
+    else return sendMsgToUrl({ "text": ":thumbsup: Your description has been removed!  Check out your updated profile with `/teambot` !" }, responseUrl);
   });
 }
 
