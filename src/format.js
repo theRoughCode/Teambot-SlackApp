@@ -345,8 +345,8 @@ function formatSkills(skillArr, callback) {
   });
 
   callback({
-    text: `Here are your skills (Level: out of ${MAX_SKILL_LVL}):`,
-    attachments:
+    "text": `Here are your skills (Level: out of ${MAX_SKILL_LVL}):`,
+    "attachments": attachments
   });
 }
 
