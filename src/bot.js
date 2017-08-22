@@ -786,6 +786,7 @@ function search(userId, responseUrl, callback) {
   callback(null);
 
   db.getUserInfo(userId, (res, userData) => {
+    console.log(userData);
     if (!res) return displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
     else if (!userData.user_type || !userData.roles) return sendMsgToUrl({ "text": "We don't have enough information on you to perform a search!  Use `/teambot start` instead!" }, responseUrl);
     else findMatch(userId, userData, msg => sendMsgToUrl(msg, responseUrl));
@@ -798,7 +799,6 @@ function search(userId, responseUrl, callback) {
 */
 function findMatch(userId, userData, callback) {
   const type = userData.user_type;
-  console.log(userData);
   const noMatchMsg = {
     text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
     attachments: [
