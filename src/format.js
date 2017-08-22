@@ -324,7 +324,7 @@ function formatSkills(skillArr, callback) {
       "text": (skill.level) ? `${skill.skill} (Level: ${skill.level})` : `${skill.skill}`,
       "fallback": "The features of this app are not supported by your device",
       "callback_id": "skills",
-      "color": COLOUR,
+      "color": DISPLAY_COLOUR,
       "attachment_type": "default",
       "actions": actions
     };
@@ -333,7 +333,7 @@ function formatSkills(skillArr, callback) {
   attachments.push({
     "fallback": "The features of this app are not supported by your device",
     "callback_id": "dashboard",
-    "color": DISPLAY_COLOUR,
+    "color": COLOUR,
     "attachment_type": "default",
     "actions": [{
       "name": "dashboard",
