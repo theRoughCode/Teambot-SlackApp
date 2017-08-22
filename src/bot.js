@@ -784,6 +784,7 @@ function setRoles(msg, role, add, callback) {
 // Search for matches
 function search(userId, responseUrl, callback) {
   callback(null);
+  console.log(userId);
 
   db.getUserInfo(userId, (res, userData) => {
     if (!res) return displayErrorMsg(`Could not get ${msg.user.name}'s info: Database error`, msg => sendMsgToUrl(msg, responseUrl));
@@ -797,7 +798,6 @@ function search(userId, responseUrl, callback) {
 [{ "user_id","user_name","rating","roles","skills","ts" }]
 */
 function findMatch(userId, userData, callback) {
-  console.log(userId);
   const type = userData.user_type;
   const noMatchMsg = {
     text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
