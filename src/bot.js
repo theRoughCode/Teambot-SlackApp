@@ -60,7 +60,6 @@ const ROLES = [
 // parse commands
 function parseCommands(msg, callback) {
   var text = msg.text.toLowerCase().split(" ");
-  console.log(msg);
 
   // welcome message or display personal info
   if (!(text[0].replace(" ","").length) || text[0] === "start") welcome(msg, callback);
@@ -798,6 +797,7 @@ function search(userId, responseUrl, callback) {
 [{ "user_id","user_name","rating","roles","skills","ts" }]
 */
 function findMatch(userId, userData, callback) {
+  console.log(userId);
   const type = userData.user_type;
   const noMatchMsg = {
     text: `No ${type}s found. :disappointed:\nWould you like to be discoverable by other ${type}s?`,
