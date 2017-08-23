@@ -654,7 +654,7 @@ function setUserType(msg, type, callback) {
     // looking for team
     if(type === "team") {
       callback({
-        text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill?`,
+        text: `Awesome!  Before we begin our search, tell us more about you!\nWhat roles are you looking to fill? _(If on mobile, click "View full message" to see more options!)_`,
         replace_original: true,
         attachments: attachments
       });
