@@ -662,7 +662,7 @@ function setUserType(msg, type, callback) {
     // looking for members
     else {
       callback({
-        text: `Awesome!  Before we begin our search, tell us more about your team!\nWhat roles are you looking for?`,
+        text: `Awesome!  Before we begin our search, tell us more about your team!\nWhat roles are you looking for? _(If on mobile, click "View full message" to see more options!)_`,
         replace_original: true,
         attachments: attachments
       });
@@ -715,7 +715,7 @@ function setRoles(msg, role, add, callback) {
           if (success) {
             var text = (role) ? "Awesome!  Before we begin our search, tell us more about you!\n" : "";
             sendMsgToUrl({
-              "text": `${text}What roles are you looking to fill?`,
+              "text": `${text}What roles are you looking to fill? _(If on mobile, click "View full message" to see more options!)_`,
               "replace_original": true,
               "attachments": attachments
             }, responseUrl);
