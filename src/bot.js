@@ -14,7 +14,7 @@ const BOT_NAME = process.env.BOT_NAME;
 const RAPH_NAME = process.env.RAPH_NAME;
 var BOT_CHANNEL_ID, RAPH_ID;
 
-const RESULTS_PER_PAGE = 5;
+const RESULTS_PER_PAGE = 2;
 
 // get bot channel id (can be null if not found)
 getChannelId(BOT_CHANNEL_NAME, id => {
