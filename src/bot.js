@@ -283,7 +283,7 @@ function list(type, responseUrl, page, callback) {
           "type": "button",
           "value": page - 1
         });
-        if (data.length > page * RESULTS_PER_PAGE) actions.push({
+        if (count > page * RESULTS_PER_PAGE) actions.push({
           "name": type,
           "text": "Next page",
           "type": "button",
@@ -297,7 +297,7 @@ function list(type, responseUrl, page, callback) {
           "attachment_type": "default",
           "actions": actions
         });
-        console.log(actions);
+        console.log(page,);
 
         return sendMsgToUrl({
          "text": `List of ${type}s:`,
