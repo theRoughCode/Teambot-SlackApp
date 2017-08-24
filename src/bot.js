@@ -255,7 +255,7 @@ function list(type, responseUrl, page, callback) {
     var endIndex = page * RESULTS_PER_PAGE;
     var count = 0;
 
-    async.forEachOf(data.slice(startIndex, endIndex), (value, userId, innerCallback) => {
+    async.forEachOf(data, (value, userId, innerCallback) => {
       if (count < startIndex || count >= endIndex) {
         count++;
         return innerCallback();
