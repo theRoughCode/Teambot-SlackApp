@@ -244,6 +244,7 @@ function userLeftChannel(userId, channel, callback) {
 
 // Lists teams or members
 function list(type, responseUrl, page, callback) {
+  page = parseInt(page);
   var output = function (type, res, data) {
     if(!res) return displayErrorMsg(`Could not retrieve list of ${type}s`, msg => callback({ text: msg }));
     else if (!data) return callback(`No ${type}s found. :disappointed:`);
