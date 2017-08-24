@@ -297,6 +297,7 @@ function list(type, responseUrl, page, callback) {
           "attachment_type": "default",
           "actions": actions
         });
+        console.log(actions);
 
         return sendMsgToUrl({
          "text": `List of ${type}s:`,
