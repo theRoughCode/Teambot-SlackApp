@@ -14,6 +14,8 @@ const BOT_NAME = process.env.BOT_NAME;
 const RAPH_NAME = process.env.RAPH_NAME;
 var BOT_CHANNEL_ID, RAPH_ID;
 
+const RESULTS_PER_PAGE = 5;
+
 // get bot channel id (can be null if not found)
 getChannelId(BOT_CHANNEL_NAME, id => {
   BOT_CHANNEL_ID = id;
@@ -66,7 +68,7 @@ function parseCommands(msg, callback) {
   // list commands
   else if (text[0] === "help" || text[0] === "commands") format.helpMsg(callback);
   // display listed teams or members
-  else if (text[0] === "list") list(text[1], msg.response_url, callback);
+  else if (text[0] === "list") list(text[1], msg.response_url, 1, callback);
   // edit skills
   else if (text[0] === "skills") createSkills(msg, callback);
   // remove user
@@ -132,6 +134,10 @@ function parseIMsg(msg, callback) {
       // view dashboard
       else if (callbackID === "dashboard") {
         welcome(msg.user.id, msg.response_url, callback);
+      }
+      // change page for listings
+      else if (callbackID === "page") {
+        list(actions[0].name, msg.response_url, actions[0].value, callback);
       }
       // edit existing data
       else if (callbackID === 'edit') {
@@ -237,7 +243,7 @@ function userLeftChannel(userId, channel, callback) {
 }
 
 // Lists teams or members
-function list(type, responseUrl, callback) {
+function list(type, responseUrl, page, callback) {
   var output = function (type, res, data) {
     if(!res) return displayErrorMsg(`Could not retrieve list of ${type}s`, msg => callback({ text: msg }));
     else if (!data) return callback(`No ${type}s found. :disappointed:`);
@@ -245,7 +251,10 @@ function list(type, responseUrl, callback) {
     const attachments = [];
     callback(null);
 
-    async.forEachOf(data, (value, userId, innerCallback) => {
+    var startIndex = (page - 1) * RESULTS_PER_PAGE;
+    var endIndex = page * RESULTS_PER_PAGE;
+
+    async.forEachOf(data.slice(startIndex, endIndex), (value, userId, innerCallback) => {
       db.getUserInfo(userId, (success, info) => {
         if (success) {
           const userName = info.username;
@@ -261,6 +270,28 @@ function list(type, responseUrl, callback) {
       if (err) {
         return displayErrorMsg(`Could not get list of ${type}s.\n${err.message}`, msg => sendMsgToUrl({ text: msg }, responseUrl));
       } else {
+        var actions = [];
+        if (page > 1) actions.push({
+          "name": type,
+          "text": "Previous page",
+          "type": "button",
+          "value": page - 1
+        });
+        if (data.length > page * RESULTS_PER_PAGE) actions.push({
+          "name": type,
+          "text": "Next page",
+          "type": "button",
+          "value": page + 1
+        });
+        if (actions.length > 0) attachments.push({
+          "title": "More results:",
+          "fallback": "More results:",
+          "callback_id": "page",
+          "color": COLOUR,
+          "attachment_type": "default",
+          "actions": actions
+        });
+
         return sendMsgToUrl({
          "text": `List of ${type}s:`,
          attachments: attachments
