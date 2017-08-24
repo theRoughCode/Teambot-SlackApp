@@ -253,8 +253,14 @@ function list(type, responseUrl, page, callback) {
 
     var startIndex = (page - 1) * RESULTS_PER_PAGE;
     var endIndex = page * RESULTS_PER_PAGE;
+    var count = 0;
 
     async.forEachOf(data.slice(startIndex, endIndex), (value, userId, innerCallback) => {
+      if (count < startIndex || count >= endIndex) {
+        count++;
+        return innerCallback();
+      } else count++;
+
       db.getUserInfo(userId, (success, info) => {
         if (success) {
           const userName = info.username;
