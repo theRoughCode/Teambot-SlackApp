@@ -293,7 +293,7 @@ function list(type, responseUrl, page, callback) {
           "title": "More results:",
           "fallback": "More results:",
           "callback_id": "page",
-          "color": COLOUR,
+          "color": format.COLOUR,
           "attachment_type": "default",
           "actions": actions
         });
