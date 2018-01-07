@@ -5,10 +5,21 @@ email, or any other method with the owners of this repository before making a ch
 
 Please note we have a code of conduct, please follow it in all your interactions with the project.
 
+## Bugs & Issues
+Notice a bug or have a question?  Check out the [issue tracker](https://github.com/theRoughCode/Teambot-SlackApp/issues) to see if someone else has logged it already.  If not, create a [new one](https://github.com/theRoughCode/Teambot-SlackApp/issues/new)!
+
+## Forking The Repo
+To begin development on the repo, you have to first fork it and create a branch with a descriptive name.
+A good branch name would be (where issue #325 is the ticket you're working on):
+
+```sh
+git checkout -b 325-add-japanese-translations
+```
+
 ## Pull Request Process
 
 1. Ensure any install or build dependencies are removed before the end of the layer when doing a 
-   build.
+   build.  (i.e. Add it to `.gitignore`)
 2. Update the README.md with details of changes (i.e. new environment 
    variables, exposed ports, useful file locations, endpoints).
 3. You may merge the Pull Request in once you have the sign-off of the project owner, or if you 
@@ -83,7 +94,8 @@ members of the project's leadership.
 
 ### Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
+The Contributing doc is adapted from [activeadmin](https://github.com/activeadmin/activeadmin/blob/master/CONTRIBUTING.md) and [PurpleBooth](https://gist.github.com/PurpleBooth/b24679402957c63ec426).<br />
+The Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
 available at [http://contributor-covenant.org/version/1/4][version]
 
 [homepage]: http://contributor-covenant.org
