@@ -93,7 +93,6 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 ## Authors
 
 * **Raphael Koh** - *Initial work and Project Owner* - [TheRoughCode](https://github.com/theRoughCode)
-* **Clayton Halim** - *Initial work* - [Clayton-Halim](https://github.com/clayton-halim)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
@@ -103,4 +102,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
+* [Clayton Halim](https://github.com/clayton-halim) for collaborating with me on [Maybot](https://github.com/theRoughCode/maybot) at FraserHacks!
 * The Hack the North team for helping me test the app!
