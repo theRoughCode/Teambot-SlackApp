@@ -5,12 +5,11 @@ const match = require('../src/match');
 const format = require('../src/format');
 const async = require('async');
 
-webhookUri = process.env.WEBHOOK;
 token = process.env.API_TOKEN;
 const SLACK = new Slack(token);
 
 const BOT_CHANNEL_NAME = process.env.BOT_CHANNEL_NAME;
-const BOT_NAME = process.env.BOT_NAME;
+const BOT_NAME = 'Teambot';
 const RAPH_NAME = process.env.RAPH_NAME;
 var BOT_CHANNEL_ID, RAPH_ID;
 
@@ -1217,8 +1216,32 @@ function addUser(userId, userName, userType, callback) {
   });
 }
 
+function getData(callback) {
+  const list = [];
+  db.getAllUsers(users => {
+    async.forEachOf(users, (value, userId, innerCallback) => {
+      if (!value.matches) return innerCallback();
+      else {
+        for (var i = 0; i < value.matches.length; i++) {
+          if(value.matches[i].requested) {
+            console.log(userId);
+            list.push(value.username);
+            return innerCallback();
+          }
+        }
+      }
+      innerCallback();
+    }, err => {
+      console.log(list);
+      if (err) callback(err);
+      else callback(list);
+    });
+  });
+}
+
 module.exports = {
   parseCommands,
   parseIMsg,
-  parseEvent
+  parseEvent,
+  getData
 }

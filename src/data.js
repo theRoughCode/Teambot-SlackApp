@@ -237,6 +237,15 @@ function undiscoverUser(userId, callback) {
   });;
 }
 
+// Get all users
+function getAllUsers(callback) {
+  userRef.once('value').then(snapshot =>
+    callback(snapshot.val()), error => {
+      console.error(error);
+      callback(null);
+  });
+}
+
 
 module.exports = {
   HACKATHON,
@@ -250,6 +259,7 @@ module.exports = {
   updateInfo,
   updateMatches,
   setWelcomeTimeStamp,
+  getAllUsers,
   getUserInfo,
   getRoles,
   getSkills,

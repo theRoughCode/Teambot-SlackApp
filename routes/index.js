@@ -51,5 +51,10 @@ routes.post('/events', function(req, res) {
   bot.parseEvent(req.body, msg => res.send(msg));
 })
 
+// Get all users
+routes.get('/users', function(req, res) {
+  bot.getData(data => res.send(data));
+})
+
 
 module.exports = routes;
