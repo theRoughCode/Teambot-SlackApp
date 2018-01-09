@@ -47,7 +47,7 @@ DB_NAME="Hack the North"
 
 ### Local Deployment
 For local deployment, download [ngrok](https://ngrok.com/).
-1. `npm start` or `nodemon` (more info on nodemon [here](https://nodemon.io/))
+1. In terminal, run `npm start` or `nodemon` (more info on nodemon [here](https://nodemon.io/)) from the project root directory.
 2. `./ngrok http 8000` where `8000` is the port name you defined within your `.env` file.
 3. Open `http://localhost:4040` in your browser.  This keeps track of the http requests made to your local server and the responses.
 4. Copy the webhook given to you by ngrok.
