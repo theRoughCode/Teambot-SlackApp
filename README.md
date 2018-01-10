@@ -22,18 +22,20 @@ A step by step series of examples that tell you have to get a development env ru
 npm install
 ```
 
-3. Create a firebase project and generate your service account credentials.  
+3. Create a Firebase project and generate your service account credentials.  
 (More info [here](https://firebase.google.com/docs/admin/setup))
 4. Download your service account credentials.
-5. Create a new Slack app [here](https://api.slack.com/apps).
-6. Create a `.env` file in the main directory of the project and include the following key-value pairs:<br />
+5. Go to your [Firebase project](https://console.firebase.google.com/u/0/) -> Database, copy the URL of your firebase database. (Should be of the form https://{project_id}.firebaseio.com/)
+6. Create a new Slack app [here](https://api.slack.com/apps).
+7. Create a `.env` file in the main directory of the project and include the following key-value pairs:<br />
   i. `PORT` - define the port used for the local server<br />
   ii. `API_TOKEN` - token used to connect to your hackathon's Slack.
   Create a token [here](https://api.slack.com/custom-integrations/legacy-tokens)<br />
   iii. `FIREBASE` - copy and paste the JSON within the Firebase service account credentials you downloaded in step 4.<br />
   iv. `BOT_CHANNEL_NAME` - name of channel within your Slack.<br />
   v. `RAPH_NAME` - Slack username of bot rep.  Any errors will be sent to this user.<br />
-  vi. `DB_NAME` - name of hackathon
+  vi. `DB_NAME` - name of hackathon<br />
+  vii. `DB_URL` - Firebase database URL
 ```
 PORT=8000
 API_TOKEN=enter_token_here
@@ -51,13 +53,14 @@ For local deployment, download [ngrok](https://ngrok.com/).
 2. `./ngrok http 8000` where `8000` is the port name you defined within your `.env` file.
 3. Open `http://localhost:4040` in your browser.  This keeps track of the http requests made to your local server and the responses.
 4. Copy the webhook given to you by ngrok.
-5. In your Slack app dashboard, go to _Features_ -> _Interactive Components_, and input `http://{webhook}.ngrok.io/interact` under _Request URL_.
-6. _Features_ -> _Slash Commands_ -> _Create New Command_, and enter the following:
+5. In your Slack app dashboard, go to _Settings_ -> _Install App_, and install the app into your Slack.
+6. Go to _Features_ -> _Interactive Components_, and input `http://{webhook}.ngrok.io/interact` under _Request URL_.
+7. _Features_ -> _Slash Commands_ -> _Create New Command_, and enter the following:
     1. Command: `/teambot`
     2. Request URL: `http://{webhook}.ngrok.io/slash`
     3. Short Description: `Manage team formation`
     4. Usage Hint: `[start, help, list]`
-7. _Features_ -> _OAuth & Permissions_ -> _Scopes_, add the following scopes:
+8. _Features_ -> _OAuth & Permissions_ -> _Scopes_, add the following scopes:
     - commands
     - incoming-webhook
     - channels:read
@@ -68,10 +71,10 @@ For local deployment, download [ngrok](https://ngrok.com/).
     - im:read
     - im:write
     - users.profile:read
-8. _Features_ -> _Event Subscriptions_, turn *Enable Events* on.
-9. Input the _Request URL_ as `http://2c20523c.ngrok.io/events`.
-10. Subscribe to the `member_joined_channel` and `member_left_channel` events.
-11. Type `/teambot` in the bot channel to begin the conversation!
+9. _Features_ -> _Event Subscriptions_, turn *Enable Events* on.
+10. Input the _Request URL_ as `http://2c20523c.ngrok.io/events`.
+11. Subscribe to the `member_joined_channel` and `member_left_channel` events.
+12. Type `/teambot` in the bot channel to begin the conversation!
 
 ### Live Deployment
 1. Host it using a web hosting service like [Heroku](heroku.com)
