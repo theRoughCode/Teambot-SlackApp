@@ -4,7 +4,7 @@ const serviceAccount = JSON.parse(process.env.FIREBASE);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://teambot-68704.firebaseio.com"
+  databaseURL: process.env.DB_URL
 });
 
 const HACKATHON = process.env.DB_NAME;
